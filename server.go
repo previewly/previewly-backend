@@ -1,9 +1,9 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"wsw/backend/graph"
+	"wsw/backend/lib/utils"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/go-chi/chi/v5"
@@ -17,8 +17,7 @@ func main() {
 	router.Use(middleware.RealIP)
 
 	router.Post("/graphql", graphqlHandler())
-
-	log.Fatal(http.ListenAndServe(":8000", router))
+	utils.F(http.ListenAndServe(":8000", router))
 }
 
 func graphqlHandler() http.HandlerFunc {

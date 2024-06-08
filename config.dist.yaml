@@ -1,0 +1,11 @@
+app:
+  cors:
+    debug: true
+    allowedOrigin: "http://localhost:4200"
+
+postgres:
+  host: "localhost"
+  port: 5432
+  db: "timeline"
+  user: "timeline"
+  password: "timeline"

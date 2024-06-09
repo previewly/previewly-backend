@@ -1,0 +1,8 @@
+services:
+  gowitness:
+    image: ghcr.io/sensepost/gowitness:latest
+    command: gowitness server --address 0.0.0.0:7171 --db-location=postgres://wsw:12345@host.docker.internal/wsw --debug-db
+    volumes:
+      - ./infra/gowitness/data/:/data/
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

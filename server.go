@@ -10,18 +10,31 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/rs/cors"
 	yaml "gopkg.in/yaml.v2"
 )
 
 func main() {
 	config := readConfig()
 
-	router := chi.NewRouter()
-	router.Use(middleware.Logger)
-	router.Use(middleware.Recoverer)
-	router.Use(middleware.RealIP)
+	corsMiddleware := cors.
+		New(cors.Options{
+			AllowedOrigins:     []string{"*"},
+			AllowCredentials:   true,
+			AllowedMethods:     []string{"GET", "POST", "OPTIONS"},
+			AllowedHeaders:     []string{"Content-Type", "Bearer", "Bearer ", "content-type", "Origin", "Accept", "Authorization"},
+			OptionsPassthrough: true,
+			Debug:              true,
+		}).
+		Handler
 
-	router.Post("/graphql", graphqlHandler())
+	gqlHandler := graphqlHandler()
+
+	router := chi.NewRouter()
+	router.Use(middleware.Logger, middleware.Recoverer, middleware.RealIP, corsMiddleware)
+
+	router.Options("/graphql", gqlHandler)
+	router.Post("/graphql", gqlHandler)
 
 	app.Start(router, config)
 }

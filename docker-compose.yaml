@@ -1,8 +1,17 @@
 services:
+  db:
+    image: postgres:16.3
+    restart: always
+    environment:
+      POSTGRES_USER: wsw
+      POSTGRES_PASSWORD: wsw12345
+      POSTGRES_DB: wsw
+    ports:
+      - 5433:5432
   gowitness:
     image: ghcr.io/sensepost/gowitness:latest
-    command: gowitness server --address 0.0.0.0:7171 --db-location=postgres://wsw:12345@host.docker.internal/wsw --debug-db
+    command: gowitness server --address 0.0.0.0:7171 --db-location=postgres://wsw:wsw12345@db/wsw --debug-db
+    depends_on:
+      - db
     volumes:
       - ./infra/gowitness/data/:/data/
-    extra_hosts:
-      - "host.docker.internal:host-gateway"

@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: wsw12345
       POSTGRES_DB: wsw
     ports:
-      - 5433:5432
+      - 5434:5432
   gowitness:
     image: ghcr.io/sensepost/gowitness:latest
     command: gowitness server --address 0.0.0.0:7171 --db-location=postgres://wsw:wsw12345@db/wsw --debug-db

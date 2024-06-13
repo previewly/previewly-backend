@@ -10,6 +10,6 @@ func D(vs ...any) {
 	dump.P(vs)
 }
 
-func F(vs ...any) {
-	log.Fatal(vs...)
+func F(format string, vs ...any) {
+	log.Fatalf(format, vs...)
 }

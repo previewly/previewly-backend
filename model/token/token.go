@@ -1,19 +1,21 @@
 package token
 
-import "wsw/backend/lib/utils"
+import (
+	"wsw/backend/domain/token/generator"
+)
 
 type (
 	Token     interface{ CreateToken() (string, error) }
-	tokenImpl struct{}
+	tokenImpl struct {
+		generator generator.TokenGenerator
+	}
 )
 
 // CreateToken implements Token.
 func (t tokenImpl) CreateToken() (string, error) {
-	// todo
-	utils.InitRandom()
-	return utils.RandomToken(), nil
+	return t.generator.Generate(), nil
 }
 
-func NewModel() Token {
-	return tokenImpl{}
+func NewModel(generator generator.TokenGenerator) Token {
+	return tokenImpl{generator: generator}
 }

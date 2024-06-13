@@ -8,5 +8,5 @@ import (
 )
 
 func Start(router chi.Router, config Config) {
-	utils.F(http.ListenAndServe(":8000", router))
+	utils.F("Error: %v", http.ListenAndServe(":8000", router))
 }

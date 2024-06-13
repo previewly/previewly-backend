@@ -9,12 +9,19 @@ import (
 	"fmt"
 	"wsw/backend/graph/model"
 	"wsw/backend/lib/utils"
+	"wsw/backend/model/token"
+
+	"github.com/golobby/container/v3"
 )
 
 // CreateToken is the resolver for the createToken field.
 func (r *mutationResolver) CreateToken(ctx context.Context) (string, error) {
-	utils.InitRandom()
-	return utils.RandomToken(), nil
+	var model token.Token
+	err := container.Resolve(&model)
+	if err != nil {
+		utils.F("Couldnt resolve model Token", err)
+	}
+	return model.CreateToken()
 }
 
 // Todos is the resolver for the todos field.
@@ -28,5 +35,7 @@ func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
-type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }
+type (
+	mutationResolver struct{ *Resolver }
+	queryResolver    struct{ *Resolver }
+)

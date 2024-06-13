@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"wsw/backend/domain/token/generator"
 	"wsw/backend/ent"
 	"wsw/backend/ent/repository"
 	"wsw/backend/lib/utils"
@@ -16,8 +17,9 @@ func initDi(config Config, appContext context.Context) {
 	initService(func(config Config) (*ent.Client, error) { return newDBClient(config.Postgres, appContext) })
 	initService(func() App { return appImpl{router: newRouter()} })
 
+	initService(func() generator.TokenGenerator { return generator.NewTokenGenerator() })
 	initService(func() repository.Token { return repository.NewToken() })
-	initService(func() token.Token { return token.NewModel() })
+	initService(func(generator generator.TokenGenerator) token.Token { return token.NewModel(generator) })
 }
 
 func initService(resolver interface{}) {

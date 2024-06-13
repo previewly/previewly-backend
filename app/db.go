@@ -4,6 +4,8 @@ import (
 	"context"
 	"strings"
 	"wsw/backend/ent"
+
+	_ "github.com/lib/pq"
 )
 
 func newDBClient(config Postgres, appContext context.Context) (*ent.Client, error) {

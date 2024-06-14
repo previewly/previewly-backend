@@ -3,7 +3,7 @@
 # https://gqlgen.com/getting-started/
 
 type PreviewData {
-  status: String!
+  status: Status!
 }
 
 type Query {
@@ -12,4 +12,10 @@ type Query {
 
 type Mutation {
   createToken: String!
+}
+
+enum Status {
+  success
+  error
+  pending
 }

@@ -2,6 +2,55 @@
 
 package model
 
+import (
+	"fmt"
+	"io"
+	"strconv"
+)
+
 type PreviewData struct {
-	Status string `json:"status"`
+	Status Status `json:"status"`
+}
+
+type Status string
+
+const (
+	StatusSuccess Status = "success"
+	StatusError   Status = "error"
+	StatusPending Status = "pending"
+)
+
+var AllStatus = []Status{
+	StatusSuccess,
+	StatusError,
+	StatusPending,
+}
+
+func (e Status) IsValid() bool {
+	switch e {
+	case StatusSuccess, StatusError, StatusPending:
+		return true
+	}
+	return false
+}
+
+func (e Status) String() string {
+	return string(e)
+}
+
+func (e *Status) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = Status(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid Status", str)
+	}
+	return nil
+}
+
+func (e Status) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

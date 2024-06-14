@@ -2,20 +2,12 @@
 #
 # https://gqlgen.com/getting-started/
 
-type Todo {
-  id: ID!
-  text: String!
-  done: Boolean!
-  user: User!
-}
-
-type User {
-  id: ID!
-  name: String!
+type PreviewData {
+  status: String!
 }
 
 type Query {
-  todos: [Todo!]!
+  getPreviewData(token: String!): PreviewData
 }
 
 type Mutation {

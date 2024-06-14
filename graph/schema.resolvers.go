@@ -29,9 +29,9 @@ func (r *mutationResolver) CreateToken(ctx context.Context) (string, error) {
 	return *token, nil
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
+// GetPreviewData is the resolver for the getPreviewData field.
+func (r *queryResolver) GetPreviewData(ctx context.Context, token string) (*model.PreviewData, error) {
+	panic(fmt.Errorf("not implemented: GetPreviewData - getPreviewData"))
 }
 
 // Mutation returns MutationResolver implementation.

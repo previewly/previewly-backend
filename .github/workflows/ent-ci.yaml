@@ -6,7 +6,7 @@ on:
       - main
   pull_request:
     paths:
-      - "ent/*"
+      - "ent/**/*"
 jobs:
   ent:
     runs-on: ubuntu-latest

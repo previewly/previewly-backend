@@ -24,5 +24,5 @@ func (t *tokenImpl) InsertToken(token string) (*ent.Token, error) {
 }
 
 func NewToken(client *ent.Client, ctx context.Context) Token {
-	return &tokenImpl{client: client}
+	return &tokenImpl{client: client, ctx: ctx}
 }

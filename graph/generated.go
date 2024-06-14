@@ -56,7 +56,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetPreviewData func(childComplexity int, token string) int
+		GetPreviewData func(childComplexity int, token string, url string) int
 	}
 }
 
@@ -64,7 +64,7 @@ type MutationResolver interface {
 	CreateToken(ctx context.Context) (string, error)
 }
 type QueryResolver interface {
-	GetPreviewData(ctx context.Context, token string) (*model.PreviewData, error)
+	GetPreviewData(ctx context.Context, token string, url string) (*model.PreviewData, error)
 }
 
 type executableSchema struct {
@@ -110,7 +110,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetPreviewData(childComplexity, args["token"].(string)), true
+		return e.complexity.Query.GetPreviewData(childComplexity, args["token"].(string), args["url"].(string)), true
 
 	}
 	return 0, false
@@ -262,6 +262,15 @@ func (ec *executionContext) field_Query_getPreviewData_args(ctx context.Context,
 		}
 	}
 	args["token"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["url"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["url"] = arg1
 	return args, nil
 }
 
@@ -405,7 +414,7 @@ func (ec *executionContext) _Query_getPreviewData(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetPreviewData(rctx, fc.Args["token"].(string))
+		return ec.resolvers.Query().GetPreviewData(rctx, fc.Args["token"].(string), fc.Args["url"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

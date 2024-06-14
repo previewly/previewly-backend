@@ -7,7 +7,7 @@ type PreviewData {
 }
 
 type Query {
-  getPreviewData(token: String!): PreviewData
+  getPreviewData(token: String!, url: String!): PreviewData
 }
 
 type Mutation {

@@ -3,23 +3,36 @@ package token
 import (
 	"wsw/backend/domain/token/generator"
 	"wsw/backend/ent/repository"
+	"wsw/backend/lib/utils"
 )
 
 type (
 	Token interface {
 		CreateToken() (*string, error)
+		GetPreviewData(string) (*PreviewData, error)
 	}
-	tokenImpl struct {
+	PreviewData struct{}
+	tokenImpl   struct {
 		generator  generator.TokenGenerator
 		repository repository.Token
 	}
 )
 
+// GetPreviewData implements Token.
+func (t tokenImpl) GetPreviewData(token string) (*PreviewData, error) {
+	tokenEntity, err := t.repository.Find(token)
+	if err != nil {
+		return nil, err
+	}
+	utils.D(tokenEntity)
+	panic("unimplemented")
+}
+
 // CreateToken implements Token.
 func (t tokenImpl) CreateToken() (*string, error) {
-	token, error := t.repository.InsertToken(t.generator.Generate())
-	if error != nil {
-		return nil, error
+	token, err := t.repository.InsertToken(t.generator.Generate())
+	if err != nil {
+		return nil, err
 	}
 	return &token.Value, nil
 }

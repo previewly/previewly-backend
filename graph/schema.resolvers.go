@@ -19,7 +19,7 @@ func (r *mutationResolver) CreateToken(ctx context.Context) (string, error) {
 	var model token.Token
 	err := container.Resolve(&model)
 	if err != nil {
-		utils.F("Couldnt resolve model Token", err)
+		utils.F("Couldnt resolve model Token: %v", err)
 	}
 	return model.CreateToken()
 }

@@ -6,17 +6,17 @@ package graph
 
 import (
 	"context"
-	"fmt"
+	"wsw/backend/graph/convertor"
 	"wsw/backend/graph/model"
 	"wsw/backend/lib/utils"
-	"wsw/backend/model/token"
+	tokenModel "wsw/backend/model/token"
 
 	container "github.com/golobby/container/v3"
 )
 
 // CreateToken is the resolver for the createToken field.
 func (r *mutationResolver) CreateToken(ctx context.Context) (string, error) {
-	var model token.Token
+	var model tokenModel.Token
 	err := container.Resolve(&model)
 	if err != nil {
 		utils.F("Couldnt resolve model Token: %v", err)
@@ -30,8 +30,18 @@ func (r *mutationResolver) CreateToken(ctx context.Context) (string, error) {
 }
 
 // GetPreviewData is the resolver for the getPreviewData field.
-func (r *queryResolver) GetPreviewData(ctx context.Context, token string) (*model.PreviewData, error) {
-	panic(fmt.Errorf("not implemented: GetPreviewData - getPreviewData"))
+func (r *queryResolver) GetPreviewData(ctx context.Context, token string, url string) (*model.PreviewData, error) {
+	var model tokenModel.Token
+	err := container.Resolve(&model)
+	if err != nil {
+		return nil, err
+	}
+
+	previewData, err := model.GetPreviewData(token)
+	if err != nil {
+		return nil, err
+	}
+	return convertor.ConvertPreviewData(previewData), nil
 }
 
 // Mutation returns MutationResolver implementation.

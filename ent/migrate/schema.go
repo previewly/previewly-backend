@@ -11,7 +11,7 @@ var (
 	// TokensColumns holds the columns for the "tokens" table.
 	TokensColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "value", Type: field.TypeString},
+		{Name: "value", Type: field.TypeString, Unique: true},
 	}
 	// TokensTable holds the schema information for the "tokens" table.
 	TokensTable = &schema.Table{

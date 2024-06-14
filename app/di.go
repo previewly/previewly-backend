@@ -13,8 +13,7 @@ import (
 
 func initDi(config Config, appContext context.Context) {
 	initService(func() context.Context { return appContext })
-	initService(func() Config { return config })
-	initService(func(config Config) (*ent.Client, error) { return newDBClient(config.Postgres, appContext) })
+	initService(func() (*ent.Client, error) { return newDBClient(config.Postgres, appContext) })
 	initService(func() App { return appImpl{router: newRouter()} })
 
 	initService(func() generator.TokenGenerator { return generator.NewTokenGenerator() })

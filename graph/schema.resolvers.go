@@ -20,8 +20,13 @@ func (r *mutationResolver) CreateToken(ctx context.Context) (string, error) {
 	err := container.Resolve(&model)
 	if err != nil {
 		utils.F("Couldnt resolve model Token: %v", err)
+		return "", err
 	}
-	return model.CreateToken()
+	token, err := model.CreateToken()
+	if err != nil {
+		return "", err
+	}
+	return *token, nil
 }
 
 // Todos is the resolver for the todos field.

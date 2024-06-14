@@ -13,7 +13,8 @@ type Token struct {
 // Fields of the Token.
 func (Token) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("value"),
+		field.String("value").
+			Unique(),
 	}
 }
 

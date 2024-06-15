@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"sync"
 	"wsw/backend/ent/token"
+	"wsw/backend/ent/url"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -74,6 +75,7 @@ func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			token.Table: token.ValidColumn,
+			url.Table:   url.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

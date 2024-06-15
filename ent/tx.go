@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// Token is the client for interacting with the Token builders.
 	Token *TokenClient
+	// Url is the client for interacting with the Url builders.
+	Url *URLClient
 
 	// lazily loaded.
 	client     *Client
@@ -146,6 +148,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Token = NewTokenClient(tx.config)
+	tx.Url = NewURLClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

@@ -12,6 +12,7 @@ import (
 	"wsw/backend/ent/migrate"
 
 	"wsw/backend/ent/token"
+	"wsw/backend/ent/url"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -25,6 +26,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// Token is the client for interacting with the Token builders.
 	Token *TokenClient
+	// Url is the client for interacting with the Url builders.
+	Url *URLClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -37,6 +40,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Token = NewTokenClient(c.config)
+	c.Url = NewURLClient(c.config)
 }
 
 type (
@@ -130,6 +134,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:    ctx,
 		config: cfg,
 		Token:  NewTokenClient(cfg),
+		Url:    NewURLClient(cfg),
 	}, nil
 }
 
@@ -150,6 +155,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:    ctx,
 		config: cfg,
 		Token:  NewTokenClient(cfg),
+		Url:    NewURLClient(cfg),
 	}, nil
 }
 
@@ -179,12 +185,14 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Token.Use(hooks...)
+	c.Url.Use(hooks...)
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Token.Intercept(interceptors...)
+	c.Url.Intercept(interceptors...)
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -192,6 +200,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *TokenMutation:
 		return c.Token.mutate(ctx, m)
+	case *URLMutation:
+		return c.Url.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -330,12 +340,145 @@ func (c *TokenClient) mutate(ctx context.Context, m *TokenMutation) (Value, erro
 	}
 }
 
+// URLClient is a client for the Url schema.
+type URLClient struct {
+	config
+}
+
+// NewURLClient returns a client for the Url from the given config.
+func NewURLClient(c config) *URLClient {
+	return &URLClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `url.Hooks(f(g(h())))`.
+func (c *URLClient) Use(hooks ...Hook) {
+	c.hooks.Url = append(c.hooks.Url, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `url.Intercept(f(g(h())))`.
+func (c *URLClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Url = append(c.inters.Url, interceptors...)
+}
+
+// Create returns a builder for creating a Url entity.
+func (c *URLClient) Create() *URLCreate {
+	mutation := newURLMutation(c.config, OpCreate)
+	return &URLCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Url entities.
+func (c *URLClient) CreateBulk(builders ...*URLCreate) *URLCreateBulk {
+	return &URLCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *URLClient) MapCreateBulk(slice any, setFunc func(*URLCreate, int)) *URLCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &URLCreateBulk{err: fmt.Errorf("calling to URLClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*URLCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &URLCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Url.
+func (c *URLClient) Update() *URLUpdate {
+	mutation := newURLMutation(c.config, OpUpdate)
+	return &URLUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *URLClient) UpdateOne(u *Url) *URLUpdateOne {
+	mutation := newURLMutation(c.config, OpUpdateOne, withUrl(u))
+	return &URLUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *URLClient) UpdateOneID(id int) *URLUpdateOne {
+	mutation := newURLMutation(c.config, OpUpdateOne, withUrlID(id))
+	return &URLUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Url.
+func (c *URLClient) Delete() *URLDelete {
+	mutation := newURLMutation(c.config, OpDelete)
+	return &URLDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *URLClient) DeleteOne(u *Url) *URLDeleteOne {
+	return c.DeleteOneID(u.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *URLClient) DeleteOneID(id int) *URLDeleteOne {
+	builder := c.Delete().Where(url.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &URLDeleteOne{builder}
+}
+
+// Query returns a query builder for Url.
+func (c *URLClient) Query() *URLQuery {
+	return &URLQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeURL},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Url entity by its id.
+func (c *URLClient) Get(ctx context.Context, id int) (*Url, error) {
+	return c.Query().Where(url.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *URLClient) GetX(ctx context.Context, id int) *Url {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *URLClient) Hooks() []Hook {
+	return c.hooks.Url
+}
+
+// Interceptors returns the client interceptors.
+func (c *URLClient) Interceptors() []Interceptor {
+	return c.inters.Url
+}
+
+func (c *URLClient) mutate(ctx context.Context, m *URLMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&URLCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&URLUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&URLUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&URLDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Url mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Token []ent.Hook
+		Token, Url []ent.Hook
 	}
 	inters struct {
-		Token []ent.Interceptor
+		Token, Url []ent.Interceptor
 	}
 )

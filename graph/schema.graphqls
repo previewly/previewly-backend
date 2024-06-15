@@ -2,8 +2,17 @@
 #
 # https://gqlgen.com/getting-started/
 
-type PreviewData {
+interface MinimalPreviewData {
+  id: Int!
+  url: String!
   status: Status!
+}
+
+type PreviewData implements MinimalPreviewData {
+  id: Int!
+  url: String!
+  status: Status!
+  image: String!
 }
 
 type Query {
@@ -12,6 +21,7 @@ type Query {
 
 type Mutation {
   createToken: String!
+  addUrl(token: String!, url: String!): MinimalPreviewData
 }
 
 enum Status {

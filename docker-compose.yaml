@@ -1,17 +1,23 @@
 services:
-  db:
+  gowitness:
+    image: ghcr.io/sensepost/gowitness:latest
+    command: gowitness server --address 0.0.0.0:7171 --db-location=postgres://gowidness:gowidness12345@gowidnessdb/gowidness --debug-db
+    depends_on:
+      - gowidnessdb
+
+  gowidnessdb:
     image: postgres:16.3
-    restart: always
+    environment:
+      POSTGRES_USER: gowidness
+      POSTGRES_PASSWORD: gowidness12345
+      POSTGRES_DB: gowidness
+    # ports:
+    #   - 5435:5432
+  wswdb:
+    image: postgres:16.3
     environment:
       POSTGRES_USER: wsw
       POSTGRES_PASSWORD: wsw12345
       POSTGRES_DB: wsw
     ports:
       - 5434:5432
-  gowitness:
-    image: ghcr.io/sensepost/gowitness:latest
-    command: gowitness server --address 0.0.0.0:7171 --db-location=postgres://wsw:wsw12345@db/wsw --debug-db
-    depends_on:
-      - db
-    volumes:
-      - ./infra/gowitness/data/:/data/

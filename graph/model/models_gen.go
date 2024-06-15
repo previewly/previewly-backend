@@ -8,9 +8,24 @@ import (
 	"strconv"
 )
 
-type PreviewData struct {
-	Status Status `json:"status"`
+type MinimalPreviewData interface {
+	IsMinimalPreviewData()
+	GetID() int
+	GetURL() string
+	GetStatus() Status
 }
+
+type PreviewData struct {
+	ID     int    `json:"id"`
+	URL    string `json:"url"`
+	Status Status `json:"status"`
+	Image  string `json:"image"`
+}
+
+func (PreviewData) IsMinimalPreviewData()  {}
+func (this PreviewData) GetID() int        { return this.ID }
+func (this PreviewData) GetURL() string    { return this.URL }
+func (this PreviewData) GetStatus() Status { return this.Status }
 
 type Status string
 

@@ -66,7 +66,7 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	CreateToken(ctx context.Context) (string, error)
-	AddURL(ctx context.Context, token string, url string) (model.MinimalPreviewData, error)
+	AddURL(ctx context.Context, token string, url string) (*model.PreviewData, error)
 }
 type QueryResolver interface {
 	GetPreviewData(ctx context.Context, token string, url string) (*model.PreviewData, error)
@@ -441,9 +441,9 @@ func (ec *executionContext) _Mutation_addUrl(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(model.MinimalPreviewData)
+	res := resTmp.(*model.PreviewData)
 	fc.Result = res
-	return ec.marshalOMinimalPreviewData2wswᚋbackendᚋgraphᚋmodelᚐMinimalPreviewData(ctx, field.Selections, res)
+	return ec.marshalOPreviewData2ᚖwswᚋbackendᚋgraphᚋmodelᚐPreviewData(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_addUrl(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -453,7 +453,17 @@ func (ec *executionContext) fieldContext_Mutation_addUrl(ctx context.Context, fi
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("FieldContext.Child cannot be called on type INTERFACE")
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_PreviewData_id(ctx, field)
+			case "url":
+				return ec.fieldContext_PreviewData_url(ctx, field)
+			case "status":
+				return ec.fieldContext_PreviewData_status(ctx, field)
+			case "image":
+				return ec.fieldContext_PreviewData_image(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PreviewData", field.Name)
 		},
 	}
 	defer func() {
@@ -623,14 +633,11 @@ func (ec *executionContext) _PreviewData_image(ctx context.Context, field graphq
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_PreviewData_image(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2614,22 +2621,6 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    ************************** interface.gotpl ***************************
 
-func (ec *executionContext) _MinimalPreviewData(ctx context.Context, sel ast.SelectionSet, obj model.MinimalPreviewData) graphql.Marshaler {
-	switch obj := (obj).(type) {
-	case nil:
-		return graphql.Null
-	case model.PreviewData:
-		return ec._PreviewData(ctx, sel, &obj)
-	case *model.PreviewData:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._PreviewData(ctx, sel, obj)
-	default:
-		panic(fmt.Errorf("unexpected type %T", obj))
-	}
-}
-
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
@@ -2687,7 +2678,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
-var previewDataImplementors = []string{"PreviewData", "MinimalPreviewData"}
+var previewDataImplementors = []string{"PreviewData"}
 
 func (ec *executionContext) _PreviewData(ctx context.Context, sel ast.SelectionSet, obj *model.PreviewData) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, previewDataImplementors)
@@ -2715,9 +2706,6 @@ func (ec *executionContext) _PreviewData(ctx context.Context, sel ast.SelectionS
 			}
 		case "image":
 			out.Values[i] = ec._PreviewData_image(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3468,13 +3456,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
-}
-
-func (ec *executionContext) marshalOMinimalPreviewData2wswᚋbackendᚋgraphᚋmodelᚐMinimalPreviewData(ctx context.Context, sel ast.SelectionSet, v model.MinimalPreviewData) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._MinimalPreviewData(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOPreviewData2ᚖwswᚋbackendᚋgraphᚋmodelᚐPreviewData(ctx context.Context, sel ast.SelectionSet, v *model.PreviewData) graphql.Marshaler {

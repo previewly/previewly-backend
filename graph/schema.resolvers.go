@@ -31,7 +31,7 @@ func (r *mutationResolver) CreateToken(ctx context.Context) (string, error) {
 }
 
 // AddURL is the resolver for the addUrl field.
-func (r *mutationResolver) AddURL(ctx context.Context, token string, url string) (model.MinimalPreviewData, error) {
+func (r *mutationResolver) AddURL(ctx context.Context, token string, url string) (*model.PreviewData, error) {
 	panic(fmt.Errorf("not implemented: AddURL - addUrl"))
 }
 

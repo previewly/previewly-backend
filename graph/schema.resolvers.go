@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"wsw/backend/graph/convertor"
 	"wsw/backend/graph/model"
 	"wsw/backend/lib/utils"
@@ -32,7 +31,17 @@ func (r *mutationResolver) CreateToken(ctx context.Context) (string, error) {
 
 // AddURL is the resolver for the addUrl field.
 func (r *mutationResolver) AddURL(ctx context.Context, token string, url string) (*model.PreviewData, error) {
-	panic(fmt.Errorf("not implemented: AddURL - addUrl"))
+	var model tokenModel.Token
+	err := container.Resolve(&model)
+	if err != nil {
+		return nil, err
+	}
+
+	previewData, err := model.AddURL(token, url)
+	if err != nil {
+		return nil, err
+	}
+	return convertor.ConvertPreviewData(previewData), nil
 }
 
 // GetPreviewData is the resolver for the getPreviewData field.
@@ -56,5 +65,7 @@ func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
-type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }
+type (
+	mutationResolver struct{ *Resolver }
+	queryResolver    struct{ *Resolver }
+)

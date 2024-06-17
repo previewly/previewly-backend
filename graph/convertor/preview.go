@@ -1,10 +1,10 @@
 package convertor
 
 import (
+	"wsw/backend/domain/preview"
 	"wsw/backend/graph/model"
-	"wsw/backend/model/token"
 )
 
-func ConvertPreviewData(data *token.PreviewData) *model.PreviewData {
+func ConvertPreviewData(data *preview.PreviewData) *model.PreviewData {
 	panic("unimplemented")
 }

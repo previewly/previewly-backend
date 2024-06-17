@@ -2,6 +2,7 @@ package token
 
 import (
 	"errors"
+	"wsw/backend/domain/preview"
 	"wsw/backend/domain/token/generator"
 	"wsw/backend/ent/repository"
 )
@@ -9,11 +10,10 @@ import (
 type (
 	Token interface {
 		CreateToken() (*string, error)
-		GetPreviewData(string) (*PreviewData, error)
-		AddURL(string, string) (*PreviewData, error)
+		GetPreviewData(string) (*preview.PreviewData, error)
+		AddURL(string, string) (*preview.PreviewData, error)
 	}
-	PreviewData struct{}
-	tokenImpl   struct {
+	tokenImpl struct {
 		generator  generator.TokenGenerator
 		repository repository.Token
 	}
@@ -25,7 +25,7 @@ func (t tokenImpl) isTokenExist(token string) bool {
 }
 
 // AddURL implements Token.
-func (t tokenImpl) AddURL(token string, url string) (*PreviewData, error) {
+func (t tokenImpl) AddURL(token string, url string) (*preview.PreviewData, error) {
 	if !t.isTokenExist(token) {
 		return nil, errors.New("invalid token")
 	}
@@ -33,7 +33,7 @@ func (t tokenImpl) AddURL(token string, url string) (*PreviewData, error) {
 }
 
 // GetPreviewData implements Token.
-func (t tokenImpl) GetPreviewData(token string) (*PreviewData, error) {
+func (t tokenImpl) GetPreviewData(token string) (*preview.PreviewData, error) {
 	if !t.isTokenExist(token) {
 		return nil, errors.New("invalid token")
 	}

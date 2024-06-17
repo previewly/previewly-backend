@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"wsw/backend/ent"
+	entUrl "wsw/backend/ent/url"
 )
 
 type (
@@ -18,13 +19,14 @@ type (
 )
 
 // Insert implements Url.
-func (u *urlImpl) Insert(string) (*ent.Url, error) {
-	panic("unimplemented")
+func (u *urlImpl) Insert(url string) (*ent.Url, error) {
+	return u.client.Url.Create().SetURL(url).Save(u.ctx)
 }
 
 // TryGet implements Url.
-func (u *urlImpl) TryGet(string) *ent.Url {
-	panic("unimplemented")
+func (u *urlImpl) TryGet(url string) *ent.Url {
+	entity, _ := u.client.Url.Query().Where(entUrl.URL(url)).Only(u.ctx)
+	return entity
 }
 
 func NewUrl(client *ent.Client, ctx context.Context) Url {

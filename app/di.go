@@ -17,9 +17,14 @@ func initDi(config Config, appContext context.Context) {
 	initService(func() App { return appImpl{router: newRouter()} })
 
 	initService(func() generator.TokenGenerator { return generator.NewTokenGenerator() })
+
 	initService(func(client *ent.Client, ctx context.Context) repository.Token {
 		return repository.NewToken(client, ctx)
 	})
+	initService(func(client *ent.Client, ctx context.Context) repository.Url {
+		return repository.NewUrl(client, ctx)
+	})
+
 	initService(func(generator generator.TokenGenerator, tokenRepository repository.Token) token.Token {
 		return token.NewModel(generator, tokenRepository)
 	})

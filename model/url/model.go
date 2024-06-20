@@ -29,8 +29,9 @@ func (u urlImpl) getUrlEntity(url string) (*ent.Url, error) {
 	return urlEntity, nil
 }
 
-func (u urlImpl) updateUrlData(erl *ent.Url) (*preview.PreviewData, error) {
-	panic("not implemented")
+func (u urlImpl) updateUrlData(url *ent.Url) (*preview.PreviewData, error) {
+	u.apiClient.AddUrl(url.URL)
+	panic("updateUrlData not implemented")
 }
 
 // AddURL implements Token.

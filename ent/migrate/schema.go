@@ -23,7 +23,7 @@ var (
 	UrlsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "url", Type: field.TypeString, Unique: true},
-		{Name: "status", Type: field.TypeString},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"success", "error", "pending"}},
 	}
 	// UrlsTable holds the schema information for the "urls" table.
 	UrlsTable = &schema.Table{

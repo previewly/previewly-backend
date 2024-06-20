@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"math"
 	"wsw/backend/ent/predicate"
-	"wsw/backend/ent/url"
+	enturl "wsw/backend/ent/url"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -18,7 +18,7 @@ import (
 type URLQuery struct {
 	config
 	ctx        *QueryContext
-	order      []url.OrderOption
+	order      []enturl.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Url
 	// intermediate query (i.e. traversal path).
@@ -52,7 +52,7 @@ func (uq *URLQuery) Unique(unique bool) *URLQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (uq *URLQuery) Order(o ...url.OrderOption) *URLQuery {
+func (uq *URLQuery) Order(o ...enturl.OrderOption) *URLQuery {
 	uq.order = append(uq.order, o...)
 	return uq
 }
@@ -65,7 +65,7 @@ func (uq *URLQuery) First(ctx context.Context) (*Url, error) {
 		return nil, err
 	}
 	if len(nodes) == 0 {
-		return nil, &NotFoundError{url.Label}
+		return nil, &NotFoundError{enturl.Label}
 	}
 	return nodes[0], nil
 }
@@ -87,7 +87,7 @@ func (uq *URLQuery) FirstID(ctx context.Context) (id int, err error) {
 		return
 	}
 	if len(ids) == 0 {
-		err = &NotFoundError{url.Label}
+		err = &NotFoundError{enturl.Label}
 		return
 	}
 	return ids[0], nil
@@ -114,9 +114,9 @@ func (uq *URLQuery) Only(ctx context.Context) (*Url, error) {
 	case 1:
 		return nodes[0], nil
 	case 0:
-		return nil, &NotFoundError{url.Label}
+		return nil, &NotFoundError{enturl.Label}
 	default:
-		return nil, &NotSingularError{url.Label}
+		return nil, &NotSingularError{enturl.Label}
 	}
 }
 
@@ -141,9 +141,9 @@ func (uq *URLQuery) OnlyID(ctx context.Context) (id int, err error) {
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &NotFoundError{url.Label}
+		err = &NotFoundError{enturl.Label}
 	default:
-		err = &NotSingularError{url.Label}
+		err = &NotSingularError{enturl.Label}
 	}
 	return
 }
@@ -182,7 +182,7 @@ func (uq *URLQuery) IDs(ctx context.Context) (ids []int, err error) {
 		uq.Unique(true)
 	}
 	ctx = setContextOp(ctx, uq.ctx, "IDs")
-	if err = uq.Select(url.FieldID).Scan(ctx, &ids); err != nil {
+	if err = uq.Select(enturl.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -246,7 +246,7 @@ func (uq *URLQuery) Clone() *URLQuery {
 	return &URLQuery{
 		config:     uq.config,
 		ctx:        uq.ctx.Clone(),
-		order:      append([]url.OrderOption{}, uq.order...),
+		order:      append([]enturl.OrderOption{}, uq.order...),
 		inters:     append([]Interceptor{}, uq.inters...),
 		predicates: append([]predicate.Url{}, uq.predicates...),
 		// clone intermediate query.
@@ -266,14 +266,14 @@ func (uq *URLQuery) Clone() *URLQuery {
 //	}
 //
 //	client.URL.Query().
-//		GroupBy(url.FieldURL).
+//		GroupBy(enturl.FieldURL).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (uq *URLQuery) GroupBy(field string, fields ...string) *URLGroupBy {
 	uq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &URLGroupBy{build: uq}
 	grbuild.flds = &uq.ctx.Fields
-	grbuild.label = url.Label
+	grbuild.label = enturl.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
 }
@@ -288,12 +288,12 @@ func (uq *URLQuery) GroupBy(field string, fields ...string) *URLGroupBy {
 //	}
 //
 //	client.URL.Query().
-//		Select(url.FieldURL).
+//		Select(enturl.FieldURL).
 //		Scan(ctx, &v)
 func (uq *URLQuery) Select(fields ...string) *URLSelect {
 	uq.ctx.Fields = append(uq.ctx.Fields, fields...)
 	sbuild := &URLSelect{URLQuery: uq}
-	sbuild.label = url.Label
+	sbuild.label = enturl.Label
 	sbuild.flds, sbuild.scan = &uq.ctx.Fields, sbuild.Scan
 	return sbuild
 }
@@ -315,7 +315,7 @@ func (uq *URLQuery) prepareQuery(ctx context.Context) error {
 		}
 	}
 	for _, f := range uq.ctx.Fields {
-		if !url.ValidColumn(f) {
+		if !enturl.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
@@ -364,7 +364,7 @@ func (uq *URLQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (uq *URLQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(url.Table, url.Columns, sqlgraph.NewFieldSpec(url.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(enturl.Table, enturl.Columns, sqlgraph.NewFieldSpec(enturl.FieldID, field.TypeInt))
 	_spec.From = uq.sql
 	if unique := uq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -373,9 +373,9 @@ func (uq *URLQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := uq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, url.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, enturl.FieldID)
 		for i := range fields {
-			if fields[i] != url.FieldID {
+			if fields[i] != enturl.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
@@ -405,10 +405,10 @@ func (uq *URLQuery) querySpec() *sqlgraph.QuerySpec {
 
 func (uq *URLQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(uq.driver.Dialect())
-	t1 := builder.Table(url.Table)
+	t1 := builder.Table(enturl.Table)
 	columns := uq.ctx.Fields
 	if len(columns) == 0 {
-		columns = url.Columns
+		columns = enturl.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
 	if uq.sql != nil {

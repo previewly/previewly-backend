@@ -9,11 +9,12 @@ import (
 	"reflect"
 	"sync"
 	"wsw/backend/ent/token"
-	"wsw/backend/ent/url"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+
+	enturl "wsw/backend/ent/url"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -74,8 +75,8 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			token.Table: token.ValidColumn,
-			url.Table:   url.ValidColumn,
+			token.Table:  token.ValidColumn,
+			enturl.Table: enturl.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

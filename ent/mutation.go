@@ -7,9 +7,10 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"wsw/backend/domain/url"
 	"wsw/backend/ent/predicate"
 	"wsw/backend/ent/token"
-	"wsw/backend/ent/url"
+	enturl "wsw/backend/ent/url"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -361,7 +362,7 @@ type URLMutation struct {
 	typ           string
 	id            *int
 	url           *string
-	status        *string
+	status        *url.Status
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Url, error)
@@ -503,12 +504,12 @@ func (m *URLMutation) ResetURL() {
 }
 
 // SetStatus sets the "status" field.
-func (m *URLMutation) SetStatus(s string) {
-	m.status = &s
+func (m *URLMutation) SetStatus(u url.Status) {
+	m.status = &u
 }
 
 // Status returns the value of the "status" field in the mutation.
-func (m *URLMutation) Status() (r string, exists bool) {
+func (m *URLMutation) Status() (r url.Status, exists bool) {
 	v := m.status
 	if v == nil {
 		return
@@ -519,7 +520,7 @@ func (m *URLMutation) Status() (r string, exists bool) {
 // OldStatus returns the old "status" field's value of the Url entity.
 // If the Url object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *URLMutation) OldStatus(ctx context.Context) (v string, err error) {
+func (m *URLMutation) OldStatus(ctx context.Context) (v url.Status, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
 	}
@@ -574,10 +575,10 @@ func (m *URLMutation) Type() string {
 func (m *URLMutation) Fields() []string {
 	fields := make([]string, 0, 2)
 	if m.url != nil {
-		fields = append(fields, url.FieldURL)
+		fields = append(fields, enturl.FieldURL)
 	}
 	if m.status != nil {
-		fields = append(fields, url.FieldStatus)
+		fields = append(fields, enturl.FieldStatus)
 	}
 	return fields
 }
@@ -587,9 +588,9 @@ func (m *URLMutation) Fields() []string {
 // schema.
 func (m *URLMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case url.FieldURL:
+	case enturl.FieldURL:
 		return m.URL()
-	case url.FieldStatus:
+	case enturl.FieldStatus:
 		return m.Status()
 	}
 	return nil, false
@@ -600,9 +601,9 @@ func (m *URLMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *URLMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case url.FieldURL:
+	case enturl.FieldURL:
 		return m.OldURL(ctx)
-	case url.FieldStatus:
+	case enturl.FieldStatus:
 		return m.OldStatus(ctx)
 	}
 	return nil, fmt.Errorf("unknown Url field %s", name)
@@ -613,15 +614,15 @@ func (m *URLMutation) OldField(ctx context.Context, name string) (ent.Value, err
 // type.
 func (m *URLMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case url.FieldURL:
+	case enturl.FieldURL:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetURL(v)
 		return nil
-	case url.FieldStatus:
-		v, ok := value.(string)
+	case enturl.FieldStatus:
+		v, ok := value.(url.Status)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -676,10 +677,10 @@ func (m *URLMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *URLMutation) ResetField(name string) error {
 	switch name {
-	case url.FieldURL:
+	case enturl.FieldURL:
 		m.ResetURL()
 		return nil
-	case url.FieldStatus:
+	case enturl.FieldStatus:
 		m.ResetStatus()
 		return nil
 	}

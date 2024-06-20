@@ -1,6 +1,7 @@
 package url
 
 import (
+	"wsw/backend/domain/gowitness"
 	"wsw/backend/domain/preview"
 	"wsw/backend/ent"
 	"wsw/backend/ent/repository"
@@ -11,6 +12,7 @@ type (
 		AddURL(string) (*preview.PreviewData, error)
 	}
 	urlImpl struct {
+		apiClient  gowitness.Client
 		repository repository.Url
 	}
 )
@@ -44,6 +46,6 @@ func (u urlImpl) AddURL(url string) (*preview.PreviewData, error) {
 	return preview, nil
 }
 
-func NewUrl(urlRepository repository.Url) Url {
-	return urlImpl{repository: urlRepository}
+func NewUrl(urlRepository repository.Url, client gowitness.Client) Url {
+	return urlImpl{repository: urlRepository, apiClient: client}
 }

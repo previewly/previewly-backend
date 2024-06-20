@@ -9,5 +9,5 @@ import (
 // Token is the predicate function for token builders.
 type Token func(*sql.Selector)
 
-// Url is the predicate function for url builders.
+// Url is the predicate function for enturl builders.
 type Url func(*sql.Selector)

@@ -5,7 +5,8 @@ package ent
 import (
 	"fmt"
 	"strings"
-	"wsw/backend/ent/url"
+	"wsw/backend/domain/url"
+	enturl "wsw/backend/ent/url"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -19,7 +20,7 @@ type Url struct {
 	// URL holds the value of the "url" field.
 	URL string `json:"url,omitempty"`
 	// Status holds the value of the "status" field.
-	Status       string `json:"status,omitempty"`
+	Status       url.Status `json:"status,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -28,9 +29,9 @@ func (*Url) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case url.FieldID:
+		case enturl.FieldID:
 			values[i] = new(sql.NullInt64)
-		case url.FieldURL, url.FieldStatus:
+		case enturl.FieldURL, enturl.FieldStatus:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -47,23 +48,23 @@ func (u *Url) assignValues(columns []string, values []any) error {
 	}
 	for i := range columns {
 		switch columns[i] {
-		case url.FieldID:
+		case enturl.FieldID:
 			value, ok := values[i].(*sql.NullInt64)
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			u.ID = int(value.Int64)
-		case url.FieldURL:
+		case enturl.FieldURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field url", values[i])
 			} else if value.Valid {
 				u.URL = value.String
 			}
-		case url.FieldStatus:
+		case enturl.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				u.Status = value.String
+				u.Status = url.Status(value.String)
 			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
@@ -105,7 +106,7 @@ func (u *Url) String() string {
 	builder.WriteString(u.URL)
 	builder.WriteString(", ")
 	builder.WriteString("status=")
-	builder.WriteString(u.Status)
+	builder.WriteString(fmt.Sprintf("%v", u.Status))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -6,7 +6,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"wsw/backend/ent/url"
+	"wsw/backend/domain/url"
+	enturl "wsw/backend/ent/url"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -26,8 +27,8 @@ func (uc *URLCreate) SetURL(s string) *URLCreate {
 }
 
 // SetStatus sets the "status" field.
-func (uc *URLCreate) SetStatus(s string) *URLCreate {
-	uc.mutation.SetStatus(s)
+func (uc *URLCreate) SetStatus(u url.Status) *URLCreate {
+	uc.mutation.SetStatus(u)
 	return uc
 }
 
@@ -71,6 +72,11 @@ func (uc *URLCreate) check() error {
 	if _, ok := uc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Url.status"`)}
 	}
+	if v, ok := uc.mutation.Status(); ok {
+		if err := enturl.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Url.status": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -95,14 +101,14 @@ func (uc *URLCreate) sqlSave(ctx context.Context) (*Url, error) {
 func (uc *URLCreate) createSpec() (*Url, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Url{config: uc.config}
-		_spec = sqlgraph.NewCreateSpec(url.Table, sqlgraph.NewFieldSpec(url.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(enturl.Table, sqlgraph.NewFieldSpec(enturl.FieldID, field.TypeInt))
 	)
 	if value, ok := uc.mutation.URL(); ok {
-		_spec.SetField(url.FieldURL, field.TypeString, value)
+		_spec.SetField(enturl.FieldURL, field.TypeString, value)
 		_node.URL = value
 	}
 	if value, ok := uc.mutation.Status(); ok {
-		_spec.SetField(url.FieldStatus, field.TypeString, value)
+		_spec.SetField(enturl.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
 	}
 	return _node, _spec

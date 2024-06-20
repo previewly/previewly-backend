@@ -9,3 +9,5 @@ postgres:
   db: "timeline"
   user: "timeline"
   password: "timeline"
+api:
+  url: "http://localhost:7171/api"

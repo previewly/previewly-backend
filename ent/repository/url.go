@@ -20,7 +20,7 @@ type (
 
 // Insert implements Url.
 func (u *urlImpl) Insert(url string) (*ent.Url, error) {
-	return u.client.Url.Create().SetURL(url).Save(u.ctx)
+	return u.client.Url.Create().SetURL(url).SetStatus("pending").Save(u.ctx)
 }
 
 // TryGet implements Url.

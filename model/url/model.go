@@ -30,7 +30,11 @@ func (u urlImpl) getUrlEntity(url string) (*ent.Url, error) {
 }
 
 func (u urlImpl) updateUrlData(url *ent.Url) (*preview.PreviewData, error) {
-	u.apiClient.AddUrl(url.URL)
+	err := u.apiClient.AddUrl(url.URL)
+	if err != nil {
+		return nil, err
+	}
+	u.apiClient.Search(url.URL)
 	panic("updateUrlData not implemented")
 }
 

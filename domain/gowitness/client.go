@@ -5,12 +5,13 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"wsw/backend/lib/utils"
 )
 
 type (
 	Client interface {
 		AddUrl(string) error
-		Search(string)
+		Search(string) (string, error)
 	}
 	clientImpl struct {
 		baseURL string
@@ -39,8 +40,20 @@ func (c *clientImpl) AddUrl(url string) error {
 }
 
 // Search implements Client.
-func (c *clientImpl) Search(string) {
-	panic("gowitness.Search is unimplemented")
+func (c *clientImpl) Search(url string) (string, error) {
+	response, err := http.Get(c.baseURL + "/list?q=" + url)
+	if err != nil {
+		return "", err
+	}
+	if response.Body != nil {
+		defer response.Body.Close()
+	}
+	result, readErr := io.ReadAll(response.Body)
+	if readErr != nil {
+		return "", readErr
+	}
+	utils.D(string(result))
+	return "", nil
 }
 
 func NewClient(client http.Client, baseURL string) Client {

@@ -32,27 +32,28 @@ func (c *clientImpl) AddUrl(url string) error {
 	if response.Body != nil {
 		defer response.Body.Close()
 	}
-	_, readErr := io.ReadAll(response.Body)
+	result, readErr := io.ReadAll(response.Body)
 	if readErr != nil {
 		return readErr
 	}
+	utils.D(string(result))
 	return nil
 }
 
 // Search implements Client.
 func (c *clientImpl) Search(url string) (string, error) {
-	response, err := http.Get(c.baseURL + "/list?q=" + url)
+	response, err := http.Get(c.baseURL + "/search?q=" + url)
 	if err != nil {
 		return "", err
 	}
 	if response.Body != nil {
 		defer response.Body.Close()
 	}
-	result, readErr := io.ReadAll(response.Body)
+	_, readErr := io.ReadAll(response.Body)
 	if readErr != nil {
 		return "", readErr
 	}
-	utils.D(string(result))
+	// utils.D(string(result))
 	return "", nil
 }
 

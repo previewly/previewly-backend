@@ -5,39 +5,44 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"wsw/backend/lib/utils"
 )
 
 type (
 	Client interface {
-		AddUrl(string) error
+		AddUrl(string) (int, error)
 		Search(string) (string, error)
 	}
-	clientImpl struct {
+	URLResponse struct{ id int }
+	clientImpl  struct {
 		baseURL string
 		client  http.Client
 	}
 )
 
 // AddUrl implements Client.
-func (c *clientImpl) AddUrl(url string) error {
+func (c *clientImpl) AddUrl(url string) (int, error) {
 	postBody, _ := json.Marshal(map[string]string{
-		"url":     url,
-		"oneshot": "false",
+		"url":        url,
+		"oneshot":    "false",
+		"foreground": "true",
 	})
 	response, err := http.Post(c.baseURL+"/screenshot", "application/json", bytes.NewBuffer(postBody))
 	if err != nil {
-		return err
+		return 0, err
 	}
 	if response.Body != nil {
 		defer response.Body.Close()
 	}
 	result, readErr := io.ReadAll(response.Body)
 	if readErr != nil {
-		return readErr
+		return 0, readErr
 	}
-	utils.D(string(result))
-	return nil
+	urlResponse := URLResponse{}
+	jsonErr := json.Unmarshal(result, &urlResponse)
+	if jsonErr != nil {
+		return 0, nil
+	}
+	return urlResponse.id, nil
 }
 
 // Search implements Client.

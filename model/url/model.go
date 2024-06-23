@@ -30,9 +30,11 @@ func (u urlImpl) getUrlEntity(url string) (*ent.Url, error) {
 }
 
 func (u urlImpl) updateUrlData(url *ent.Url) (*preview.PreviewData, error) {
-	err := u.apiClient.AddUrl(url.URL)
-	if err != nil {
-		return nil, err
+	if u.shouldAddUrlToApi(url) {
+		go func(url *ent.Url) {
+			id, err := u.apiClient.AddUrl(url.URL)
+			u.setApiUrlId(url, id, err)
+		}(url)
 	}
 	u.apiClient.Search(url.URL)
 	panic("updateUrlData not implemented")
@@ -49,6 +51,14 @@ func (u urlImpl) AddURL(url string) (*preview.PreviewData, error) {
 		return nil, errPreview
 	}
 	return preview, nil
+}
+
+func (u urlImpl) shouldAddUrlToApi(url *ent.Url) bool {
+	panic("shouldAddUrlToApi not implemented")
+}
+
+func (u urlImpl) setApiUrlId(url *ent.Url, id int, err error) {
+	panic("setApiUrlId not implemented")
 }
 
 func NewUrl(urlRepository repository.Url, client gowitness.Client) Url {

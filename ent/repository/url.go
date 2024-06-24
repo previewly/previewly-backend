@@ -10,6 +10,7 @@ type (
 	Url interface {
 		TryGet(string) *ent.Url
 		Insert(string) (*ent.Url, error)
+		UpdateApiUrlId(*ent.Url, int) error
 	}
 
 	urlImpl struct {
@@ -17,6 +18,12 @@ type (
 		ctx    context.Context
 	}
 )
+
+// UpdateApiUrlId implements Url.
+func (u *urlImpl) UpdateApiUrlId(url *ent.Url, apiUrlId int) error {
+	_, err := u.client.Url.UpdateOne(url).SetAPIURLID(apiUrlId).Save(u.ctx)
+	return err
+}
 
 // Insert implements Url.
 func (u *urlImpl) Insert(url string) (*ent.Url, error) {

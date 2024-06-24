@@ -17,6 +17,7 @@ func (Url) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("url").Unique(),
 		field.Enum("status").GoType(url.Status("pending")),
+		field.Int("api_url_id").Nillable().Optional(),
 	}
 }
 

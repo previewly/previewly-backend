@@ -363,6 +363,8 @@ type URLMutation struct {
 	id            *int
 	url           *string
 	status        *url.Status
+	api_url_id    *int
+	addapi_url_id *int
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Url, error)
@@ -539,6 +541,76 @@ func (m *URLMutation) ResetStatus() {
 	m.status = nil
 }
 
+// SetAPIURLID sets the "api_url_id" field.
+func (m *URLMutation) SetAPIURLID(i int) {
+	m.api_url_id = &i
+	m.addapi_url_id = nil
+}
+
+// APIURLID returns the value of the "api_url_id" field in the mutation.
+func (m *URLMutation) APIURLID() (r int, exists bool) {
+	v := m.api_url_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAPIURLID returns the old "api_url_id" field's value of the Url entity.
+// If the Url object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *URLMutation) OldAPIURLID(ctx context.Context) (v *int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAPIURLID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAPIURLID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAPIURLID: %w", err)
+	}
+	return oldValue.APIURLID, nil
+}
+
+// AddAPIURLID adds i to the "api_url_id" field.
+func (m *URLMutation) AddAPIURLID(i int) {
+	if m.addapi_url_id != nil {
+		*m.addapi_url_id += i
+	} else {
+		m.addapi_url_id = &i
+	}
+}
+
+// AddedAPIURLID returns the value that was added to the "api_url_id" field in this mutation.
+func (m *URLMutation) AddedAPIURLID() (r int, exists bool) {
+	v := m.addapi_url_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearAPIURLID clears the value of the "api_url_id" field.
+func (m *URLMutation) ClearAPIURLID() {
+	m.api_url_id = nil
+	m.addapi_url_id = nil
+	m.clearedFields[enturl.FieldAPIURLID] = struct{}{}
+}
+
+// APIURLIDCleared returns if the "api_url_id" field was cleared in this mutation.
+func (m *URLMutation) APIURLIDCleared() bool {
+	_, ok := m.clearedFields[enturl.FieldAPIURLID]
+	return ok
+}
+
+// ResetAPIURLID resets all changes to the "api_url_id" field.
+func (m *URLMutation) ResetAPIURLID() {
+	m.api_url_id = nil
+	m.addapi_url_id = nil
+	delete(m.clearedFields, enturl.FieldAPIURLID)
+}
+
 // Where appends a list predicates to the URLMutation builder.
 func (m *URLMutation) Where(ps ...predicate.Url) {
 	m.predicates = append(m.predicates, ps...)
@@ -573,12 +645,15 @@ func (m *URLMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *URLMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 3)
 	if m.url != nil {
 		fields = append(fields, enturl.FieldURL)
 	}
 	if m.status != nil {
 		fields = append(fields, enturl.FieldStatus)
+	}
+	if m.api_url_id != nil {
+		fields = append(fields, enturl.FieldAPIURLID)
 	}
 	return fields
 }
@@ -592,6 +667,8 @@ func (m *URLMutation) Field(name string) (ent.Value, bool) {
 		return m.URL()
 	case enturl.FieldStatus:
 		return m.Status()
+	case enturl.FieldAPIURLID:
+		return m.APIURLID()
 	}
 	return nil, false
 }
@@ -605,6 +682,8 @@ func (m *URLMutation) OldField(ctx context.Context, name string) (ent.Value, err
 		return m.OldURL(ctx)
 	case enturl.FieldStatus:
 		return m.OldStatus(ctx)
+	case enturl.FieldAPIURLID:
+		return m.OldAPIURLID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Url field %s", name)
 }
@@ -628,6 +707,13 @@ func (m *URLMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetStatus(v)
 		return nil
+	case enturl.FieldAPIURLID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAPIURLID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Url field %s", name)
 }
@@ -635,13 +721,21 @@ func (m *URLMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *URLMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addapi_url_id != nil {
+		fields = append(fields, enturl.FieldAPIURLID)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *URLMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case enturl.FieldAPIURLID:
+		return m.AddedAPIURLID()
+	}
 	return nil, false
 }
 
@@ -650,6 +744,13 @@ func (m *URLMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *URLMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case enturl.FieldAPIURLID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddAPIURLID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Url numeric field %s", name)
 }
@@ -657,7 +758,11 @@ func (m *URLMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *URLMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(enturl.FieldAPIURLID) {
+		fields = append(fields, enturl.FieldAPIURLID)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -670,6 +775,11 @@ func (m *URLMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *URLMutation) ClearField(name string) error {
+	switch name {
+	case enturl.FieldAPIURLID:
+		m.ClearAPIURLID()
+		return nil
+	}
 	return fmt.Errorf("unknown Url nullable field %s", name)
 }
 
@@ -682,6 +792,9 @@ func (m *URLMutation) ResetField(name string) error {
 		return nil
 	case enturl.FieldStatus:
 		m.ResetStatus()
+		return nil
+	case enturl.FieldAPIURLID:
+		m.ResetAPIURLID()
 		return nil
 	}
 	return fmt.Errorf("unknown Url field %s", name)

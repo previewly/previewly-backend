@@ -59,6 +59,11 @@ func URL(v string) predicate.Url {
 	return predicate.Url(sql.FieldEQ(FieldURL, v))
 }
 
+// APIURLID applies equality check predicate on the "api_url_id" field. It's identical to APIURLIDEQ.
+func APIURLID(v int) predicate.Url {
+	return predicate.Url(sql.FieldEQ(FieldAPIURLID, v))
+}
+
 // URLEQ applies the EQ predicate on the "url" field.
 func URLEQ(v string) predicate.Url {
 	return predicate.Url(sql.FieldEQ(FieldURL, v))
@@ -152,6 +157,56 @@ func StatusNotIn(vs ...url.Status) predicate.Url {
 		v[i] = vs[i]
 	}
 	return predicate.Url(sql.FieldNotIn(FieldStatus, v...))
+}
+
+// APIURLIDEQ applies the EQ predicate on the "api_url_id" field.
+func APIURLIDEQ(v int) predicate.Url {
+	return predicate.Url(sql.FieldEQ(FieldAPIURLID, v))
+}
+
+// APIURLIDNEQ applies the NEQ predicate on the "api_url_id" field.
+func APIURLIDNEQ(v int) predicate.Url {
+	return predicate.Url(sql.FieldNEQ(FieldAPIURLID, v))
+}
+
+// APIURLIDIn applies the In predicate on the "api_url_id" field.
+func APIURLIDIn(vs ...int) predicate.Url {
+	return predicate.Url(sql.FieldIn(FieldAPIURLID, vs...))
+}
+
+// APIURLIDNotIn applies the NotIn predicate on the "api_url_id" field.
+func APIURLIDNotIn(vs ...int) predicate.Url {
+	return predicate.Url(sql.FieldNotIn(FieldAPIURLID, vs...))
+}
+
+// APIURLIDGT applies the GT predicate on the "api_url_id" field.
+func APIURLIDGT(v int) predicate.Url {
+	return predicate.Url(sql.FieldGT(FieldAPIURLID, v))
+}
+
+// APIURLIDGTE applies the GTE predicate on the "api_url_id" field.
+func APIURLIDGTE(v int) predicate.Url {
+	return predicate.Url(sql.FieldGTE(FieldAPIURLID, v))
+}
+
+// APIURLIDLT applies the LT predicate on the "api_url_id" field.
+func APIURLIDLT(v int) predicate.Url {
+	return predicate.Url(sql.FieldLT(FieldAPIURLID, v))
+}
+
+// APIURLIDLTE applies the LTE predicate on the "api_url_id" field.
+func APIURLIDLTE(v int) predicate.Url {
+	return predicate.Url(sql.FieldLTE(FieldAPIURLID, v))
+}
+
+// APIURLIDIsNil applies the IsNil predicate on the "api_url_id" field.
+func APIURLIDIsNil() predicate.Url {
+	return predicate.Url(sql.FieldIsNull(FieldAPIURLID))
+}
+
+// APIURLIDNotNil applies the NotNil predicate on the "api_url_id" field.
+func APIURLIDNotNil() predicate.Url {
+	return predicate.Url(sql.FieldNotNull(FieldAPIURLID))
 }
 
 // And groups predicates with the AND operator between them.

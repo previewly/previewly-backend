@@ -56,6 +56,33 @@ func (uu *URLUpdate) SetNillableStatus(u *url.Status) *URLUpdate {
 	return uu
 }
 
+// SetAPIURLID sets the "api_url_id" field.
+func (uu *URLUpdate) SetAPIURLID(i int) *URLUpdate {
+	uu.mutation.ResetAPIURLID()
+	uu.mutation.SetAPIURLID(i)
+	return uu
+}
+
+// SetNillableAPIURLID sets the "api_url_id" field if the given value is not nil.
+func (uu *URLUpdate) SetNillableAPIURLID(i *int) *URLUpdate {
+	if i != nil {
+		uu.SetAPIURLID(*i)
+	}
+	return uu
+}
+
+// AddAPIURLID adds i to the "api_url_id" field.
+func (uu *URLUpdate) AddAPIURLID(i int) *URLUpdate {
+	uu.mutation.AddAPIURLID(i)
+	return uu
+}
+
+// ClearAPIURLID clears the value of the "api_url_id" field.
+func (uu *URLUpdate) ClearAPIURLID() *URLUpdate {
+	uu.mutation.ClearAPIURLID()
+	return uu
+}
+
 // Mutation returns the URLMutation object of the builder.
 func (uu *URLUpdate) Mutation() *URLMutation {
 	return uu.mutation
@@ -116,6 +143,15 @@ func (uu *URLUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.Status(); ok {
 		_spec.SetField(enturl.FieldStatus, field.TypeEnum, value)
 	}
+	if value, ok := uu.mutation.APIURLID(); ok {
+		_spec.SetField(enturl.FieldAPIURLID, field.TypeInt, value)
+	}
+	if value, ok := uu.mutation.AddedAPIURLID(); ok {
+		_spec.AddField(enturl.FieldAPIURLID, field.TypeInt, value)
+	}
+	if uu.mutation.APIURLIDCleared() {
+		_spec.ClearField(enturl.FieldAPIURLID, field.TypeInt)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{enturl.Label}
@@ -161,6 +197,33 @@ func (uuo *URLUpdateOne) SetNillableStatus(u *url.Status) *URLUpdateOne {
 	if u != nil {
 		uuo.SetStatus(*u)
 	}
+	return uuo
+}
+
+// SetAPIURLID sets the "api_url_id" field.
+func (uuo *URLUpdateOne) SetAPIURLID(i int) *URLUpdateOne {
+	uuo.mutation.ResetAPIURLID()
+	uuo.mutation.SetAPIURLID(i)
+	return uuo
+}
+
+// SetNillableAPIURLID sets the "api_url_id" field if the given value is not nil.
+func (uuo *URLUpdateOne) SetNillableAPIURLID(i *int) *URLUpdateOne {
+	if i != nil {
+		uuo.SetAPIURLID(*i)
+	}
+	return uuo
+}
+
+// AddAPIURLID adds i to the "api_url_id" field.
+func (uuo *URLUpdateOne) AddAPIURLID(i int) *URLUpdateOne {
+	uuo.mutation.AddAPIURLID(i)
+	return uuo
+}
+
+// ClearAPIURLID clears the value of the "api_url_id" field.
+func (uuo *URLUpdateOne) ClearAPIURLID() *URLUpdateOne {
+	uuo.mutation.ClearAPIURLID()
 	return uuo
 }
 
@@ -253,6 +316,15 @@ func (uuo *URLUpdateOne) sqlSave(ctx context.Context) (_node *Url, err error) {
 	}
 	if value, ok := uuo.mutation.Status(); ok {
 		_spec.SetField(enturl.FieldStatus, field.TypeEnum, value)
+	}
+	if value, ok := uuo.mutation.APIURLID(); ok {
+		_spec.SetField(enturl.FieldAPIURLID, field.TypeInt, value)
+	}
+	if value, ok := uuo.mutation.AddedAPIURLID(); ok {
+		_spec.AddField(enturl.FieldAPIURLID, field.TypeInt, value)
+	}
+	if uuo.mutation.APIURLIDCleared() {
+		_spec.ClearField(enturl.FieldAPIURLID, field.TypeInt)
 	}
 	_node = &Url{config: uuo.config}
 	_spec.Assign = _node.assignValues

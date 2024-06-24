@@ -10,14 +10,20 @@ import (
 type (
 	Client interface {
 		AddUrl(string) (int, error)
-		Search(string) (string, error)
+		Details(int) (DetailsURL, error)
 	}
+	DetailsURL  struct{}
 	URLResponse struct{ id int }
 	clientImpl  struct {
 		baseURL string
 		client  http.Client
 	}
 )
+
+// Details implements Client.
+func (c *clientImpl) Details(int) (DetailsURL, error) {
+	panic("Details unimplemented")
+}
 
 // AddUrl implements Client.
 func (c *clientImpl) AddUrl(url string) (int, error) {
@@ -43,23 +49,6 @@ func (c *clientImpl) AddUrl(url string) (int, error) {
 		return 0, nil
 	}
 	return urlResponse.id, nil
-}
-
-// Search implements Client.
-func (c *clientImpl) Search(url string) (string, error) {
-	response, err := http.Get(c.baseURL + "/search?q=" + url)
-	if err != nil {
-		return "", err
-	}
-	if response.Body != nil {
-		defer response.Body.Close()
-	}
-	_, readErr := io.ReadAll(response.Body)
-	if readErr != nil {
-		return "", readErr
-	}
-	// utils.D(string(result))
-	return "", nil
 }
 
 func NewClient(client http.Client, baseURL string) Client {

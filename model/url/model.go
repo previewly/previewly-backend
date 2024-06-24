@@ -29,15 +29,21 @@ func (u urlImpl) getUrlEntity(url string) (*ent.Url, error) {
 	return urlEntity, nil
 }
 
-func (u urlImpl) updateUrlData(url *ent.Url) (*preview.PreviewData, error) {
+func (u urlImpl) updateUrlData(url *ent.Url) error {
 	if u.shouldAddUrlToApi(url) {
 		go func(url *ent.Url) {
 			id, err := u.apiClient.AddUrl(url.URL)
 			u.setApiUrlId(url, id, err)
 		}(url)
 	}
-	u.apiClient.Search(url.URL)
-	panic("updateUrlData not implemented")
+	if url.APIURLID != nil {
+		details, err := u.apiClient.Details(*url.APIURLID)
+		if err != nil {
+			return err
+		}
+		u.updateApiURLDetails(details)
+	}
+	return nil
 }
 
 // AddURL implements Token.
@@ -46,15 +52,25 @@ func (u urlImpl) AddURL(url string) (*preview.PreviewData, error) {
 	if err != nil {
 		return nil, err
 	}
-	preview, errPreview := u.updateUrlData(urlEntity)
+	u.updateUrlData(urlEntity)
+
+	preview, errPreview := u.getPreviewData(urlEntity)
 	if errPreview != nil {
 		return nil, errPreview
 	}
 	return preview, nil
 }
 
+func (u urlImpl) getPreviewData(url *ent.Url) (*preview.PreviewData, error) {
+	panic("getPreviewData not implemented")
+}
+
 func (u urlImpl) shouldAddUrlToApi(url *ent.Url) bool {
 	panic("shouldAddUrlToApi not implemented")
+}
+
+func (u urlImpl) updateApiURLDetails(details gowitness.DetailsURL) {
+	panic("updateApiURLDetails not implemented")
 }
 
 func (u urlImpl) setApiUrlId(url *ent.Url, apiUrlId int, urlError error) {

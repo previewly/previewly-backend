@@ -20,7 +20,9 @@ type Url struct {
 	// URL holds the value of the "url" field.
 	URL string `json:"url,omitempty"`
 	// Status holds the value of the "status" field.
-	Status       url.Status `json:"status,omitempty"`
+	Status url.Status `json:"status,omitempty"`
+	// APIURLID holds the value of the "api_url_id" field.
+	APIURLID     *int `json:"api_url_id,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -29,7 +31,7 @@ func (*Url) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case enturl.FieldID:
+		case enturl.FieldID, enturl.FieldAPIURLID:
 			values[i] = new(sql.NullInt64)
 		case enturl.FieldURL, enturl.FieldStatus:
 			values[i] = new(sql.NullString)
@@ -65,6 +67,13 @@ func (u *Url) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
 				u.Status = url.Status(value.String)
+			}
+		case enturl.FieldAPIURLID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field api_url_id", values[i])
+			} else if value.Valid {
+				u.APIURLID = new(int)
+				*u.APIURLID = int(value.Int64)
 			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
@@ -107,6 +116,11 @@ func (u *Url) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", u.Status))
+	builder.WriteString(", ")
+	if v := u.APIURLID; v != nil {
+		builder.WriteString("api_url_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

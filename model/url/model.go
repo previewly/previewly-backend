@@ -57,8 +57,8 @@ func (u urlImpl) shouldAddUrlToApi(url *ent.Url) bool {
 	panic("shouldAddUrlToApi not implemented")
 }
 
-func (u urlImpl) setApiUrlId(url *ent.Url, id int, err error) {
-	panic("setApiUrlId not implemented")
+func (u urlImpl) setApiUrlId(url *ent.Url, apiUrlId int, urlError error) {
+	u.repository.UpdateApiUrlId(url, apiUrlId)
 }
 
 func NewUrl(urlRepository repository.Url, client gowitness.Client) Url {

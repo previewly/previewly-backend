@@ -32,6 +32,20 @@ func (uc *URLCreate) SetStatus(u url.Status) *URLCreate {
 	return uc
 }
 
+// SetAPIURLID sets the "api_url_id" field.
+func (uc *URLCreate) SetAPIURLID(i int) *URLCreate {
+	uc.mutation.SetAPIURLID(i)
+	return uc
+}
+
+// SetNillableAPIURLID sets the "api_url_id" field if the given value is not nil.
+func (uc *URLCreate) SetNillableAPIURLID(i *int) *URLCreate {
+	if i != nil {
+		uc.SetAPIURLID(*i)
+	}
+	return uc
+}
+
 // Mutation returns the URLMutation object of the builder.
 func (uc *URLCreate) Mutation() *URLMutation {
 	return uc.mutation
@@ -110,6 +124,10 @@ func (uc *URLCreate) createSpec() (*Url, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Status(); ok {
 		_spec.SetField(enturl.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
+	}
+	if value, ok := uc.mutation.APIURLID(); ok {
+		_spec.SetField(enturl.FieldAPIURLID, field.TypeInt, value)
+		_node.APIURLID = &value
 	}
 	return _node, _spec
 }

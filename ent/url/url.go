@@ -18,6 +18,8 @@ const (
 	FieldURL = "url"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
+	// FieldAPIURLID holds the string denoting the api_url_id field in the database.
+	FieldAPIURLID = "api_url_id"
 	// Table holds the table name of the url in the database.
 	Table = "urls"
 )
@@ -27,6 +29,7 @@ var Columns = []string{
 	FieldID,
 	FieldURL,
 	FieldStatus,
+	FieldAPIURLID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -65,4 +68,9 @@ func ByURL(opts ...sql.OrderTermOption) OrderOption {
 // ByStatus orders the results by the status field.
 func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
+// ByAPIURLID orders the results by the api_url_id field.
+func ByAPIURLID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAPIURLID, opts...).ToFunc()
 }

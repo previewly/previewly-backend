@@ -66,7 +66,10 @@ func (u urlImpl) AddURL(url string) (*preview.PreviewData, error) {
 }
 
 func (u urlImpl) getPreviewData(url *ent.Url) (*preview.PreviewData, error) {
-	panic("getPreviewData not implemented")
+	return &preview.PreviewData{
+		ID:  url.ID,
+		URL: url.URL,
+	}, nil
 }
 
 func (u urlImpl) shouldAddUrlToApi(url *ent.Url, isNew bool) bool {

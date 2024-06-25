@@ -15,22 +15,26 @@ type (
 		apiClient  gowitness.Client
 		repository repository.Url
 	}
+	UrlEntityHolder struct {
+		entity *ent.Url
+		isNew  bool
+	}
 )
 
-func (u urlImpl) getUrlEntity(url string) (*ent.Url, error) {
+func (u urlImpl) getUrlEntity(url string) (*UrlEntityHolder, error) {
 	urlEntity := u.repository.TryGet(url)
 	if urlEntity == nil {
 		urlEntity, err := u.repository.Insert(url)
 		if err != nil {
 			return nil, err
 		}
-		return urlEntity, nil
+		return &UrlEntityHolder{entity: urlEntity, isNew: true}, nil
 	}
-	return urlEntity, nil
+	return &UrlEntityHolder{entity: urlEntity, isNew: false}, nil
 }
 
-func (u urlImpl) updateUrlData(url *ent.Url) error {
-	if u.shouldAddUrlToApi(url) {
+func (u urlImpl) updateUrlData(url *ent.Url, isNew bool) error {
+	if u.shouldAddUrlToApi(url, isNew) {
 		go func(url *ent.Url) {
 			id, err := u.apiClient.AddUrl(url.URL)
 			u.setApiUrlId(url, id, err)
@@ -48,13 +52,13 @@ func (u urlImpl) updateUrlData(url *ent.Url) error {
 
 // AddURL implements Token.
 func (u urlImpl) AddURL(url string) (*preview.PreviewData, error) {
-	urlEntity, err := u.getUrlEntity(url)
+	urlEntityHolder, err := u.getUrlEntity(url)
 	if err != nil {
 		return nil, err
 	}
-	u.updateUrlData(urlEntity)
+	u.updateUrlData(urlEntityHolder.entity, urlEntityHolder.isNew)
 
-	preview, errPreview := u.getPreviewData(urlEntity)
+	preview, errPreview := u.getPreviewData(urlEntityHolder.entity)
 	if errPreview != nil {
 		return nil, errPreview
 	}
@@ -65,8 +69,9 @@ func (u urlImpl) getPreviewData(url *ent.Url) (*preview.PreviewData, error) {
 	panic("getPreviewData not implemented")
 }
 
-func (u urlImpl) shouldAddUrlToApi(url *ent.Url) bool {
-	panic("shouldAddUrlToApi not implemented")
+func (u urlImpl) shouldAddUrlToApi(url *ent.Url, isNew bool) bool {
+	// TODO
+	return isNew
 }
 
 func (u urlImpl) updateApiURLDetails(details gowitness.DetailsURL) {

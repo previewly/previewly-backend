@@ -6,5 +6,10 @@ import (
 )
 
 func ConvertPreviewData(data *preview.PreviewData) *model.PreviewData {
-	panic("unimplemented")
+	return &model.PreviewData{
+		ID:     data.ID,
+		URL:    data.URL,
+		Image:  nil,
+		Status: model.StatusSuccess,
+	}
 }

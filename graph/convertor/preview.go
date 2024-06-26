@@ -10,6 +10,19 @@ func ConvertPreviewData(data *preview.PreviewData) *model.PreviewData {
 		ID:     data.ID,
 		URL:    data.URL,
 		Image:  nil,
-		Status: model.StatusSuccess,
+		Status: convertPreviewStatus(data.Status),
+	}
+}
+
+func convertPreviewStatus(status preview.Status) model.Status {
+	switch status {
+	case preview.StatusPending:
+		return model.StatusPending
+	case preview.StatusError:
+		return model.StatusError
+	case preview.StatusSuccess:
+		return model.StatusSuccess
+	default:
+		return model.StatusPending
 	}
 }

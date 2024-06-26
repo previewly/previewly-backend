@@ -3,6 +3,7 @@ package url
 import (
 	"wsw/backend/domain/gowitness"
 	"wsw/backend/domain/preview"
+	"wsw/backend/domain/url"
 	"wsw/backend/ent"
 	"wsw/backend/ent/repository"
 	"wsw/backend/lib/utils"
@@ -70,9 +71,23 @@ func (u urlImpl) AddURL(url string) (*preview.PreviewData, error) {
 
 func (u urlImpl) getPreviewData(url *ent.Url) (*preview.PreviewData, error) {
 	return &preview.PreviewData{
-		ID:  url.ID,
-		URL: url.URL,
+		ID:     url.ID,
+		URL:    url.URL,
+		Status: u.getPreviewDataStatus(url.Status),
 	}, nil
+}
+
+func (u urlImpl) getPreviewDataStatus(status url.Status) preview.Status {
+	switch status {
+	case url.Success:
+		return preview.StatusSuccess
+	case url.Error:
+		return preview.StatusError
+	case url.Pending:
+		return preview.StatusPending
+	default:
+		return preview.StatusPending
+	}
 }
 
 func (u urlImpl) shouldAddUrlToApi(url *ent.Url, isNew bool) bool {

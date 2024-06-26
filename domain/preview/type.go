@@ -12,5 +12,5 @@ type PreviewData struct {
 	ID     int
 	URL    string
 	Image  string
-	Status string
+	Status Status
 }

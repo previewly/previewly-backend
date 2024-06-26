@@ -5,6 +5,7 @@ import (
 	"wsw/backend/domain/preview"
 	"wsw/backend/ent"
 	"wsw/backend/ent/repository"
+	"wsw/backend/lib/utils"
 )
 
 type (
@@ -36,7 +37,7 @@ func (u urlImpl) getUrlEntity(url string) (*UrlEntityHolder, error) {
 func (u urlImpl) updateUrlData(url *ent.Url, isNew bool) error {
 	if u.shouldAddUrlToApi(url, isNew) {
 		go func(url *ent.Url) {
-			id, err := u.apiClient.AddUrl(url.URL)
+			id, err := u.apiClient.AddURL(url.URL)
 			u.setApiUrlId(url, id, err)
 		}(url)
 	}
@@ -56,8 +57,10 @@ func (u urlImpl) AddURL(url string) (*preview.PreviewData, error) {
 	if err != nil {
 		return nil, err
 	}
-	u.updateUrlData(urlEntityHolder.entity, urlEntityHolder.isNew)
-
+	errUpdate := u.updateUrlData(urlEntityHolder.entity, urlEntityHolder.isNew)
+	if errUpdate != nil {
+		return nil, errUpdate
+	}
 	preview, errPreview := u.getPreviewData(urlEntityHolder.entity)
 	if errPreview != nil {
 		return nil, errPreview
@@ -82,7 +85,8 @@ func (u urlImpl) updateApiURLDetails(details gowitness.DetailsURL) {
 }
 
 func (u urlImpl) setApiUrlId(url *ent.Url, apiUrlId int, urlError error) {
-	u.repository.UpdateApiUrlId(url, apiUrlId)
+	err := u.repository.UpdateApiUrlId(url, apiUrlId)
+	utils.D(err)
 }
 
 func NewUrl(urlRepository repository.Url, client gowitness.Client) Url {

@@ -9,12 +9,13 @@ import (
 
 type (
 	Client interface {
-		AddUrl(string) (int, error)
+		AddURL(string) (int, error)
 		Details(int) (DetailsURL, error)
 	}
-	DetailsURL  struct{}
-	URLResponse struct{ id int }
-	clientImpl  struct {
+	DetailsURL     struct{}
+	addURLResponse struct{ ID int }
+
+	clientImpl struct {
 		baseURL string
 		client  http.Client
 	}
@@ -25,8 +26,8 @@ func (c *clientImpl) Details(int) (DetailsURL, error) {
 	panic("Details unimplemented")
 }
 
-// AddUrl implements Client.
-func (c *clientImpl) AddUrl(url string) (int, error) {
+// AddURL implements Client.
+func (c *clientImpl) AddURL(url string) (int, error) {
 	postBody, _ := json.Marshal(map[string]string{
 		"url":        url,
 		"oneshot":    "false",
@@ -43,12 +44,12 @@ func (c *clientImpl) AddUrl(url string) (int, error) {
 	if readErr != nil {
 		return 0, readErr
 	}
-	urlResponse := URLResponse{}
-	jsonErr := json.Unmarshal(result, &urlResponse)
+	responseType := addURLResponse{}
+	jsonErr := json.Unmarshal(result, &responseType)
 	if jsonErr != nil {
 		return 0, nil
 	}
-	return urlResponse.id, nil
+	return responseType.ID, nil
 }
 
 func NewClient(client http.Client, baseURL string) Client {

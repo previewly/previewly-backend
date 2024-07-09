@@ -365,6 +365,7 @@ type URLMutation struct {
 	status        *url.Status
 	api_url_id    *int
 	addapi_url_id *int
+	image         *string
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Url, error)
@@ -611,6 +612,55 @@ func (m *URLMutation) ResetAPIURLID() {
 	delete(m.clearedFields, enturl.FieldAPIURLID)
 }
 
+// SetImage sets the "image" field.
+func (m *URLMutation) SetImage(s string) {
+	m.image = &s
+}
+
+// Image returns the value of the "image" field in the mutation.
+func (m *URLMutation) Image() (r string, exists bool) {
+	v := m.image
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldImage returns the old "image" field's value of the Url entity.
+// If the Url object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *URLMutation) OldImage(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldImage is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldImage requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldImage: %w", err)
+	}
+	return oldValue.Image, nil
+}
+
+// ClearImage clears the value of the "image" field.
+func (m *URLMutation) ClearImage() {
+	m.image = nil
+	m.clearedFields[enturl.FieldImage] = struct{}{}
+}
+
+// ImageCleared returns if the "image" field was cleared in this mutation.
+func (m *URLMutation) ImageCleared() bool {
+	_, ok := m.clearedFields[enturl.FieldImage]
+	return ok
+}
+
+// ResetImage resets all changes to the "image" field.
+func (m *URLMutation) ResetImage() {
+	m.image = nil
+	delete(m.clearedFields, enturl.FieldImage)
+}
+
 // Where appends a list predicates to the URLMutation builder.
 func (m *URLMutation) Where(ps ...predicate.Url) {
 	m.predicates = append(m.predicates, ps...)
@@ -645,7 +695,7 @@ func (m *URLMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *URLMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.url != nil {
 		fields = append(fields, enturl.FieldURL)
 	}
@@ -654,6 +704,9 @@ func (m *URLMutation) Fields() []string {
 	}
 	if m.api_url_id != nil {
 		fields = append(fields, enturl.FieldAPIURLID)
+	}
+	if m.image != nil {
+		fields = append(fields, enturl.FieldImage)
 	}
 	return fields
 }
@@ -669,6 +722,8 @@ func (m *URLMutation) Field(name string) (ent.Value, bool) {
 		return m.Status()
 	case enturl.FieldAPIURLID:
 		return m.APIURLID()
+	case enturl.FieldImage:
+		return m.Image()
 	}
 	return nil, false
 }
@@ -684,6 +739,8 @@ func (m *URLMutation) OldField(ctx context.Context, name string) (ent.Value, err
 		return m.OldStatus(ctx)
 	case enturl.FieldAPIURLID:
 		return m.OldAPIURLID(ctx)
+	case enturl.FieldImage:
+		return m.OldImage(ctx)
 	}
 	return nil, fmt.Errorf("unknown Url field %s", name)
 }
@@ -713,6 +770,13 @@ func (m *URLMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAPIURLID(v)
+		return nil
+	case enturl.FieldImage:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetImage(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Url field %s", name)
@@ -762,6 +826,9 @@ func (m *URLMutation) ClearedFields() []string {
 	if m.FieldCleared(enturl.FieldAPIURLID) {
 		fields = append(fields, enturl.FieldAPIURLID)
 	}
+	if m.FieldCleared(enturl.FieldImage) {
+		fields = append(fields, enturl.FieldImage)
+	}
 	return fields
 }
 
@@ -779,6 +846,9 @@ func (m *URLMutation) ClearField(name string) error {
 	case enturl.FieldAPIURLID:
 		m.ClearAPIURLID()
 		return nil
+	case enturl.FieldImage:
+		m.ClearImage()
+		return nil
 	}
 	return fmt.Errorf("unknown Url nullable field %s", name)
 }
@@ -795,6 +865,9 @@ func (m *URLMutation) ResetField(name string) error {
 		return nil
 	case enturl.FieldAPIURLID:
 		m.ResetAPIURLID()
+		return nil
+	case enturl.FieldImage:
+		m.ResetImage()
 		return nil
 	}
 	return fmt.Errorf("unknown Url field %s", name)

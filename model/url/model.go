@@ -94,13 +94,13 @@ func (u urlImpl) getPreviewDataStatus(status url.Status) preview.Status {
 	}
 }
 
-func (u urlImpl) shouldAddUrlToApi(url *ent.Url, isNew bool) bool {
+func (u urlImpl) shouldAddUrlToApi(_ *ent.Url, isNew bool) bool {
 	// TODO
 	return isNew
 }
 
 func (u urlImpl) updateApiURLDetails(details gowitness.DetailsURL) {
-	panic("updateApiURLDetails not implemented")
+	u.repository.Update(details.Image, details.ID)
 }
 
 func (u urlImpl) setApiUrlId(url *ent.Url, apiUrlId int, urlError error) {

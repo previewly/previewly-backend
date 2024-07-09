@@ -14,6 +14,7 @@ type (
 		Details(*ent.Url) (DetailsURL, error)
 	}
 	DetailsURL struct {
+		ID    int
 		Image string
 	}
 	addURLResponse struct{ ID int }
@@ -28,9 +29,9 @@ type (
 // Details implements Client.
 func (c *clientImpl) Details(url *ent.Url) (DetailsURL, error) {
 	if url.APIURLID == nil {
-		return DetailsURL{Image: c.newUrlImage()}, nil
+		return DetailsURL{ID: url.ID, Image: c.newUrlImage()}, nil
 	}
-	return DetailsURL{Image: c.newUrlImage()}, nil
+	return DetailsURL{ID: url.ID, Image: c.newUrlImage()}, nil
 }
 
 func (c *clientImpl) newUrlImage() string {

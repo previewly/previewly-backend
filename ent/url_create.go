@@ -46,6 +46,20 @@ func (uc *URLCreate) SetNillableAPIURLID(i *int) *URLCreate {
 	return uc
 }
 
+// SetImage sets the "image" field.
+func (uc *URLCreate) SetImage(s string) *URLCreate {
+	uc.mutation.SetImage(s)
+	return uc
+}
+
+// SetNillableImage sets the "image" field if the given value is not nil.
+func (uc *URLCreate) SetNillableImage(s *string) *URLCreate {
+	if s != nil {
+		uc.SetImage(*s)
+	}
+	return uc
+}
+
 // Mutation returns the URLMutation object of the builder.
 func (uc *URLCreate) Mutation() *URLMutation {
 	return uc.mutation
@@ -128,6 +142,10 @@ func (uc *URLCreate) createSpec() (*Url, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.APIURLID(); ok {
 		_spec.SetField(enturl.FieldAPIURLID, field.TypeInt, value)
 		_node.APIURLID = &value
+	}
+	if value, ok := uc.mutation.Image(); ok {
+		_spec.SetField(enturl.FieldImage, field.TypeString, value)
+		_node.Image = &value
 	}
 	return _node, _spec
 }

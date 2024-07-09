@@ -43,13 +43,11 @@ func (u urlImpl) updateUrlData(url *ent.Url, isNew bool) error {
 			u.setApiUrlId(url, id, err)
 		}(url)
 	}
-	if url.APIURLID != nil {
-		details, err := u.apiClient.Details(*url.APIURLID)
-		if err != nil {
-			return err
-		}
-		u.updateApiURLDetails(details)
+	details, err := u.apiClient.Details(url)
+	if err != nil {
+		return err
 	}
+	u.updateApiURLDetails(details)
 	return nil
 }
 

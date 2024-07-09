@@ -5,25 +5,36 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"wsw/backend/ent"
 )
 
 type (
 	Client interface {
 		AddURL(string) (int, error)
-		Details(int) (DetailsURL, error)
+		Details(*ent.Url) (DetailsURL, error)
 	}
-	DetailsURL     struct{}
+	DetailsURL struct {
+		Image string
+	}
 	addURLResponse struct{ ID int }
 
 	clientImpl struct {
-		baseURL string
-		client  http.Client
+		baseURL   string
+		imageHost string
+		client    http.Client
 	}
 )
 
 // Details implements Client.
-func (c *clientImpl) Details(int) (DetailsURL, error) {
-	panic("Details unimplemented")
+func (c *clientImpl) Details(url *ent.Url) (DetailsURL, error) {
+	if url.APIURLID == nil {
+		return DetailsURL{Image: c.newUrlImage()}, nil
+	}
+	return DetailsURL{Image: c.newUrlImage()}, nil
+}
+
+func (c *clientImpl) newUrlImage() string {
+	return c.imageHost + "/assets/loader-200px-200px.gif"
 }
 
 // AddURL implements Client.
@@ -52,6 +63,6 @@ func (c *clientImpl) AddURL(url string) (int, error) {
 	return responseType.ID, nil
 }
 
-func NewClient(client http.Client, baseURL string) Client {
-	return &clientImpl{client: client, baseURL: baseURL}
+func NewClient(client http.Client, baseURL string, imageHost string) Client {
+	return &clientImpl{client: client, baseURL: baseURL, imageHost: imageHost}
 }

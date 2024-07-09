@@ -2,6 +2,7 @@ package app
 
 import (
 	"net/http"
+	"os"
 	"wsw/backend/graph"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -29,6 +30,16 @@ func newRouter() *chi.Mux {
 
 	router.Options("/graphql", gqlHandler)
 	router.Post("/graphql", gqlHandler)
+
+	fs := http.FileServer(http.Dir("./"))
+	router.Get("/assets/*", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := os.Stat("./" + r.RequestURI); os.IsNotExist(err) {
+			http.StripPrefix(r.RequestURI, fs).ServeHTTP(w, r)
+		} else {
+			fs.ServeHTTP(w, r)
+		}
+	})
+
 	return router
 }
 

@@ -83,6 +83,26 @@ func (uu *URLUpdate) ClearAPIURLID() *URLUpdate {
 	return uu
 }
 
+// SetImage sets the "image" field.
+func (uu *URLUpdate) SetImage(s string) *URLUpdate {
+	uu.mutation.SetImage(s)
+	return uu
+}
+
+// SetNillableImage sets the "image" field if the given value is not nil.
+func (uu *URLUpdate) SetNillableImage(s *string) *URLUpdate {
+	if s != nil {
+		uu.SetImage(*s)
+	}
+	return uu
+}
+
+// ClearImage clears the value of the "image" field.
+func (uu *URLUpdate) ClearImage() *URLUpdate {
+	uu.mutation.ClearImage()
+	return uu
+}
+
 // Mutation returns the URLMutation object of the builder.
 func (uu *URLUpdate) Mutation() *URLMutation {
 	return uu.mutation
@@ -151,6 +171,12 @@ func (uu *URLUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if uu.mutation.APIURLIDCleared() {
 		_spec.ClearField(enturl.FieldAPIURLID, field.TypeInt)
+	}
+	if value, ok := uu.mutation.Image(); ok {
+		_spec.SetField(enturl.FieldImage, field.TypeString, value)
+	}
+	if uu.mutation.ImageCleared() {
+		_spec.ClearField(enturl.FieldImage, field.TypeString)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -224,6 +250,26 @@ func (uuo *URLUpdateOne) AddAPIURLID(i int) *URLUpdateOne {
 // ClearAPIURLID clears the value of the "api_url_id" field.
 func (uuo *URLUpdateOne) ClearAPIURLID() *URLUpdateOne {
 	uuo.mutation.ClearAPIURLID()
+	return uuo
+}
+
+// SetImage sets the "image" field.
+func (uuo *URLUpdateOne) SetImage(s string) *URLUpdateOne {
+	uuo.mutation.SetImage(s)
+	return uuo
+}
+
+// SetNillableImage sets the "image" field if the given value is not nil.
+func (uuo *URLUpdateOne) SetNillableImage(s *string) *URLUpdateOne {
+	if s != nil {
+		uuo.SetImage(*s)
+	}
+	return uuo
+}
+
+// ClearImage clears the value of the "image" field.
+func (uuo *URLUpdateOne) ClearImage() *URLUpdateOne {
+	uuo.mutation.ClearImage()
 	return uuo
 }
 
@@ -325,6 +371,12 @@ func (uuo *URLUpdateOne) sqlSave(ctx context.Context) (_node *Url, err error) {
 	}
 	if uuo.mutation.APIURLIDCleared() {
 		_spec.ClearField(enturl.FieldAPIURLID, field.TypeInt)
+	}
+	if value, ok := uuo.mutation.Image(); ok {
+		_spec.SetField(enturl.FieldImage, field.TypeString, value)
+	}
+	if uuo.mutation.ImageCleared() {
+		_spec.ClearField(enturl.FieldImage, field.TypeString)
 	}
 	_node = &Url{config: uuo.config}
 	_spec.Assign = _node.assignValues

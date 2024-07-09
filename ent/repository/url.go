@@ -11,6 +11,7 @@ type (
 		TryGet(string) *ent.Url
 		Insert(string) (*ent.Url, error)
 		UpdateApiUrlId(*ent.Url, int) error
+		Update(string, int) error
 	}
 
 	urlImpl struct {
@@ -18,6 +19,16 @@ type (
 		ctx    context.Context
 	}
 )
+
+// Update implements Url.
+func (u *urlImpl) Update(image string, ID int) error {
+	urlEntity, err := u.client.Url.Query().Where(entUrl.ID(ID)).Only(u.ctx)
+	if err != nil {
+		return err
+	}
+	_, errSave := u.client.Url.UpdateOne(urlEntity).SetImage(image).Save(u.ctx)
+	return errSave
+}
 
 // UpdateApiUrlId implements Url.
 func (u *urlImpl) UpdateApiUrlId(url *ent.Url, apiUrlId int) error {

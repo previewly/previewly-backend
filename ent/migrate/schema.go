@@ -25,6 +25,7 @@ var (
 		{Name: "url", Type: field.TypeString, Unique: true},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"success", "error", "pending"}},
 		{Name: "api_url_id", Type: field.TypeInt, Nullable: true},
+		{Name: "image", Type: field.TypeString, Nullable: true},
 	}
 	// UrlsTable holds the schema information for the "urls" table.
 	UrlsTable = &schema.Table{

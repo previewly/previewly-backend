@@ -22,7 +22,9 @@ type Url struct {
 	// Status holds the value of the "status" field.
 	Status url.Status `json:"status,omitempty"`
 	// APIURLID holds the value of the "api_url_id" field.
-	APIURLID     *int `json:"api_url_id,omitempty"`
+	APIURLID *int `json:"api_url_id,omitempty"`
+	// Image holds the value of the "image" field.
+	Image        *string `json:"image,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -33,7 +35,7 @@ func (*Url) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case enturl.FieldID, enturl.FieldAPIURLID:
 			values[i] = new(sql.NullInt64)
-		case enturl.FieldURL, enturl.FieldStatus:
+		case enturl.FieldURL, enturl.FieldStatus, enturl.FieldImage:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -74,6 +76,13 @@ func (u *Url) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.APIURLID = new(int)
 				*u.APIURLID = int(value.Int64)
+			}
+		case enturl.FieldImage:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field image", values[i])
+			} else if value.Valid {
+				u.Image = new(string)
+				*u.Image = value.String
 			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
@@ -120,6 +129,11 @@ func (u *Url) String() string {
 	if v := u.APIURLID; v != nil {
 		builder.WriteString("api_url_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := u.Image; v != nil {
+		builder.WriteString("image=")
+		builder.WriteString(*v)
 	}
 	builder.WriteByte(')')
 	return builder.String()

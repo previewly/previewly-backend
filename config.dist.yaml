@@ -2,6 +2,8 @@ app:
   cors:
     debug: true
     allowedOrigin: "http://localhost:4200"
+  host:
+    images: "http://localhostt:8000/"
 
 postgres:
   host: "localhost"
@@ -9,5 +11,6 @@ postgres:
   db: "timeline"
   user: "timeline"
   password: "timeline"
+
 api:
   url: "http://localhost:7171/api"

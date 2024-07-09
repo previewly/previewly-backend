@@ -13,6 +13,15 @@ type API struct {
 }
 
 type Config struct {
+	App      AppConfig
 	Postgres Postgres
 	API      API `yaml:"api"`
+}
+
+type AppConfig struct {
+	Hosts Hosts `yaml:"hosts"`
+}
+
+type Hosts struct {
+	Images string `yaml:"images"`
 }

@@ -1,6 +1,7 @@
 package url
 
 import (
+	netUrl "net/url"
 	"wsw/backend/domain/gowitness"
 	"wsw/backend/domain/preview"
 	"wsw/backend/domain/url"
@@ -54,6 +55,11 @@ func (u urlImpl) updateUrlData(url *ent.Url, isNew bool) error {
 
 // AddURL implements Token.
 func (u urlImpl) AddURL(url string) (*preview.PreviewData, error) {
+	_, err := netUrl.ParseRequestURI(url)
+	if err != nil {
+		return nil, err
+	}
+
 	urlEntityHolder, err := u.getUrlEntity(url)
 	if err != nil {
 		return nil, err

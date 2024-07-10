@@ -18,22 +18,22 @@ type (
 		apiClient  gowitness.Client
 		repository repository.Url
 	}
-	UrlEntityHolder struct {
+	EntityHolder struct {
 		entity *ent.Url
 		isNew  bool
 	}
 )
 
-func (u urlImpl) getUrlEntity(url string) (*UrlEntityHolder, error) {
+func (u urlImpl) getUrlEntity(url string) (*EntityHolder, error) {
 	urlEntity := u.repository.TryGet(url)
 	if urlEntity == nil {
 		urlEntity, err := u.repository.Insert(url)
 		if err != nil {
 			return nil, err
 		}
-		return &UrlEntityHolder{entity: urlEntity, isNew: true}, nil
+		return &EntityHolder{entity: urlEntity, isNew: true}, nil
 	}
-	return &UrlEntityHolder{entity: urlEntity, isNew: false}, nil
+	return &EntityHolder{entity: urlEntity, isNew: false}, nil
 }
 
 func (u urlImpl) updateUrlData(url *ent.Url, isNew bool) (*ent.Url, error) {
@@ -61,21 +61,18 @@ func (u urlImpl) AddURL(url string) (*preview.PreviewData, error) {
 	if err != nil {
 		return nil, err
 	}
-	updatetedEntity, errUpdate := u.updateUrlData(urlEntityHolder.entity, urlEntityHolder.isNew)
+	updatedEntity, errUpdate := u.updateUrlData(urlEntityHolder.entity, urlEntityHolder.isNew)
 	if errUpdate != nil {
 		return nil, errUpdate
 	}
-	preview, errPreview := u.getPreviewData(updatetedEntity)
-	if errPreview != nil {
-		return nil, errPreview
-	}
-	return preview, nil
+	return u.getPreviewData(updatedEntity)
 }
 
 func (u urlImpl) getPreviewData(url *ent.Url) (*preview.PreviewData, error) {
 	return &preview.PreviewData{
 		ID:     url.ID,
 		URL:    url.URL,
+		Image:  url.Image,
 		Status: u.getPreviewDataStatus(url.Status),
 	}, nil
 }

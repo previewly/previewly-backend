@@ -24,7 +24,7 @@ type Url struct {
 	// APIURLID holds the value of the "api_url_id" field.
 	APIURLID *int `json:"api_url_id,omitempty"`
 	// Image holds the value of the "image" field.
-	Image        *string `json:"image,omitempty"`
+	Image        string `json:"image,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -81,8 +81,7 @@ func (u *Url) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field image", values[i])
 			} else if value.Valid {
-				u.Image = new(string)
-				*u.Image = value.String
+				u.Image = value.String
 			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
@@ -131,10 +130,8 @@ func (u *Url) String() string {
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
-	if v := u.Image; v != nil {
-		builder.WriteString("image=")
-		builder.WriteString(*v)
-	}
+	builder.WriteString("image=")
+	builder.WriteString(u.Image)
 	builder.WriteByte(')')
 	return builder.String()
 }

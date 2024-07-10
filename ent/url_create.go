@@ -52,14 +52,6 @@ func (uc *URLCreate) SetImage(s string) *URLCreate {
 	return uc
 }
 
-// SetNillableImage sets the "image" field if the given value is not nil.
-func (uc *URLCreate) SetNillableImage(s *string) *URLCreate {
-	if s != nil {
-		uc.SetImage(*s)
-	}
-	return uc
-}
-
 // Mutation returns the URLMutation object of the builder.
 func (uc *URLCreate) Mutation() *URLMutation {
 	return uc.mutation
@@ -105,6 +97,9 @@ func (uc *URLCreate) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Url.status": %w`, err)}
 		}
 	}
+	if _, ok := uc.mutation.Image(); !ok {
+		return &ValidationError{Name: "image", err: errors.New(`ent: missing required field "Url.image"`)}
+	}
 	return nil
 }
 
@@ -145,7 +140,7 @@ func (uc *URLCreate) createSpec() (*Url, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := uc.mutation.Image(); ok {
 		_spec.SetField(enturl.FieldImage, field.TypeString, value)
-		_node.Image = &value
+		_node.Image = value
 	}
 	return _node, _spec
 }

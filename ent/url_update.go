@@ -97,12 +97,6 @@ func (uu *URLUpdate) SetNillableImage(s *string) *URLUpdate {
 	return uu
 }
 
-// ClearImage clears the value of the "image" field.
-func (uu *URLUpdate) ClearImage() *URLUpdate {
-	uu.mutation.ClearImage()
-	return uu
-}
-
 // Mutation returns the URLMutation object of the builder.
 func (uu *URLUpdate) Mutation() *URLMutation {
 	return uu.mutation
@@ -174,9 +168,6 @@ func (uu *URLUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := uu.mutation.Image(); ok {
 		_spec.SetField(enturl.FieldImage, field.TypeString, value)
-	}
-	if uu.mutation.ImageCleared() {
-		_spec.ClearField(enturl.FieldImage, field.TypeString)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -264,12 +255,6 @@ func (uuo *URLUpdateOne) SetNillableImage(s *string) *URLUpdateOne {
 	if s != nil {
 		uuo.SetImage(*s)
 	}
-	return uuo
-}
-
-// ClearImage clears the value of the "image" field.
-func (uuo *URLUpdateOne) ClearImage() *URLUpdateOne {
-	uuo.mutation.ClearImage()
 	return uuo
 }
 
@@ -374,9 +359,6 @@ func (uuo *URLUpdateOne) sqlSave(ctx context.Context) (_node *Url, err error) {
 	}
 	if value, ok := uuo.mutation.Image(); ok {
 		_spec.SetField(enturl.FieldImage, field.TypeString, value)
-	}
-	if uuo.mutation.ImageCleared() {
-		_spec.ClearField(enturl.FieldImage, field.TypeString)
 	}
 	_node = &Url{config: uuo.config}
 	_spec.Assign = _node.assignValues

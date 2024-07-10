@@ -629,7 +629,7 @@ func (m *URLMutation) Image() (r string, exists bool) {
 // OldImage returns the old "image" field's value of the Url entity.
 // If the Url object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *URLMutation) OldImage(ctx context.Context) (v *string, err error) {
+func (m *URLMutation) OldImage(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldImage is only allowed on UpdateOne operations")
 	}
@@ -643,22 +643,9 @@ func (m *URLMutation) OldImage(ctx context.Context) (v *string, err error) {
 	return oldValue.Image, nil
 }
 
-// ClearImage clears the value of the "image" field.
-func (m *URLMutation) ClearImage() {
-	m.image = nil
-	m.clearedFields[enturl.FieldImage] = struct{}{}
-}
-
-// ImageCleared returns if the "image" field was cleared in this mutation.
-func (m *URLMutation) ImageCleared() bool {
-	_, ok := m.clearedFields[enturl.FieldImage]
-	return ok
-}
-
 // ResetImage resets all changes to the "image" field.
 func (m *URLMutation) ResetImage() {
 	m.image = nil
-	delete(m.clearedFields, enturl.FieldImage)
 }
 
 // Where appends a list predicates to the URLMutation builder.
@@ -826,9 +813,6 @@ func (m *URLMutation) ClearedFields() []string {
 	if m.FieldCleared(enturl.FieldAPIURLID) {
 		fields = append(fields, enturl.FieldAPIURLID)
 	}
-	if m.FieldCleared(enturl.FieldImage) {
-		fields = append(fields, enturl.FieldImage)
-	}
 	return fields
 }
 
@@ -845,9 +829,6 @@ func (m *URLMutation) ClearField(name string) error {
 	switch name {
 	case enturl.FieldAPIURLID:
 		m.ClearAPIURLID()
-		return nil
-	case enturl.FieldImage:
-		m.ClearImage()
 		return nil
 	}
 	return fmt.Errorf("unknown Url nullable field %s", name)

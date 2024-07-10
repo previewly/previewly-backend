@@ -37,7 +37,7 @@ func (u *urlImpl) UpdateApiUrlId(url *ent.Url, apiUrlId int) error {
 
 // Insert implements Url.
 func (u *urlImpl) Insert(url string) (*ent.Url, error) {
-	return u.client.Url.Create().SetURL(url).SetStatus("pending").Save(u.ctx)
+	return u.client.Url.Create().SetURL(url).SetStatus("pending").SetImage("").Save(u.ctx)
 }
 
 // TryGet implements Url.

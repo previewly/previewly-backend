@@ -36,7 +36,7 @@ func (u urlImpl) getUrlEntity(url string) (*UrlEntityHolder, error) {
 	return &UrlEntityHolder{entity: urlEntity, isNew: false}, nil
 }
 
-func (u urlImpl) updateUrlData(url *ent.Url, isNew bool) error {
+func (u urlImpl) updateUrlData(url *ent.Url, isNew bool) (*ent.Url, error) {
 	if u.shouldAddUrlToApi(url, isNew) {
 		go func(url *ent.Url) {
 			id, err := u.apiClient.AddURL(url.URL)
@@ -45,10 +45,9 @@ func (u urlImpl) updateUrlData(url *ent.Url, isNew bool) error {
 	}
 	details, err := u.apiClient.Details(url)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	u.updateApiURLDetails(details)
-	return nil
+	return u.updateApiURLDetails(details)
 }
 
 // AddURL implements Token.
@@ -62,11 +61,11 @@ func (u urlImpl) AddURL(url string) (*preview.PreviewData, error) {
 	if err != nil {
 		return nil, err
 	}
-	errUpdate := u.updateUrlData(urlEntityHolder.entity, urlEntityHolder.isNew)
+	updatetedEntity, errUpdate := u.updateUrlData(urlEntityHolder.entity, urlEntityHolder.isNew)
 	if errUpdate != nil {
 		return nil, errUpdate
 	}
-	preview, errPreview := u.getPreviewData(urlEntityHolder.entity)
+	preview, errPreview := u.getPreviewData(updatetedEntity)
 	if errPreview != nil {
 		return nil, errPreview
 	}
@@ -99,8 +98,8 @@ func (u urlImpl) shouldAddUrlToApi(_ *ent.Url, isNew bool) bool {
 	return isNew
 }
 
-func (u urlImpl) updateApiURLDetails(details *gowitness.DetailsURL) {
-	u.repository.Update(details.Image, details.ID)
+func (u urlImpl) updateApiURLDetails(details *gowitness.DetailsURL) (*ent.Url, error) {
+	return u.repository.Update(details.Image, details.ID)
 }
 
 func (u urlImpl) setApiUrlId(url *ent.Url, apiUrlId int, urlError error) {

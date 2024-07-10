@@ -9,7 +9,7 @@ func ConvertPreviewData(data *preview.PreviewData) *model.PreviewData {
 	return &model.PreviewData{
 		ID:     data.ID,
 		URL:    data.URL,
-		Image:  nil,
+		Image:  data.Image,
 		Status: convertPreviewStatus(data.Status),
 	}
 }

@@ -2,6 +2,8 @@ services:
   gowitness:
     image: ghcr.io/wert2all/gowitness:latest
     command: gowitness server --address 0.0.0.0:7171 --db-location=postgres://gowidness:gowidness12345@gowidnessdb/gowidness --debug-db
+    volumes:
+      - ./assets/screenshots:/data/screenshots
     depends_on:
       - gowidnessdb
     ports:

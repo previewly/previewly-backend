@@ -99,7 +99,7 @@ func (u urlImpl) shouldAddUrlToApi(_ *ent.Url, isNew bool) bool {
 	return isNew
 }
 
-func (u urlImpl) updateApiURLDetails(details gowitness.DetailsURL) {
+func (u urlImpl) updateApiURLDetails(details *gowitness.DetailsURL) {
 	u.repository.Update(details.Image, details.ID)
 }
 

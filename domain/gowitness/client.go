@@ -5,19 +5,26 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strconv"
 	"wsw/backend/ent"
+	"wsw/backend/lib/utils"
 )
 
 type (
 	Client interface {
 		AddURL(string) (int, error)
-		Details(*ent.Url) (DetailsURL, error)
+		Details(*ent.Url) (*DetailsURL, error)
 	}
 	DetailsURL struct {
 		ID    int
 		Image string
 	}
-	addURLResponse struct{ ID int }
+	addURLResponse  struct{ ID int }
+	detailsResponse struct {
+		ID       int
+		Title    string
+		Filename string
+	}
 
 	clientImpl struct {
 		baseURL   string
@@ -27,11 +34,29 @@ type (
 )
 
 // Details implements Client.
-func (c *clientImpl) Details(url *ent.Url) (DetailsURL, error) {
-	if url.APIURLID == nil {
-		return DetailsURL{ID: url.ID, Image: c.newUrlImage()}, nil
+func (c *clientImpl) Details(url *ent.Url) (*DetailsURL, error) {
+	if url.APIURLID != nil {
+		response, err := http.Get(c.baseURL + "/detail/" + strconv.FormatInt(int64(*url.APIURLID), 10))
+		if err != nil {
+			return nil, err
+		}
+		if response.Body != nil {
+			defer response.Body.Close()
+		}
+		result, readErr := io.ReadAll(response.Body)
+		if readErr != nil {
+			return nil, readErr
+		}
+
+		responseType := detailsResponse{}
+		jsonErr := json.Unmarshal(result, &responseType)
+		if jsonErr != nil {
+			return nil, jsonErr
+		}
+		utils.D(responseType)
+		return &DetailsURL{ID: url.ID, Image: c.newUrlImage()}, nil
 	}
-	return DetailsURL{ID: url.ID, Image: c.newUrlImage()}, nil
+	return &DetailsURL{ID: url.ID, Image: c.newUrlImage()}, nil
 }
 
 func (c *clientImpl) newUrlImage() string {
@@ -59,7 +84,7 @@ func (c *clientImpl) AddURL(url string) (int, error) {
 	responseType := addURLResponse{}
 	jsonErr := json.Unmarshal(result, &responseType)
 	if jsonErr != nil {
-		return 0, nil
+		return 0, jsonErr
 	}
 	return responseType.ID, nil
 }

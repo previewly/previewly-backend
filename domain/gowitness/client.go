@@ -63,7 +63,7 @@ func (c *clientImpl) newUrlImage() string {
 }
 
 func (c *clientImpl) newScreenshot(response detailsResponse) string {
-	return c.imageHost + "/screenshot/" + response.Filename
+	return c.imageHost + "/screenshots/" + response.Filename
 }
 
 // AddURL implements Client.

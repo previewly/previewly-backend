@@ -95,7 +95,7 @@ func (u urlImpl) shouldAddUrlToApi(url *ent.Url, isNew bool) bool {
 }
 
 func (u urlImpl) updateApiURLDetails(details *gowitness.DetailsURL) (*ent.Url, error) {
-	return u.repository.Update(details.Image, details.ID)
+	return u.repository.Update(details.Image, details.Status, details.ID)
 }
 
 func (u urlImpl) setApiUrlId(url *ent.Url, apiUrlId int, urlError error) {

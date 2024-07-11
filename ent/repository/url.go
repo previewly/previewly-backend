@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"wsw/backend/domain/url"
 	"wsw/backend/ent"
 	entUrl "wsw/backend/ent/url"
 )
@@ -11,7 +12,7 @@ type (
 		TryGet(string) *ent.Url
 		Insert(string) (*ent.Url, error)
 		UpdateApiUrlId(*ent.Url, int) error
-		Update(string, int) (*ent.Url, error)
+		Update(string, url.Status, int) (*ent.Url, error)
 	}
 
 	urlImpl struct {
@@ -21,12 +22,12 @@ type (
 )
 
 // Update implements Url.
-func (u *urlImpl) Update(image string, ID int) (*ent.Url, error) {
+func (u *urlImpl) Update(image string, status url.Status, ID int) (*ent.Url, error) {
 	urlEntity, err := u.client.Url.Query().Where(entUrl.ID(ID)).Only(u.ctx)
 	if err != nil {
 		return nil, err
 	}
-	return u.client.Url.UpdateOne(urlEntity).SetImage(image).Save(u.ctx)
+	return u.client.Url.UpdateOne(urlEntity).SetImage(image).SetStatus(status).Save(u.ctx)
 }
 
 // UpdateApiUrlId implements Url.

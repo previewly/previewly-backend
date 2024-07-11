@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"wsw/backend/domain/url"
 	"wsw/backend/ent"
 )
 
@@ -15,8 +16,9 @@ type (
 		Details(*ent.Url) (*DetailsURL, error)
 	}
 	DetailsURL struct {
-		ID    int
-		Image string
+		ID     int
+		Image  string
+		Status url.Status
 	}
 	addURLResponse  struct{ ID int }
 	detailsResponse struct {
@@ -53,17 +55,9 @@ func (c *clientImpl) Details(url *ent.Url) (*DetailsURL, error) {
 			return nil, jsonErr
 		}
 
-		return &DetailsURL{ID: url.ID, Image: c.newScreenshot(responseType)}, nil
+		return c.createDetailsWithScreenshot(url.ID, responseType), nil
 	}
-	return &DetailsURL{ID: url.ID, Image: c.newUrlImage()}, nil
-}
-
-func (c *clientImpl) newUrlImage() string {
-	return c.imageHost + "/assets/loader-200px-200px.gif"
-}
-
-func (c *clientImpl) newScreenshot(response detailsResponse) string {
-	return c.imageHost + "/screenshots/" + response.Filename
+	return c.createDetailsForNewUrl(url.ID), nil
 }
 
 // AddURL implements Client.
@@ -92,6 +86,17 @@ func (c *clientImpl) AddURL(url string) (int, error) {
 	return responseType.ID, nil
 }
 
+func (c *clientImpl) createDetailsWithScreenshot(id int, response detailsResponse) *DetailsURL {
+	return &DetailsURL{
+		ID:     id,
+		Image:  c.imageHost + "/screenshots/" + response.Filename,
+		Status: url.Success,
+	}
+}
+
+func (c *clientImpl) createDetailsForNewUrl(id int) *DetailsURL {
+	return &DetailsURL{ID: id, Image: c.imageHost + "/assets/loader-200px-200px.gif", Status: url.Pending}
+}
 func NewClient(client http.Client, baseURL string, imageHost string) Client {
 	return &clientImpl{client: client, baseURL: baseURL, imageHost: imageHost}
 }

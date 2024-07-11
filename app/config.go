@@ -19,7 +19,7 @@ type Config struct {
 }
 
 type AppConfig struct {
-	Hosts Hosts `yaml:"hosts"`
+	Host Hosts `yaml:"host"`
 }
 
 type Hosts struct {

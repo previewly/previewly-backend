@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"strconv"
 	"wsw/backend/ent"
-	"wsw/backend/lib/utils"
 )
 
 type (
@@ -53,14 +52,18 @@ func (c *clientImpl) Details(url *ent.Url) (*DetailsURL, error) {
 		if jsonErr != nil {
 			return nil, jsonErr
 		}
-		utils.D(responseType)
-		return &DetailsURL{ID: url.ID, Image: c.newUrlImage()}, nil
+
+		return &DetailsURL{ID: url.ID, Image: c.newScreenshot(responseType)}, nil
 	}
 	return &DetailsURL{ID: url.ID, Image: c.newUrlImage()}, nil
 }
 
 func (c *clientImpl) newUrlImage() string {
 	return c.imageHost + "/assets/loader-200px-200px.gif"
+}
+
+func (c *clientImpl) newScreenshot(response detailsResponse) string {
+	return c.imageHost + "/screenshot/" + response.Filename
 }
 
 // AddURL implements Client.

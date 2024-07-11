@@ -51,5 +51,6 @@ func readConfig() Config {
 		utils.D(err, cfg)
 		panic("cannot parse config ")
 	}
+
 	return cfg
 }

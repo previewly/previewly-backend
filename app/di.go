@@ -25,7 +25,7 @@ func initDi(config Config, appContext context.Context) {
 		client := http.Client{
 			Timeout: time.Second * 2, // Timeout after 2 seconds
 		}
-		return gowitness.NewClient(client, config.API.BaseURL, config.App.Hosts.Images)
+		return gowitness.NewClient(client, config.API.BaseURL, config.App.Host.Images)
 	})
 
 	initService(func(client *ent.Client, ctx context.Context) repository.Token {

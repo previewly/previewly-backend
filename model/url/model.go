@@ -90,9 +90,8 @@ func (u urlImpl) getPreviewDataStatus(status url.Status) preview.Status {
 	}
 }
 
-func (u urlImpl) shouldAddUrlToApi(_ *ent.Url, isNew bool) bool {
-	// TODO
-	return isNew
+func (u urlImpl) shouldAddUrlToApi(url *ent.Url, isNew bool) bool {
+	return isNew || url.APIURLID == nil || *url.APIURLID == 0
 }
 
 func (u urlImpl) updateApiURLDetails(details *gowitness.DetailsURL) (*ent.Url, error) {

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.2](https://github.com/wert2all/wsw-backend/compare/v1.2.1...v1.2.2) (2024-07-12)
+
+
+### Bug Fixes
+
+* fix docker build token ([41656f6](https://github.com/wert2all/wsw-backend/commit/41656f6ae54aad0bd9b7ba4f0b305ec266d5a33e))
+
 ## [1.2.1](https://github.com/wert2all/wsw-backend/compare/v1.2.0...v1.2.1) (2024-07-12)
 
 

@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/wert2all/wsw-backend/compare/v1.1.0...v1.2.0) (2024-07-12)
+
+
+### Features
+
+* add docker container ([8b080d8](https://github.com/wert2all/wsw-backend/commit/8b080d8ddd4eee9e2812610ce51b5ad878c67169))
+
+
+### Bug Fixes
+
+* update docker registry ([c9f9fcc](https://github.com/wert2all/wsw-backend/commit/c9f9fcc97737366c15ec5f7fce70ec1fc612f180))
+
 ## [1.1.0](https://github.com/wert2all/wsw-backend/compare/v1.0.0...v1.1.0) (2024-07-11)
 
 

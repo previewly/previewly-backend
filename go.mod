@@ -12,7 +12,6 @@ require (
 	github.com/rs/cors v1.11.0
 	github.com/vektah/gqlparser/v2 v2.5.12
 	golang.org/x/exp v0.0.0-20220909182711-5c715a9e8561
-	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (

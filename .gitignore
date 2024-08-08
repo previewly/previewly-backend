@@ -2,4 +2,5 @@
 backend
 config.yaml
 wsw-backend
+.env.local
 assets/screenshots/

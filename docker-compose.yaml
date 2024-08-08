@@ -21,7 +21,7 @@ services:
     image: postgres:16.3
     environment:
       POSTGRES_USER: wsw
-      POSTGRES_PASSWORD: wsw12345
+      POSTGRES_PASSWORD: wsw
       POSTGRES_DB: wsw
     ports:
       - 5434:5432

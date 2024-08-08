@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"os"
 )
 
@@ -36,6 +37,10 @@ type Hosts struct {
 }
 
 func newConfig() Config {
+	fmt.Println()
+	fmt.Println("You could use this environment variables: DBPort, DBHost, DBName, DBUser, DBPassword, ApiUrl, ImageHost")
+	fmt.Println()
+
 	config := Config{
 		App: AppConfig{
 			Host: Hosts{

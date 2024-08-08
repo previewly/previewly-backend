@@ -7,4 +7,4 @@ COPY . ./source
 RUN cd ./source/ && CGO_ENABLED=0 GOOS=linux go build -o /app/wsw-backend && rm -rf /app/source
 EXPOSE 8000
 
-CMD ["/app/wsw-backend"]
+#CMD ["/app/wsw-backend"]

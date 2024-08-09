@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.0](https://github.com/wert2all/wsw-backend/compare/v1.2.2...v1.3.0) (2024-08-09)
+
+
+### Features
+
+* remove config file ([92a49d3](https://github.com/wert2all/wsw-backend/commit/92a49d37f806f4fe2c5f3bd366177262d51233b8))
+
+
+### Bug Fixes
+
+* try to run application container ([78ff440](https://github.com/wert2all/wsw-backend/commit/78ff440557ee8043182d1db8f876a3c0550abb55))
+
 ## [1.2.2](https://github.com/wert2all/wsw-backend/compare/v1.2.1...v1.2.2) (2024-07-12)
 
 

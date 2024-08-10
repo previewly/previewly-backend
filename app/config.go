@@ -28,11 +28,7 @@ type Config struct {
 }
 
 type AppConfig struct {
-	Host Hosts
-}
-
-type Hosts struct {
-	Images string
+	ImageHost string
 }
 
 func newConfig() Config {
@@ -45,7 +41,7 @@ func newConfig() Config {
 		dbUserNameFlag     string
 		dbUserPasswordFlag string
 
-		apiUrlFlag string
+		apiURLFlag string
 	)
 
 	flag.StringVar(&imageHostFlag, "image-host", defaultHTTPHost+":8000", "Image host")
@@ -56,15 +52,13 @@ func newConfig() Config {
 	flag.StringVar(&dbUserNameFlag, "db-user-name", "wsw", "Database user name")
 	flag.StringVar(&dbUserPasswordFlag, "db-user-password", "wsw", "Database user password")
 
-	flag.StringVar(&apiUrlFlag, "api-url", defaultHTTPHost+":7171/api", "Api url")
+	flag.StringVar(&apiURLFlag, "api-url", defaultHTTPHost+":7171/api", "Api url")
 
 	flag.Parse()
 
 	config := Config{
 		App: AppConfig{
-			Host: Hosts{
-				Images: imageHostFlag,
-			},
+			ImageHost: imageHostFlag,
 		},
 		Postgres: Postgres{
 			Host:     dbHostFlag,
@@ -74,7 +68,7 @@ func newConfig() Config {
 			Password: dbUserPasswordFlag,
 		},
 		API: API{
-			BaseURL: apiUrlFlag,
+			BaseURL: apiURLFlag,
 		},
 	}
 	// utils.D(config)

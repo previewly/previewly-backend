@@ -1,8 +1,7 @@
 package app
 
 import (
-	"fmt"
-	"os"
+	"flag"
 )
 
 const (
@@ -11,7 +10,7 @@ const (
 )
 
 type Postgres struct {
-	Port     string
+	Port     int
 	Host     string
 	DB       string
 	User     string
@@ -37,35 +36,47 @@ type Hosts struct {
 }
 
 func newConfig() Config {
-	fmt.Println()
-	fmt.Println("You could use this environment variables: DBPort, DBHost, DBName, DBUser, DBPassword, ApiUrl, ImageHost")
-	fmt.Println()
+	var (
+		imageHostFlag string
+
+		dbHostFlag         string
+		dbPortFlag         int
+		dbNameFlag         string
+		dbUserNameFlag     string
+		dbUserPasswordFlag string
+
+		apiUrlFlag string
+	)
+
+	flag.StringVar(&imageHostFlag, "image-host", defaultHTTPHost+":8000", "Image host")
+
+	flag.StringVar(&dbHostFlag, "db-host", defaultHost, "Database host")
+	flag.IntVar(&dbPortFlag, "db-port", 5432, "Database port")
+	flag.StringVar(&dbNameFlag, "db-name", "wsw", "Database name")
+	flag.StringVar(&dbUserNameFlag, "db-user-name", "wsw", "Database user name")
+	flag.StringVar(&dbUserPasswordFlag, "db-user-password", "wsw", "Database user password")
+
+	flag.StringVar(&apiUrlFlag, "api-url", defaultHTTPHost+":7171/api", "Api url")
+
+	flag.Parse()
 
 	config := Config{
 		App: AppConfig{
 			Host: Hosts{
-				Images: getEnvVariable("ImageHost", defaultHTTPHost+":8000"),
+				Images: imageHostFlag,
 			},
 		},
 		Postgres: Postgres{
-			Port:     getEnvVariable("DBPort", "5432"),
-			Host:     getEnvVariable("DBHost", defaultHost),
-			DB:       getEnvVariable("DBName", "wsw"),
-			User:     getEnvVariable("DBUser", "wsw"),
-			Password: getEnvVariable("DBPassword", "wsw"),
+			Host:     dbHostFlag,
+			Port:     dbPortFlag,
+			DB:       dbNameFlag,
+			User:     dbUserNameFlag,
+			Password: dbUserPasswordFlag,
 		},
 		API: API{
-			BaseURL: getEnvVariable("ApiUrl", defaultHTTPHost+":7171/api"),
+			BaseURL: apiUrlFlag,
 		},
 	}
 	// utils.D(config)
 	return config
-}
-
-func getEnvVariable(variableName string, defaultValue string) string {
-	if os.Getenv(variableName) != "" {
-		return os.Getenv(variableName)
-	}
-
-	return defaultValue
 }

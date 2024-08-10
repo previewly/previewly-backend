@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"net/http"
+	"strconv"
 	"wsw/backend/lib/utils"
 
 	"github.com/go-chi/chi/v5"
@@ -16,6 +17,7 @@ type App interface {
 
 type appImpl struct {
 	router *chi.Mux
+	listen ListenHost
 }
 
 // Close implements App.
@@ -25,7 +27,7 @@ func (a appImpl) Close() {
 
 // Start implements App.
 func (a appImpl) Start() {
-	utils.F("Error: %v", http.ListenAndServe(":8000", a.router))
+	utils.F("Error: %v", http.ListenAndServe(a.listen.Host+":"+strconv.Itoa(a.listen.Port), a.router))
 }
 
 func NewApp() (App, error) {

@@ -18,7 +18,12 @@ import (
 func initDi(config Config, appContext context.Context) {
 	initService(func() context.Context { return appContext })
 	initService(func() (*ent.Client, error) { return newDBClient(config.Postgres, appContext) })
-	initService(func() App { return appImpl{router: newRouter()} })
+	initService(func() App {
+		return appImpl{
+			router: newRouter(),
+			listen: config.App.Listen,
+		}
+	})
 
 	initService(func() generator.TokenGenerator { return generator.NewTokenGenerator() })
 	initService(func() gowitness.Client {

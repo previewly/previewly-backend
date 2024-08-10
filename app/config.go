@@ -26,13 +26,20 @@ type Config struct {
 	Postgres Postgres
 	API      API
 }
-
+type ListenHost struct {
+	Host string
+	Port int
+}
 type AppConfig struct {
 	ImageHost string
+	Listen    ListenHost
 }
 
 func newConfig() Config {
 	var (
+		listenHostFlag string
+		listenPortFlag int
+
 		imageHostFlag string
 
 		dbHostFlag         string
@@ -43,6 +50,9 @@ func newConfig() Config {
 
 		apiURLFlag string
 	)
+
+	flag.StringVar(&listenHostFlag, "listen-host", "", "Listen host")
+	flag.IntVar(&listenPortFlag, "listen-port", 8000, "Listen port")
 
 	flag.StringVar(&imageHostFlag, "image-host", defaultHTTPHost+":8000", "Image host")
 
@@ -59,6 +69,10 @@ func newConfig() Config {
 	config := Config{
 		App: AppConfig{
 			ImageHost: imageHostFlag,
+			Listen: ListenHost{
+				Host: listenHostFlag,
+				Port: listenPortFlag,
+			},
 		},
 		Postgres: Postgres{
 			Host:     dbHostFlag,

@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"strconv"
 	"strings"
 	"wsw/backend/ent"
 
@@ -25,7 +26,7 @@ func createConnectionURI(config Postgres) string {
 
 	optionsMap := map[string]string{
 		"host":     config.Host,
-		"port":     config.Port,
+		"port":     strconv.Itoa(config.Port),
 		"user":     config.User,
 		"password": config.Password,
 		"dbname":   config.DB,

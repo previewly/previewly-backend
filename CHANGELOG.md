@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/wert2all/wsw-backend/compare/v1.3.0...v1.4.0) (2024-08-10)
+
+
+### Features
+
+* replace cli env to  cli arguments ([4efc53a](https://github.com/wert2all/wsw-backend/commit/4efc53a55da8e5bfc7c160960ffce887c187a2be))
+
 ## [1.3.0](https://github.com/wert2all/wsw-backend/compare/v1.2.2...v1.3.0) (2024-08-09)
 
 

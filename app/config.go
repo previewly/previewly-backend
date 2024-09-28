@@ -17,9 +17,14 @@ type Postgres struct {
 	Password string
 }
 
+type Gowitness struct {
+	ScreenshotPath string
+}
+
 type Config struct {
-	App      AppConfig
-	Postgres Postgres
+	App       AppConfig
+	Postgres  Postgres
+	Gowitness Gowitness
 }
 
 type ListenHost struct {
@@ -41,6 +46,8 @@ func newConfig() Config {
 		dbNameFlag         string
 		dbUserNameFlag     string
 		dbUserPasswordFlag string
+
+		screenShotPath string
 	)
 
 	flag.StringVar(&listenHostFlag, "listen-host", "", "Listen host")
@@ -52,6 +59,7 @@ func newConfig() Config {
 	flag.StringVar(&dbUserNameFlag, "db-user-name", "wsw", "Database user name")
 	flag.StringVar(&dbUserPasswordFlag, "db-user-password", "wsw", "Database user password")
 
+	flag.StringVar(&screenShotPath, "screenshot-path", "data/screenshots", "Screenshot path")
 	flag.Parse()
 
 	config := Config{
@@ -67,6 +75,9 @@ func newConfig() Config {
 			DB:       dbNameFlag,
 			User:     dbUserNameFlag,
 			Password: dbUserPasswordFlag,
+		},
+		Gowitness: Gowitness{
+			ScreenshotPath: screenShotPath,
 		},
 	}
 	// utils.D(config)

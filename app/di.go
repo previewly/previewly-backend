@@ -25,6 +25,8 @@ func initDi(config Config, appContext context.Context) {
 	initService(func() gowitness.Writer { return gowitness.NewRunnerWriter() })
 	initService(func(logger *slog.Logger, writer gowitness.Writer) gowitness.Runner {
 		options := runner.NewDefaultOptions()
+		options.Scan.ScreenshotPath = config.Gowitness.ScreenshotPath
+
 		driver, _ := driver.NewChromedp(logger, *options)
 		return gowitness.NewRunner(logger, writer, driver, *options)
 	})

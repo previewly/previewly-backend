@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"log/slog"
 
 	"wsw/backend/domain/gowitness"
 	"wsw/backend/domain/token/generator"
@@ -12,12 +13,22 @@ import (
 	"wsw/backend/model/url"
 
 	"github.com/golobby/container/v3"
+	"github.com/sensepost/gowitness/pkg/runner"
+	driver "github.com/sensepost/gowitness/pkg/runner/drivers"
 )
 
 func initDi(config Config, appContext context.Context) {
 	initService(func() context.Context { return appContext })
 	initService(func() (*ent.Client, error) { return newDBClient(config.Postgres, appContext) })
-	initService(func() gowitness.Runner { return gowitness.NewRunner() })
+
+	initService(func() *slog.Logger { return slog.Default() })
+	initService(func() gowitness.Writer { return gowitness.NewRunnerWriter() })
+	initService(func(logger *slog.Logger, writer gowitness.Writer) gowitness.Runner {
+		options := runner.NewDefaultOptions()
+		driver, _ := driver.NewChromedp(logger, *options)
+		return gowitness.NewRunner(logger, writer, driver, *options)
+	})
+
 	initService(func(entClient *ent.Client, runner gowitness.Runner) App {
 		return appImpl{
 			router: newRouter(),

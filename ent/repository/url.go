@@ -12,7 +12,7 @@ type (
 	Url interface {
 		TryGet(string) *ent.Url
 		Insert(string) (*ent.Url, error)
-		Update(string, url.Status, int) (*ent.Url, error)
+		Update(string, url.Status, int, error) (*ent.Url, error)
 	}
 
 	urlImpl struct {
@@ -22,7 +22,7 @@ type (
 )
 
 // Update implements Url.
-func (u *urlImpl) Update(image string, status url.Status, ID int) (*ent.Url, error) {
+func (u *urlImpl) Update(image string, status url.Status, ID int, _ error) (*ent.Url, error) {
 	urlEntity, err := u.client.Url.Query().Where(entUrl.ID(ID)).Only(u.ctx)
 	if err != nil {
 		return nil, err

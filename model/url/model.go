@@ -46,14 +46,14 @@ func (u urlImpl) updateUrlData(urlEntity *ent.Url) (*ent.Url, error) {
 	if u.shouldUpdateUrlData(urlEntity) {
 		go func(url *ent.Url) {
 			details, err := u.apiClient.GetUrlDetails(url.URL)
-			u.updateApiURLDetails(details, err)
+			u.updateURLDetails(details, url.ID, err)
 		}(urlEntity)
 	}
 	return urlEntity, nil
 }
 
-func (u urlImpl) updateApiURLDetails(details *gowitness.Details, err error) {
-	panic("unimplemented")
+func (u urlImpl) updateURLDetails(details *gowitness.Details, urlID int, err error) {
+	u.repository.Update(details.Image, details.Status, urlID, err)
 }
 
 func (u urlImpl) shouldUpdateUrlData(urlEntity *ent.Url) bool {

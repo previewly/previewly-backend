@@ -3,6 +3,8 @@ package gowitness
 import (
 	"log/slog"
 
+	"wsw/backend/domain/url"
+
 	"github.com/sensepost/gowitness/pkg/models"
 	"github.com/sensepost/gowitness/pkg/runner"
 	"github.com/sensepost/gowitness/pkg/writers"
@@ -18,7 +20,10 @@ type (
 	Writer interface {
 		Write(*models.Result) error
 	}
-	Details    struct{}
+	Details struct {
+		Image  string
+		Status url.Status
+	}
 	clientImpl struct{}
 	runnerImpl struct {
 		runner *runner.Runner

@@ -4,25 +4,30 @@ import (
 	"context"
 	"net/http"
 	"strconv"
+
 	"wsw/backend/lib/utils"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/golobby/container/v3"
 )
 
-type App interface {
-	Start()
-	Close()
-}
+type (
+	closer func()
+	App    interface {
+		Start()
+		Closer() closer
+	}
+)
 
 type appImpl struct {
 	router *chi.Mux
 	listen ListenHost
+	closer closer
 }
 
 // Close implements App.
-func (a appImpl) Close() {
-	panic("unimplemented")
+func (a appImpl) Closer() closer {
+	return a.closer
 }
 
 // Start implements App.

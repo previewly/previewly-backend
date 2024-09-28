@@ -17,10 +17,15 @@ import (
 func initDi(config Config, appContext context.Context) {
 	initService(func() context.Context { return appContext })
 	initService(func() (*ent.Client, error) { return newDBClient(config.Postgres, appContext) })
-	initService(func() App {
+	initService(func() gowitness.Runner { return gowitness.NewRunner() })
+	initService(func(entClient *ent.Client, runner gowitness.Runner) App {
 		return appImpl{
 			router: newRouter(),
 			listen: config.App.Listen,
+			closer: func() {
+				entClient.Close()
+				runner.Close()
+			},
 		}
 	})
 

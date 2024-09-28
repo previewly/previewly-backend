@@ -25,7 +25,7 @@ func NewCustomWriter() (*customWriter, error) {
 	return &customWriter{}, nil
 }
 
-func main() {
+func Test() {
 	logger := slog.Default()
 
 	// define scan/chrome/logging etc. options. drivers, scanners and writers use these.

@@ -11,5 +11,5 @@ func main() {
 		utils.F("Coulnd not create application: %v", err)
 	}
 	application.Start()
-	defer application.Close()
+	defer application.Closer()()
 }

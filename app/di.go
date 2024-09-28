@@ -4,8 +4,10 @@ import (
 	"context"
 	"log/slog"
 
+	"wsw/backend/app/config"
 	"wsw/backend/domain/gowitness"
 	"wsw/backend/domain/token/generator"
+	"wsw/backend/domain/url/screenshot"
 	"wsw/backend/ent"
 	"wsw/backend/ent/repository"
 	"wsw/backend/lib/utils"
@@ -15,41 +17,46 @@ import (
 	"github.com/golobby/container/v3"
 	"github.com/sensepost/gowitness/pkg/runner"
 	driver "github.com/sensepost/gowitness/pkg/runner/drivers"
+
+	writers "github.com/sensepost/gowitness/pkg/writers"
 )
 
-func initDi(config Config, appContext context.Context) {
+func initDi(config config.Config, appContext context.Context) {
 	initService(func() context.Context { return appContext })
 	initService(func() (*ent.Client, error) { return newDBClient(config.Postgres, appContext) })
 
-	initService(func() *slog.Logger { return slog.Default() })
-	initService(func() gowitness.Writer { return gowitness.NewRunnerWriter() })
-	initService(func(logger *slog.Logger, writer gowitness.Writer) gowitness.Runner {
-		options := runner.NewDefaultOptions()
-		options.Scan.ScreenshotPath = config.Gowitness.ScreenshotPath
-
-		driver, _ := driver.NewChromedp(logger, *options)
-		return gowitness.NewRunner(logger, writer, driver, *options)
-	})
-
-	initService(func(entClient *ent.Client, runner gowitness.Runner) App {
+	initService(func(entClient *ent.Client) App {
 		return appImpl{
 			router: newRouter(),
 			listen: config.App.Listen,
 			closer: func() {
 				entClient.Close()
-				runner.Close()
 			},
 		}
 	})
 
 	initService(func() generator.TokenGenerator { return generator.NewTokenGenerator() })
-	initService(func() gowitness.Client { return gowitness.NewClient() })
+	initService(func() screenshot.Provider { return screenshot.NewProvider(config.Gowitness) })
 
 	initService(func(client *ent.Client, ctx context.Context) repository.Token {
 		return repository.NewToken(client, ctx)
 	})
 	initService(func(client *ent.Client, ctx context.Context) repository.Url {
 		return repository.NewUrl(client, ctx)
+	})
+
+	initService(func() *slog.Logger { return slog.Default() })
+	initService(func(repository repository.Url, urlProvider screenshot.Provider) gowitness.CreateWriter {
+		return func(url *ent.Url) writers.Writer {
+			return gowitness.NewRunnerWriter(url, repository, urlProvider)
+		}
+	})
+	initService(func(logger *slog.Logger, createWriter gowitness.CreateWriter) gowitness.Client {
+		options := runner.NewDefaultOptions()
+		options.Scan.ScreenshotPath = config.Gowitness.ScreenshotPath
+
+		driver, _ := driver.NewChromedp(logger, *options)
+		return gowitness.NewClient(logger, createWriter, driver, *options)
 	})
 
 	initService(func(generator generator.TokenGenerator, tokenRepository repository.Token) token.Token {

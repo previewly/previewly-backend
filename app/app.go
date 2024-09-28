@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"wsw/backend/app/config"
 	"wsw/backend/lib/utils"
 
 	"github.com/go-chi/chi/v5"
@@ -21,7 +22,7 @@ type (
 
 type appImpl struct {
 	router *chi.Mux
-	listen ListenHost
+	listen config.ListenHost
 	closer closer
 }
 
@@ -36,7 +37,7 @@ func (a appImpl) Start() {
 }
 
 func NewApp() (App, error) {
-	initDi(newConfig(), context.Background())
+	initDi(config.NewConfig(), context.Background())
 	var application App
 	err := container.Resolve(&application)
 	return application, err

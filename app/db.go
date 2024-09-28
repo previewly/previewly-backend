@@ -4,24 +4,30 @@ import (
 	"context"
 	"strconv"
 	"strings"
+
+	"wsw/backend/app/config"
 	"wsw/backend/ent"
+	"wsw/backend/ent/migrate"
 
 	_ "github.com/lib/pq"
 )
 
-func newDBClient(config Postgres, appContext context.Context) (*ent.Client, error) {
+func newDBClient(config config.Postgres, appContext context.Context) (*ent.Client, error) {
 	client, err := ent.Open("postgres", createConnectionURI(config))
 	if err != nil {
 		return nil, err
 	}
-	if err := client.Schema.Create(appContext); err != nil {
+	if err := client.Schema.Create(
+		appContext,
+		migrate.WithDropIndex(true),
+		migrate.WithDropColumn(true)); err != nil {
 		return nil, err
 	}
 
 	return client, nil
 }
 
-func createConnectionURI(config Postgres) string {
+func createConnectionURI(config config.Postgres) string {
 	var sb strings.Builder
 
 	optionsMap := map[string]string{

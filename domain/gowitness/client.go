@@ -3,64 +3,48 @@ package gowitness
 import (
 	"log/slog"
 
-	"wsw/backend/domain/url"
+	"wsw/backend/ent"
 
-	"github.com/sensepost/gowitness/pkg/models"
 	"github.com/sensepost/gowitness/pkg/runner"
 	"github.com/sensepost/gowitness/pkg/writers"
 )
 
 type (
 	Client interface {
-		GetUrlDetails(string) (*Details, error)
+		UpdateUrl(*ent.Url)
 	}
-	Runner interface {
-		Close()
-	}
-	Writer interface {
-		Write(*models.Result) error
-	}
-	Details struct {
-		Image  string
-		Status url.Status
-	}
-	clientImpl struct{}
-	runnerImpl struct {
-		runner *runner.Runner
-	}
-	writerImpl struct {
-		Result *models.Result
+	CreateWriter func(*ent.Url) writers.Writer
+
+	clientImlp struct {
+		logger       *slog.Logger
+		driver       runner.Driver
+		options      runner.Options
+		createWriter CreateWriter
 	}
 )
 
-// Write implements Writer.
-func (w writerImpl) Write(result *models.Result) error {
-	w.Result = result
-	return nil
+// UpdateUrl implements Client.
+func (r clientImlp) UpdateUrl(uri *ent.Url) {
+	writer := r.createWriter(uri)
+	runner := r.createRunner(writer)
+	go func() {
+		runner.Targets <- uri.URL
+		close(runner.Targets)
+	}()
+
+	runner.Run()
 }
 
-// Close implements Runner.
-func (r runnerImpl) Close() {
-	r.runner.Close()
+func (r clientImlp) createRunner(writer writers.Writer) runner.Runner {
+	runner, _ := runner.NewRunner(r.logger, r.driver, r.options, []writers.Writer{writer})
+	return *runner
 }
 
-func NewClient() Client {
-	return clientImpl{}
-}
-
-func NewRunner(logger *slog.Logger, writer Writer, driver runner.Driver, opts runner.Options) Runner {
-	runner, _ := runner.NewRunner(logger, driver, opts, []writers.Writer{writer})
-
-	return runnerImpl{
-		runner: runner,
+func NewClient(logger *slog.Logger, createWriter CreateWriter, driver runner.Driver, opts runner.Options) Client {
+	return clientImlp{
+		createWriter: createWriter,
+		logger:       logger,
+		driver:       driver,
+		options:      opts,
 	}
-}
-
-func NewRunnerWriter() Writer {
-	return writerImpl{}
-}
-
-// GetUrlDetails implements Client.
-func (c clientImpl) GetUrlDetails(string) (*Details, error) {
-	panic("unimplemented")
 }

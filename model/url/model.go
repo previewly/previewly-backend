@@ -15,7 +15,7 @@ type (
 		AddURL(string) (*preview.PreviewData, error)
 	}
 	urlImpl struct {
-		apiClient  gowitness.Client
+		client     gowitness.Client
 		repository repository.Url
 	}
 )
@@ -39,21 +39,16 @@ func (u urlImpl) AddURL(url string) (*preview.PreviewData, error) {
 }
 
 func NewUrl(urlRepository repository.Url, client gowitness.Client) Url {
-	return urlImpl{repository: urlRepository, apiClient: client}
+	return urlImpl{repository: urlRepository, client: client}
 }
 
 func (u urlImpl) updateUrlData(urlEntity *ent.Url) (*ent.Url, error) {
 	if u.shouldUpdateUrlData(urlEntity) {
 		go func(url *ent.Url) {
-			details, err := u.apiClient.GetUrlDetails(url.URL)
-			u.updateURLDetails(details, url.ID, err)
+			u.client.UpdateUrl(url)
 		}(urlEntity)
 	}
 	return urlEntity, nil
-}
-
-func (u urlImpl) updateURLDetails(details *gowitness.Details, urlID int, err error) {
-	u.repository.Update(details.Image, details.Status, urlID, err)
 }
 
 func (u urlImpl) shouldUpdateUrlData(urlEntity *ent.Url) bool {

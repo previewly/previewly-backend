@@ -1,4 +1,4 @@
-package app
+package config
 
 import (
 	"flag"
@@ -18,7 +18,8 @@ type Postgres struct {
 }
 
 type Gowitness struct {
-	ScreenshotPath string
+	ScreenshotPath    string
+	ScreenshotBaseUrl string
 }
 
 type Config struct {
@@ -36,7 +37,7 @@ type AppConfig struct {
 	Listen ListenHost
 }
 
-func newConfig() Config {
+func NewConfig() Config {
 	var (
 		listenHostFlag string
 		listenPortFlag int
@@ -47,7 +48,8 @@ func newConfig() Config {
 		dbUserNameFlag     string
 		dbUserPasswordFlag string
 
-		screenShotPath string
+		screenShotPath    string
+		screenshotBaseURL string
 	)
 
 	flag.StringVar(&listenHostFlag, "listen-host", "", "Listen host")
@@ -60,6 +62,8 @@ func newConfig() Config {
 	flag.StringVar(&dbUserPasswordFlag, "db-user-password", "wsw", "Database user password")
 
 	flag.StringVar(&screenShotPath, "screenshot-path", "data/screenshots", "Screenshot path")
+	flag.StringVar(&screenshotBaseURL, "screenshot-base-url", "http://localhost:8000/screenshot/", "Base url for screenshot")
+
 	flag.Parse()
 
 	config := Config{
@@ -77,7 +81,8 @@ func newConfig() Config {
 			Password: dbUserPasswordFlag,
 		},
 		Gowitness: Gowitness{
-			ScreenshotPath: screenShotPath,
+			ScreenshotPath:    screenShotPath,
+			ScreenshotBaseUrl: screenshotBaseURL,
 		},
 	}
 	// utils.D(config)

@@ -56,43 +56,16 @@ func (uu *URLUpdate) SetNillableStatus(u *url.Status) *URLUpdate {
 	return uu
 }
 
-// SetAPIURLID sets the "api_url_id" field.
-func (uu *URLUpdate) SetAPIURLID(i int) *URLUpdate {
-	uu.mutation.ResetAPIURLID()
-	uu.mutation.SetAPIURLID(i)
+// SetImageURL sets the "image_url" field.
+func (uu *URLUpdate) SetImageURL(s string) *URLUpdate {
+	uu.mutation.SetImageURL(s)
 	return uu
 }
 
-// SetNillableAPIURLID sets the "api_url_id" field if the given value is not nil.
-func (uu *URLUpdate) SetNillableAPIURLID(i *int) *URLUpdate {
-	if i != nil {
-		uu.SetAPIURLID(*i)
-	}
-	return uu
-}
-
-// AddAPIURLID adds i to the "api_url_id" field.
-func (uu *URLUpdate) AddAPIURLID(i int) *URLUpdate {
-	uu.mutation.AddAPIURLID(i)
-	return uu
-}
-
-// ClearAPIURLID clears the value of the "api_url_id" field.
-func (uu *URLUpdate) ClearAPIURLID() *URLUpdate {
-	uu.mutation.ClearAPIURLID()
-	return uu
-}
-
-// SetImage sets the "image" field.
-func (uu *URLUpdate) SetImage(s string) *URLUpdate {
-	uu.mutation.SetImage(s)
-	return uu
-}
-
-// SetNillableImage sets the "image" field if the given value is not nil.
-func (uu *URLUpdate) SetNillableImage(s *string) *URLUpdate {
+// SetNillableImageURL sets the "image_url" field if the given value is not nil.
+func (uu *URLUpdate) SetNillableImageURL(s *string) *URLUpdate {
 	if s != nil {
-		uu.SetImage(*s)
+		uu.SetImageURL(*s)
 	}
 	return uu
 }
@@ -157,17 +130,8 @@ func (uu *URLUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.Status(); ok {
 		_spec.SetField(enturl.FieldStatus, field.TypeEnum, value)
 	}
-	if value, ok := uu.mutation.APIURLID(); ok {
-		_spec.SetField(enturl.FieldAPIURLID, field.TypeInt, value)
-	}
-	if value, ok := uu.mutation.AddedAPIURLID(); ok {
-		_spec.AddField(enturl.FieldAPIURLID, field.TypeInt, value)
-	}
-	if uu.mutation.APIURLIDCleared() {
-		_spec.ClearField(enturl.FieldAPIURLID, field.TypeInt)
-	}
-	if value, ok := uu.mutation.Image(); ok {
-		_spec.SetField(enturl.FieldImage, field.TypeString, value)
+	if value, ok := uu.mutation.ImageURL(); ok {
+		_spec.SetField(enturl.FieldImageURL, field.TypeString, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -217,43 +181,16 @@ func (uuo *URLUpdateOne) SetNillableStatus(u *url.Status) *URLUpdateOne {
 	return uuo
 }
 
-// SetAPIURLID sets the "api_url_id" field.
-func (uuo *URLUpdateOne) SetAPIURLID(i int) *URLUpdateOne {
-	uuo.mutation.ResetAPIURLID()
-	uuo.mutation.SetAPIURLID(i)
+// SetImageURL sets the "image_url" field.
+func (uuo *URLUpdateOne) SetImageURL(s string) *URLUpdateOne {
+	uuo.mutation.SetImageURL(s)
 	return uuo
 }
 
-// SetNillableAPIURLID sets the "api_url_id" field if the given value is not nil.
-func (uuo *URLUpdateOne) SetNillableAPIURLID(i *int) *URLUpdateOne {
-	if i != nil {
-		uuo.SetAPIURLID(*i)
-	}
-	return uuo
-}
-
-// AddAPIURLID adds i to the "api_url_id" field.
-func (uuo *URLUpdateOne) AddAPIURLID(i int) *URLUpdateOne {
-	uuo.mutation.AddAPIURLID(i)
-	return uuo
-}
-
-// ClearAPIURLID clears the value of the "api_url_id" field.
-func (uuo *URLUpdateOne) ClearAPIURLID() *URLUpdateOne {
-	uuo.mutation.ClearAPIURLID()
-	return uuo
-}
-
-// SetImage sets the "image" field.
-func (uuo *URLUpdateOne) SetImage(s string) *URLUpdateOne {
-	uuo.mutation.SetImage(s)
-	return uuo
-}
-
-// SetNillableImage sets the "image" field if the given value is not nil.
-func (uuo *URLUpdateOne) SetNillableImage(s *string) *URLUpdateOne {
+// SetNillableImageURL sets the "image_url" field if the given value is not nil.
+func (uuo *URLUpdateOne) SetNillableImageURL(s *string) *URLUpdateOne {
 	if s != nil {
-		uuo.SetImage(*s)
+		uuo.SetImageURL(*s)
 	}
 	return uuo
 }
@@ -348,17 +285,8 @@ func (uuo *URLUpdateOne) sqlSave(ctx context.Context) (_node *Url, err error) {
 	if value, ok := uuo.mutation.Status(); ok {
 		_spec.SetField(enturl.FieldStatus, field.TypeEnum, value)
 	}
-	if value, ok := uuo.mutation.APIURLID(); ok {
-		_spec.SetField(enturl.FieldAPIURLID, field.TypeInt, value)
-	}
-	if value, ok := uuo.mutation.AddedAPIURLID(); ok {
-		_spec.AddField(enturl.FieldAPIURLID, field.TypeInt, value)
-	}
-	if uuo.mutation.APIURLIDCleared() {
-		_spec.ClearField(enturl.FieldAPIURLID, field.TypeInt)
-	}
-	if value, ok := uuo.mutation.Image(); ok {
-		_spec.SetField(enturl.FieldImage, field.TypeString, value)
+	if value, ok := uuo.mutation.ImageURL(); ok {
+		_spec.SetField(enturl.FieldImageURL, field.TypeString, value)
 	}
 	_node = &Url{config: uuo.config}
 	_spec.Assign = _node.assignValues

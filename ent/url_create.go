@@ -32,23 +32,9 @@ func (uc *URLCreate) SetStatus(u url.Status) *URLCreate {
 	return uc
 }
 
-// SetAPIURLID sets the "api_url_id" field.
-func (uc *URLCreate) SetAPIURLID(i int) *URLCreate {
-	uc.mutation.SetAPIURLID(i)
-	return uc
-}
-
-// SetNillableAPIURLID sets the "api_url_id" field if the given value is not nil.
-func (uc *URLCreate) SetNillableAPIURLID(i *int) *URLCreate {
-	if i != nil {
-		uc.SetAPIURLID(*i)
-	}
-	return uc
-}
-
-// SetImage sets the "image" field.
-func (uc *URLCreate) SetImage(s string) *URLCreate {
-	uc.mutation.SetImage(s)
+// SetImageURL sets the "image_url" field.
+func (uc *URLCreate) SetImageURL(s string) *URLCreate {
+	uc.mutation.SetImageURL(s)
 	return uc
 }
 
@@ -97,8 +83,8 @@ func (uc *URLCreate) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Url.status": %w`, err)}
 		}
 	}
-	if _, ok := uc.mutation.Image(); !ok {
-		return &ValidationError{Name: "image", err: errors.New(`ent: missing required field "Url.image"`)}
+	if _, ok := uc.mutation.ImageURL(); !ok {
+		return &ValidationError{Name: "image_url", err: errors.New(`ent: missing required field "Url.image_url"`)}
 	}
 	return nil
 }
@@ -134,13 +120,9 @@ func (uc *URLCreate) createSpec() (*Url, *sqlgraph.CreateSpec) {
 		_spec.SetField(enturl.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
 	}
-	if value, ok := uc.mutation.APIURLID(); ok {
-		_spec.SetField(enturl.FieldAPIURLID, field.TypeInt, value)
-		_node.APIURLID = &value
-	}
-	if value, ok := uc.mutation.Image(); ok {
-		_spec.SetField(enturl.FieldImage, field.TypeString, value)
-		_node.Image = value
+	if value, ok := uc.mutation.ImageURL(); ok {
+		_spec.SetField(enturl.FieldImageURL, field.TypeString, value)
+		_node.ImageURL = value
 	}
 	return _node, _spec
 }

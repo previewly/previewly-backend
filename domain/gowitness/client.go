@@ -36,7 +36,7 @@ func (w writerImpl) Write(result *models.Result) error {
 
 // Close implements Runner.
 func (r runnerImpl) Close() {
-	panic("unimplemented")
+	r.runner.Close()
 }
 
 func NewClient() Client {

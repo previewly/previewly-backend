@@ -17,22 +17,18 @@ type Postgres struct {
 	Password string
 }
 
-type API struct {
-	BaseURL string
-}
-
 type Config struct {
 	App      AppConfig
 	Postgres Postgres
-	API      API
 }
+
 type ListenHost struct {
 	Host string
 	Port int
 }
+
 type AppConfig struct {
-	ImageHost string
-	Listen    ListenHost
+	Listen ListenHost
 }
 
 func newConfig() Config {
@@ -40,21 +36,15 @@ func newConfig() Config {
 		listenHostFlag string
 		listenPortFlag int
 
-		imageHostFlag string
-
 		dbHostFlag         string
 		dbPortFlag         int
 		dbNameFlag         string
 		dbUserNameFlag     string
 		dbUserPasswordFlag string
-
-		apiURLFlag string
 	)
 
 	flag.StringVar(&listenHostFlag, "listen-host", "", "Listen host")
 	flag.IntVar(&listenPortFlag, "listen-port", 8000, "Listen port")
-
-	flag.StringVar(&imageHostFlag, "image-host", defaultHTTPHost+":8000", "Image host")
 
 	flag.StringVar(&dbHostFlag, "db-host", defaultHost, "Database host")
 	flag.IntVar(&dbPortFlag, "db-port", 5432, "Database port")
@@ -62,13 +52,10 @@ func newConfig() Config {
 	flag.StringVar(&dbUserNameFlag, "db-user-name", "wsw", "Database user name")
 	flag.StringVar(&dbUserPasswordFlag, "db-user-password", "wsw", "Database user password")
 
-	flag.StringVar(&apiURLFlag, "api-url", defaultHTTPHost+":7171/api", "Api url")
-
 	flag.Parse()
 
 	config := Config{
 		App: AppConfig{
-			ImageHost: imageHostFlag,
 			Listen: ListenHost{
 				Host: listenHostFlag,
 				Port: listenPortFlag,
@@ -80,9 +67,6 @@ func newConfig() Config {
 			DB:       dbNameFlag,
 			User:     dbUserNameFlag,
 			Password: dbUserPasswordFlag,
-		},
-		API: API{
-			BaseURL: apiURLFlag,
 		},
 	}
 	// utils.D(config)

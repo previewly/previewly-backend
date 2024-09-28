@@ -2,8 +2,7 @@ package app
 
 import (
 	"context"
-	"net/http"
-	"time"
+
 	"wsw/backend/domain/gowitness"
 	"wsw/backend/domain/token/generator"
 	"wsw/backend/ent"
@@ -26,12 +25,7 @@ func initDi(config Config, appContext context.Context) {
 	})
 
 	initService(func() generator.TokenGenerator { return generator.NewTokenGenerator() })
-	initService(func() gowitness.Client {
-		client := http.Client{
-			Timeout: time.Second * 2, // Timeout after 2 seconds
-		}
-		return gowitness.NewClient(client, config.API.BaseURL, config.App.ImageHost)
-	})
+	initService(func() gowitness.Client { return gowitness.NewClient() })
 
 	initService(func(client *ent.Client, ctx context.Context) repository.Token {
 		return repository.NewToken(client, ctx)

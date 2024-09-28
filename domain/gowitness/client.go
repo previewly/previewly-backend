@@ -2,13 +2,14 @@ package gowitness
 
 type (
 	Client interface {
-		GetUrlDetails(string)
+		GetUrlDetails(string) (*Details, error)
 	}
+	Details    struct{}
 	clientImpl struct{}
 )
 
 // GetUrlDetails implements Client.
-func (c clientImpl) GetUrlDetails(string) {
+func (c clientImpl) GetUrlDetails(string) (*Details, error) {
 	panic("unimplemented")
 }
 

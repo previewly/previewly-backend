@@ -24,7 +24,6 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "url", Type: field.TypeString, Unique: true},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"success", "error", "pending"}},
-		{Name: "image_url", Type: field.TypeString},
 		{Name: "relative_path", Type: field.TypeString, Nullable: true},
 	}
 	// UrlsTable holds the schema information for the "urls" table.

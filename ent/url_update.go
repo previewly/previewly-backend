@@ -56,20 +56,6 @@ func (uu *URLUpdate) SetNillableStatus(u *url.Status) *URLUpdate {
 	return uu
 }
 
-// SetImageURL sets the "image_url" field.
-func (uu *URLUpdate) SetImageURL(s string) *URLUpdate {
-	uu.mutation.SetImageURL(s)
-	return uu
-}
-
-// SetNillableImageURL sets the "image_url" field if the given value is not nil.
-func (uu *URLUpdate) SetNillableImageURL(s *string) *URLUpdate {
-	if s != nil {
-		uu.SetImageURL(*s)
-	}
-	return uu
-}
-
 // SetRelativePath sets the "relative_path" field.
 func (uu *URLUpdate) SetRelativePath(s string) *URLUpdate {
 	uu.mutation.SetRelativePath(s)
@@ -150,9 +136,6 @@ func (uu *URLUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.Status(); ok {
 		_spec.SetField(enturl.FieldStatus, field.TypeEnum, value)
 	}
-	if value, ok := uu.mutation.ImageURL(); ok {
-		_spec.SetField(enturl.FieldImageURL, field.TypeString, value)
-	}
 	if value, ok := uu.mutation.RelativePath(); ok {
 		_spec.SetField(enturl.FieldRelativePath, field.TypeString, value)
 	}
@@ -203,20 +186,6 @@ func (uuo *URLUpdateOne) SetStatus(u url.Status) *URLUpdateOne {
 func (uuo *URLUpdateOne) SetNillableStatus(u *url.Status) *URLUpdateOne {
 	if u != nil {
 		uuo.SetStatus(*u)
-	}
-	return uuo
-}
-
-// SetImageURL sets the "image_url" field.
-func (uuo *URLUpdateOne) SetImageURL(s string) *URLUpdateOne {
-	uuo.mutation.SetImageURL(s)
-	return uuo
-}
-
-// SetNillableImageURL sets the "image_url" field if the given value is not nil.
-func (uuo *URLUpdateOne) SetNillableImageURL(s *string) *URLUpdateOne {
-	if s != nil {
-		uuo.SetImageURL(*s)
 	}
 	return uuo
 }
@@ -330,9 +299,6 @@ func (uuo *URLUpdateOne) sqlSave(ctx context.Context) (_node *Url, err error) {
 	}
 	if value, ok := uuo.mutation.Status(); ok {
 		_spec.SetField(enturl.FieldStatus, field.TypeEnum, value)
-	}
-	if value, ok := uuo.mutation.ImageURL(); ok {
-		_spec.SetField(enturl.FieldImageURL, field.TypeString, value)
 	}
 	if value, ok := uuo.mutation.RelativePath(); ok {
 		_spec.SetField(enturl.FieldRelativePath, field.TypeString, value)

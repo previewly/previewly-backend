@@ -6,6 +6,7 @@ import (
 	"wsw/backend/domain/gowitness"
 	"wsw/backend/domain/preview"
 	"wsw/backend/domain/url"
+	"wsw/backend/domain/url/screenshot"
 	"wsw/backend/ent"
 	"wsw/backend/ent/repository"
 )
@@ -15,8 +16,9 @@ type (
 		AddURL(string) (*preview.PreviewData, error)
 	}
 	urlImpl struct {
-		client     gowitness.Client
-		repository repository.Url
+		client                gowitness.Client
+		repository            repository.Url
+		screenshotURLProvider screenshot.Provider
 	}
 )
 
@@ -38,8 +40,8 @@ func (u urlImpl) AddURL(url string) (*preview.PreviewData, error) {
 	return u.getPreviewData(updatedEntity)
 }
 
-func NewUrl(urlRepository repository.Url, client gowitness.Client) Url {
-	return urlImpl{repository: urlRepository, client: client}
+func NewUrl(urlRepository repository.Url, client gowitness.Client, provider screenshot.Provider) Url {
+	return urlImpl{repository: urlRepository, client: client, screenshotURLProvider: provider}
 }
 
 func (u urlImpl) updateUrlData(urlEntity *ent.Url, isNew bool) (*ent.Url, error) {
@@ -64,7 +66,7 @@ func (u urlImpl) getPreviewData(url *ent.Url) (*preview.PreviewData, error) {
 	return &preview.PreviewData{
 		ID:     url.ID,
 		URL:    url.URL,
-		Image:  url.ImageURL,
+		Image:  u.screenshotURLProvider.Provide(url.RelativePath),
 		Status: u.getPreviewDataStatus(url.Status),
 	}, nil
 }

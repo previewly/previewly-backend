@@ -38,6 +38,20 @@ func (uc *URLCreate) SetImageURL(s string) *URLCreate {
 	return uc
 }
 
+// SetRelativePath sets the "relative_path" field.
+func (uc *URLCreate) SetRelativePath(s string) *URLCreate {
+	uc.mutation.SetRelativePath(s)
+	return uc
+}
+
+// SetNillableRelativePath sets the "relative_path" field if the given value is not nil.
+func (uc *URLCreate) SetNillableRelativePath(s *string) *URLCreate {
+	if s != nil {
+		uc.SetRelativePath(*s)
+	}
+	return uc
+}
+
 // Mutation returns the URLMutation object of the builder.
 func (uc *URLCreate) Mutation() *URLMutation {
 	return uc.mutation
@@ -123,6 +137,10 @@ func (uc *URLCreate) createSpec() (*Url, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.ImageURL(); ok {
 		_spec.SetField(enturl.FieldImageURL, field.TypeString, value)
 		_node.ImageURL = value
+	}
+	if value, ok := uc.mutation.RelativePath(); ok {
+		_spec.SetField(enturl.FieldRelativePath, field.TypeString, value)
+		_node.RelativePath = &value
 	}
 	return _node, _spec
 }

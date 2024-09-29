@@ -22,7 +22,9 @@ type Url struct {
 	// Status holds the value of the "status" field.
 	Status url.Status `json:"status,omitempty"`
 	// ImageURL holds the value of the "image_url" field.
-	ImageURL     string `json:"image_url,omitempty"`
+	ImageURL string `json:"image_url,omitempty"`
+	// RelativePath holds the value of the "relative_path" field.
+	RelativePath *string `json:"relative_path,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -33,7 +35,7 @@ func (*Url) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case enturl.FieldID:
 			values[i] = new(sql.NullInt64)
-		case enturl.FieldURL, enturl.FieldStatus, enturl.FieldImageURL:
+		case enturl.FieldURL, enturl.FieldStatus, enturl.FieldImageURL, enturl.FieldRelativePath:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -73,6 +75,13 @@ func (u *Url) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field image_url", values[i])
 			} else if value.Valid {
 				u.ImageURL = value.String
+			}
+		case enturl.FieldRelativePath:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field relative_path", values[i])
+			} else if value.Valid {
+				u.RelativePath = new(string)
+				*u.RelativePath = value.String
 			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
@@ -118,6 +127,11 @@ func (u *Url) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("image_url=")
 	builder.WriteString(u.ImageURL)
+	builder.WriteString(", ")
+	if v := u.RelativePath; v != nil {
+		builder.WriteString("relative_path=")
+		builder.WriteString(*v)
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

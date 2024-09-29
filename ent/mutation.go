@@ -364,6 +364,7 @@ type URLMutation struct {
 	url           *string
 	status        *url.Status
 	image_url     *string
+	relative_path *string
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Url, error)
@@ -576,6 +577,55 @@ func (m *URLMutation) ResetImageURL() {
 	m.image_url = nil
 }
 
+// SetRelativePath sets the "relative_path" field.
+func (m *URLMutation) SetRelativePath(s string) {
+	m.relative_path = &s
+}
+
+// RelativePath returns the value of the "relative_path" field in the mutation.
+func (m *URLMutation) RelativePath() (r string, exists bool) {
+	v := m.relative_path
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRelativePath returns the old "relative_path" field's value of the Url entity.
+// If the Url object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *URLMutation) OldRelativePath(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRelativePath is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRelativePath requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRelativePath: %w", err)
+	}
+	return oldValue.RelativePath, nil
+}
+
+// ClearRelativePath clears the value of the "relative_path" field.
+func (m *URLMutation) ClearRelativePath() {
+	m.relative_path = nil
+	m.clearedFields[enturl.FieldRelativePath] = struct{}{}
+}
+
+// RelativePathCleared returns if the "relative_path" field was cleared in this mutation.
+func (m *URLMutation) RelativePathCleared() bool {
+	_, ok := m.clearedFields[enturl.FieldRelativePath]
+	return ok
+}
+
+// ResetRelativePath resets all changes to the "relative_path" field.
+func (m *URLMutation) ResetRelativePath() {
+	m.relative_path = nil
+	delete(m.clearedFields, enturl.FieldRelativePath)
+}
+
 // Where appends a list predicates to the URLMutation builder.
 func (m *URLMutation) Where(ps ...predicate.Url) {
 	m.predicates = append(m.predicates, ps...)
@@ -610,7 +660,7 @@ func (m *URLMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *URLMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.url != nil {
 		fields = append(fields, enturl.FieldURL)
 	}
@@ -619,6 +669,9 @@ func (m *URLMutation) Fields() []string {
 	}
 	if m.image_url != nil {
 		fields = append(fields, enturl.FieldImageURL)
+	}
+	if m.relative_path != nil {
+		fields = append(fields, enturl.FieldRelativePath)
 	}
 	return fields
 }
@@ -634,6 +687,8 @@ func (m *URLMutation) Field(name string) (ent.Value, bool) {
 		return m.Status()
 	case enturl.FieldImageURL:
 		return m.ImageURL()
+	case enturl.FieldRelativePath:
+		return m.RelativePath()
 	}
 	return nil, false
 }
@@ -649,6 +704,8 @@ func (m *URLMutation) OldField(ctx context.Context, name string) (ent.Value, err
 		return m.OldStatus(ctx)
 	case enturl.FieldImageURL:
 		return m.OldImageURL(ctx)
+	case enturl.FieldRelativePath:
+		return m.OldRelativePath(ctx)
 	}
 	return nil, fmt.Errorf("unknown Url field %s", name)
 }
@@ -679,6 +736,13 @@ func (m *URLMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetImageURL(v)
 		return nil
+	case enturl.FieldRelativePath:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRelativePath(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Url field %s", name)
 }
@@ -708,7 +772,11 @@ func (m *URLMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *URLMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(enturl.FieldRelativePath) {
+		fields = append(fields, enturl.FieldRelativePath)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -721,6 +789,11 @@ func (m *URLMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *URLMutation) ClearField(name string) error {
+	switch name {
+	case enturl.FieldRelativePath:
+		m.ClearRelativePath()
+		return nil
+	}
 	return fmt.Errorf("unknown Url nullable field %s", name)
 }
 
@@ -736,6 +809,9 @@ func (m *URLMutation) ResetField(name string) error {
 		return nil
 	case enturl.FieldImageURL:
 		m.ResetImageURL()
+		return nil
+	case enturl.FieldRelativePath:
+		m.ResetRelativePath()
 		return nil
 	}
 	return fmt.Errorf("unknown Url field %s", name)

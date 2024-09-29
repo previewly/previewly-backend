@@ -6,6 +6,7 @@ import (
 
 	"wsw/backend/app/config"
 	"wsw/backend/domain/gowitness"
+	"wsw/backend/domain/path/screenshot/relative"
 	"wsw/backend/domain/token/generator"
 	"wsw/backend/domain/url/screenshot"
 	"wsw/backend/ent"
@@ -37,6 +38,7 @@ func initDi(config config.Config, appContext context.Context) {
 
 	initService(func() generator.TokenGenerator { return generator.NewTokenGenerator() })
 	initService(func() screenshot.Provider { return screenshot.NewProvider(config.Gowitness) })
+	initService(func() relative.Provider { return relative.NewProvider() })
 
 	initService(func(client *ent.Client, ctx context.Context) repository.Token {
 		return repository.NewToken(client, ctx)
@@ -46,9 +48,9 @@ func initDi(config config.Config, appContext context.Context) {
 	})
 
 	initService(func() *slog.Logger { return slog.Default() })
-	initService(func(repository repository.Url, urlProvider screenshot.Provider) gowitness.CreateWriter {
+	initService(func(repository repository.Url, urlProvider screenshot.Provider, relativePathProvider relative.Provider) gowitness.CreateWriter {
 		return func(url *ent.Url) writers.Writer {
-			return gowitness.NewRunnerWriter(url, repository, urlProvider)
+			return gowitness.NewRunnerWriter(url, repository, urlProvider, relativePathProvider)
 		}
 	})
 	initService(func(logger *slog.Logger, createWriter gowitness.CreateWriter) gowitness.Client {

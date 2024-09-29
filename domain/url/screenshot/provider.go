@@ -1,6 +1,8 @@
 package screenshot
 
-import "wsw/backend/app/config"
+import (
+	"wsw/backend/app/config"
+)
 
 type (
 	Provider interface {
@@ -8,6 +10,7 @@ type (
 	}
 	providerImpl struct {
 		baseURL string
+		loader  Loader
 	}
 )
 
@@ -16,12 +19,12 @@ func (p providerImpl) Provide(filename *string) string {
 	if filename != nil {
 		return p.baseURL + *filename
 	}
-	// FIXME
-	return "loader"
+	return p.loader.Provide()
 }
 
-func NewProvider(config config.Gowitness) Provider {
+func NewProvider(config config.Gowitness, loader Loader) Provider {
 	return providerImpl{
 		baseURL: config.ScreenshotBaseUrl,
+		loader:  loader,
 	}
 }

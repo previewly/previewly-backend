@@ -64,6 +64,11 @@ func ImageURL(v string) predicate.Url {
 	return predicate.Url(sql.FieldEQ(FieldImageURL, v))
 }
 
+// RelativePath applies equality check predicate on the "relative_path" field. It's identical to RelativePathEQ.
+func RelativePath(v string) predicate.Url {
+	return predicate.Url(sql.FieldEQ(FieldRelativePath, v))
+}
+
 // URLEQ applies the EQ predicate on the "url" field.
 func URLEQ(v string) predicate.Url {
 	return predicate.Url(sql.FieldEQ(FieldURL, v))
@@ -222,6 +227,81 @@ func ImageURLEqualFold(v string) predicate.Url {
 // ImageURLContainsFold applies the ContainsFold predicate on the "image_url" field.
 func ImageURLContainsFold(v string) predicate.Url {
 	return predicate.Url(sql.FieldContainsFold(FieldImageURL, v))
+}
+
+// RelativePathEQ applies the EQ predicate on the "relative_path" field.
+func RelativePathEQ(v string) predicate.Url {
+	return predicate.Url(sql.FieldEQ(FieldRelativePath, v))
+}
+
+// RelativePathNEQ applies the NEQ predicate on the "relative_path" field.
+func RelativePathNEQ(v string) predicate.Url {
+	return predicate.Url(sql.FieldNEQ(FieldRelativePath, v))
+}
+
+// RelativePathIn applies the In predicate on the "relative_path" field.
+func RelativePathIn(vs ...string) predicate.Url {
+	return predicate.Url(sql.FieldIn(FieldRelativePath, vs...))
+}
+
+// RelativePathNotIn applies the NotIn predicate on the "relative_path" field.
+func RelativePathNotIn(vs ...string) predicate.Url {
+	return predicate.Url(sql.FieldNotIn(FieldRelativePath, vs...))
+}
+
+// RelativePathGT applies the GT predicate on the "relative_path" field.
+func RelativePathGT(v string) predicate.Url {
+	return predicate.Url(sql.FieldGT(FieldRelativePath, v))
+}
+
+// RelativePathGTE applies the GTE predicate on the "relative_path" field.
+func RelativePathGTE(v string) predicate.Url {
+	return predicate.Url(sql.FieldGTE(FieldRelativePath, v))
+}
+
+// RelativePathLT applies the LT predicate on the "relative_path" field.
+func RelativePathLT(v string) predicate.Url {
+	return predicate.Url(sql.FieldLT(FieldRelativePath, v))
+}
+
+// RelativePathLTE applies the LTE predicate on the "relative_path" field.
+func RelativePathLTE(v string) predicate.Url {
+	return predicate.Url(sql.FieldLTE(FieldRelativePath, v))
+}
+
+// RelativePathContains applies the Contains predicate on the "relative_path" field.
+func RelativePathContains(v string) predicate.Url {
+	return predicate.Url(sql.FieldContains(FieldRelativePath, v))
+}
+
+// RelativePathHasPrefix applies the HasPrefix predicate on the "relative_path" field.
+func RelativePathHasPrefix(v string) predicate.Url {
+	return predicate.Url(sql.FieldHasPrefix(FieldRelativePath, v))
+}
+
+// RelativePathHasSuffix applies the HasSuffix predicate on the "relative_path" field.
+func RelativePathHasSuffix(v string) predicate.Url {
+	return predicate.Url(sql.FieldHasSuffix(FieldRelativePath, v))
+}
+
+// RelativePathIsNil applies the IsNil predicate on the "relative_path" field.
+func RelativePathIsNil() predicate.Url {
+	return predicate.Url(sql.FieldIsNull(FieldRelativePath))
+}
+
+// RelativePathNotNil applies the NotNil predicate on the "relative_path" field.
+func RelativePathNotNil() predicate.Url {
+	return predicate.Url(sql.FieldNotNull(FieldRelativePath))
+}
+
+// RelativePathEqualFold applies the EqualFold predicate on the "relative_path" field.
+func RelativePathEqualFold(v string) predicate.Url {
+	return predicate.Url(sql.FieldEqualFold(FieldRelativePath, v))
+}
+
+// RelativePathContainsFold applies the ContainsFold predicate on the "relative_path" field.
+func RelativePathContainsFold(v string) predicate.Url {
+	return predicate.Url(sql.FieldContainsFold(FieldRelativePath, v))
 }
 
 // And groups predicates with the AND operator between them.

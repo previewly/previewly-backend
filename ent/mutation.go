@@ -363,7 +363,6 @@ type URLMutation struct {
 	id            *int
 	url           *string
 	status        *url.Status
-	image_url     *string
 	relative_path *string
 	clearedFields map[string]struct{}
 	done          bool
@@ -541,42 +540,6 @@ func (m *URLMutation) ResetStatus() {
 	m.status = nil
 }
 
-// SetImageURL sets the "image_url" field.
-func (m *URLMutation) SetImageURL(s string) {
-	m.image_url = &s
-}
-
-// ImageURL returns the value of the "image_url" field in the mutation.
-func (m *URLMutation) ImageURL() (r string, exists bool) {
-	v := m.image_url
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldImageURL returns the old "image_url" field's value of the Url entity.
-// If the Url object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *URLMutation) OldImageURL(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldImageURL is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldImageURL requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldImageURL: %w", err)
-	}
-	return oldValue.ImageURL, nil
-}
-
-// ResetImageURL resets all changes to the "image_url" field.
-func (m *URLMutation) ResetImageURL() {
-	m.image_url = nil
-}
-
 // SetRelativePath sets the "relative_path" field.
 func (m *URLMutation) SetRelativePath(s string) {
 	m.relative_path = &s
@@ -660,15 +623,12 @@ func (m *URLMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *URLMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 3)
 	if m.url != nil {
 		fields = append(fields, enturl.FieldURL)
 	}
 	if m.status != nil {
 		fields = append(fields, enturl.FieldStatus)
-	}
-	if m.image_url != nil {
-		fields = append(fields, enturl.FieldImageURL)
 	}
 	if m.relative_path != nil {
 		fields = append(fields, enturl.FieldRelativePath)
@@ -685,8 +645,6 @@ func (m *URLMutation) Field(name string) (ent.Value, bool) {
 		return m.URL()
 	case enturl.FieldStatus:
 		return m.Status()
-	case enturl.FieldImageURL:
-		return m.ImageURL()
 	case enturl.FieldRelativePath:
 		return m.RelativePath()
 	}
@@ -702,8 +660,6 @@ func (m *URLMutation) OldField(ctx context.Context, name string) (ent.Value, err
 		return m.OldURL(ctx)
 	case enturl.FieldStatus:
 		return m.OldStatus(ctx)
-	case enturl.FieldImageURL:
-		return m.OldImageURL(ctx)
 	case enturl.FieldRelativePath:
 		return m.OldRelativePath(ctx)
 	}
@@ -728,13 +684,6 @@ func (m *URLMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStatus(v)
-		return nil
-	case enturl.FieldImageURL:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetImageURL(v)
 		return nil
 	case enturl.FieldRelativePath:
 		v, ok := value.(string)
@@ -806,9 +755,6 @@ func (m *URLMutation) ResetField(name string) error {
 		return nil
 	case enturl.FieldStatus:
 		m.ResetStatus()
-		return nil
-	case enturl.FieldImageURL:
-		m.ResetImageURL()
 		return nil
 	case enturl.FieldRelativePath:
 		m.ResetRelativePath()

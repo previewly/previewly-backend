@@ -18,8 +18,6 @@ const (
 	FieldURL = "url"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
-	// FieldImageURL holds the string denoting the image_url field in the database.
-	FieldImageURL = "image_url"
 	// FieldRelativePath holds the string denoting the relative_path field in the database.
 	FieldRelativePath = "relative_path"
 	// Table holds the table name of the url in the database.
@@ -31,7 +29,6 @@ var Columns = []string{
 	FieldID,
 	FieldURL,
 	FieldStatus,
-	FieldImageURL,
 	FieldRelativePath,
 }
 
@@ -71,11 +68,6 @@ func ByURL(opts ...sql.OrderTermOption) OrderOption {
 // ByStatus orders the results by the status field.
 func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
-}
-
-// ByImageURL orders the results by the image_url field.
-func ByImageURL(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldImageURL, opts...).ToFunc()
 }
 
 // ByRelativePath orders the results by the relative_path field.

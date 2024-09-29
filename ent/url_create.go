@@ -32,12 +32,6 @@ func (uc *URLCreate) SetStatus(u url.Status) *URLCreate {
 	return uc
 }
 
-// SetImageURL sets the "image_url" field.
-func (uc *URLCreate) SetImageURL(s string) *URLCreate {
-	uc.mutation.SetImageURL(s)
-	return uc
-}
-
 // SetRelativePath sets the "relative_path" field.
 func (uc *URLCreate) SetRelativePath(s string) *URLCreate {
 	uc.mutation.SetRelativePath(s)
@@ -97,9 +91,6 @@ func (uc *URLCreate) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Url.status": %w`, err)}
 		}
 	}
-	if _, ok := uc.mutation.ImageURL(); !ok {
-		return &ValidationError{Name: "image_url", err: errors.New(`ent: missing required field "Url.image_url"`)}
-	}
 	return nil
 }
 
@@ -133,10 +124,6 @@ func (uc *URLCreate) createSpec() (*Url, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Status(); ok {
 		_spec.SetField(enturl.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
-	}
-	if value, ok := uc.mutation.ImageURL(); ok {
-		_spec.SetField(enturl.FieldImageURL, field.TypeString, value)
-		_node.ImageURL = value
 	}
 	if value, ok := uc.mutation.RelativePath(); ok {
 		_spec.SetField(enturl.FieldRelativePath, field.TypeString, value)

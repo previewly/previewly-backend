@@ -37,7 +37,10 @@ func initDi(config config.Config, appContext context.Context) {
 	})
 
 	initService(func() generator.TokenGenerator { return generator.NewTokenGenerator() })
-	initService(func() screenshot.Provider { return screenshot.NewProvider(config.Gowitness) })
+	initService(func() screenshot.Loader { return screenshot.NewLoader(config.App.AssetsBaseURL) })
+	initService(func(loader screenshot.Loader) screenshot.Provider {
+		return screenshot.NewProvider(config.Gowitness, loader)
+	})
 	initService(func() relative.Provider { return relative.NewProvider() })
 
 	initService(func(client *ent.Client, ctx context.Context) repository.Token {

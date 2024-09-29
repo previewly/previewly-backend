@@ -2,6 +2,7 @@ package config
 
 import (
 	"flag"
+	"strconv"
 )
 
 const (
@@ -34,13 +35,16 @@ type ListenHost struct {
 }
 
 type AppConfig struct {
-	Listen ListenHost
+	Listen        ListenHost
+	AssetsBaseURL string
 }
 
 func NewConfig() Config {
 	var (
 		listenHostFlag string
 		listenPortFlag int
+
+		assetsBaseURL string
 
 		dbHostFlag         string
 		dbPortFlag         int
@@ -54,6 +58,8 @@ func NewConfig() Config {
 
 	flag.StringVar(&listenHostFlag, "listen-host", "", "Listen host")
 	flag.IntVar(&listenPortFlag, "listen-port", 8000, "Listen port")
+
+	flag.StringVar(&assetsBaseURL, "assets-base-url", defaultHTTPHost+":"+strconv.Itoa(listenPortFlag)+"/assets/", "Assets base url")
 
 	flag.StringVar(&dbHostFlag, "db-host", defaultHost, "Database host")
 	flag.IntVar(&dbPortFlag, "db-port", 5432, "Database port")
@@ -72,6 +78,7 @@ func NewConfig() Config {
 				Host: listenHostFlag,
 				Port: listenPortFlag,
 			},
+			AssetsBaseURL: assetsBaseURL,
 		},
 		Postgres: Postgres{
 			Host:     dbHostFlag,

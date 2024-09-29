@@ -26,12 +26,12 @@ func (u urlImpl) AddURL(url string) (*preview.PreviewData, error) {
 	if err != nil {
 		return nil, err
 	}
-	urlEntity, err := u.getUrlEntity(url)
+	urlEntity, err, isNew := u.getUrlEntity(url)
 	if err != nil {
 		return nil, err
 	}
 
-	updatedEntity, err := u.updateUrlData(urlEntity)
+	updatedEntity, err := u.updateUrlData(urlEntity, isNew)
 	if err != nil {
 		return nil, err
 	}
@@ -42,8 +42,8 @@ func NewUrl(urlRepository repository.Url, client gowitness.Client) Url {
 	return urlImpl{repository: urlRepository, client: client}
 }
 
-func (u urlImpl) updateUrlData(urlEntity *ent.Url) (*ent.Url, error) {
-	if u.shouldUpdateUrlData(urlEntity) {
+func (u urlImpl) updateUrlData(urlEntity *ent.Url, isNew bool) (*ent.Url, error) {
+	if isNew {
 		go func(url *ent.Url) {
 			u.client.UpdateUrl(url)
 		}(urlEntity)
@@ -51,19 +51,13 @@ func (u urlImpl) updateUrlData(urlEntity *ent.Url) (*ent.Url, error) {
 	return urlEntity, nil
 }
 
-func (u urlImpl) shouldUpdateUrlData(urlEntity *ent.Url) bool {
-	if urlEntity.Status == url.Success || urlEntity.Status == url.Error {
-		return false
-	}
-	return true
-}
-
-func (u urlImpl) getUrlEntity(url string) (*ent.Url, error) {
+func (u urlImpl) getUrlEntity(url string) (*ent.Url, error, bool) {
 	entity := u.repository.TryGet(url)
 	if entity == nil {
-		return u.repository.Insert(url)
+		entity, err := u.repository.Insert(url)
+		return entity, err, true
 	}
-	return entity, nil
+	return entity, nil, false
 }
 
 func (u urlImpl) getPreviewData(url *ent.Url) (*preview.PreviewData, error) {

@@ -1,5 +1,32 @@
 # Changelog
 
+## [1.5.0](https://github.com/wert2all/previewly-backend/compare/v1.4.0...v1.5.0) (2024-09-29)
+
+
+### Features
+
+* add closeing ent client and gowitness runner after app was closed ([bccc6ab](https://github.com/wert2all/previewly-backend/commit/bccc6ab473433deed726edc013bb297825c75ec2))
+* add default loader provider ([77e0dd7](https://github.com/wert2all/previewly-backend/commit/77e0dd79fc3583fac37e3d1dd84260bbeb751cbd))
+* add listen argument for application ([a3ecd86](https://github.com/wert2all/previewly-backend/commit/a3ecd8649ab8a82aaeaf2345cbe02e38657e949f))
+* add screenshot path ([9a193f9](https://github.com/wert2all/previewly-backend/commit/9a193f945912324c65dd2deaf663b2c3c442b93d))
+* create gowitness runner on DI ([63df03b](https://github.com/wert2all/previewly-backend/commit/63df03ba4c5a91420f65e8dd9c0a02b0108189b6))
+* fetch site preview image ([d271658](https://github.com/wert2all/previewly-backend/commit/d271658b688b6969083d0cdeafb0d2cd0981a4a4))
+* generate image url on fly from relative path ([05e9414](https://github.com/wert2all/previewly-backend/commit/05e941427c0ccabc42b9b6428b9ae551830c2ff6))
+* save image path ([39cbdd4](https://github.com/wert2all/previewly-backend/commit/39cbdd44741b4c9b1c92cc9502cf5198623b245e))
+* update application ([cad4e12](https://github.com/wert2all/previewly-backend/commit/cad4e1284fb220299474f7fefa68114cb0b32ee1))
+* update url data on model ([416b4f7](https://github.com/wert2all/previewly-backend/commit/416b4f7433e5ea835dfde9b25a6dfbfdf5c2bcc8))
+* update URL entity by details data ([6503349](https://github.com/wert2all/previewly-backend/commit/6503349608fc2bd53e38d5dca1a03253700b05e6))
+
+
+### Bug Fixes
+
+* fix cicd ([b5790b5](https://github.com/wert2all/previewly-backend/commit/b5790b5c4cab0d519767528f108a8e13b1b9842b))
+* fix updating a new images only ([cf019bc](https://github.com/wert2all/previewly-backend/commit/cf019bcf6ce71d54eeda8d1482d75b8b51a72517))
+* remove api url ([1fa9027](https://github.com/wert2all/previewly-backend/commit/1fa902769be1cd42bf2dc276e67208fdbff6302a))
+* remove useless methods ([c912067](https://github.com/wert2all/previewly-backend/commit/c9120670c505ba178c96fb860e69bcafc4288e4c))
+* update docke compose file ([23b37df](https://github.com/wert2all/previewly-backend/commit/23b37dfe723f5e82adea7450ad971cef9ceb4697))
+* update gowitness runner close method ([3efdb91](https://github.com/wert2all/previewly-backend/commit/3efdb91cc37bf5a5b50bd4089e2847a156dace2a))
+
 ## [1.4.0](https://github.com/wert2all/wsw-backend/compare/v1.3.0...v1.4.0) (2024-08-10)
 
 

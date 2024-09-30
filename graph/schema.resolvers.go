@@ -70,6 +70,17 @@ func (r *queryResolver) GetPreviewData(ctx context.Context, token string, url st
 	return convertor.ConvertPreviewData(previewData), nil
 }
 
+// VerifyToken is the resolver for the verifyToken field.
+func (r *queryResolver) VerifyToken(ctx context.Context, token string) (*bool, error) {
+	var tokenModelImpl tokenModel.Token
+	err := container.Resolve(&tokenModelImpl)
+	if err != nil {
+		return nil, err
+	}
+	isExist := tokenModelImpl.IsTokenExist(token)
+	return &isExist, nil
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 

@@ -57,13 +57,24 @@ func (r *mutationResolver) AddURL(ctx context.Context, token string, url string)
 
 // GetPreviewData is the resolver for the getPreviewData field.
 func (r *queryResolver) GetPreviewData(ctx context.Context, token string, url string) (*model.PreviewData, error) {
-	var model tokenModel.Token
-	err := container.Resolve(&model)
-	if err != nil {
-		return nil, err
+	var tokenModelImpl tokenModel.Token
+	var urlModelImpl urlModel.Url
+
+	errTokenModel := container.Resolve(&tokenModelImpl)
+	errUrlModel := container.Resolve(&urlModelImpl)
+
+	if errUrlModel != nil {
+		return nil, errTokenModel
+	}
+	if errTokenModel != nil {
+		return nil, errTokenModel
 	}
 
-	previewData, err := model.GetPreviewData(token)
+	if !tokenModelImpl.IsTokenExist(token) {
+		return nil, errors.New("invalid token")
+	}
+
+	previewData, err := urlModelImpl.GetPreviewData(url)
 	if err != nil {
 		return nil, err
 	}

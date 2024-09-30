@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.6.0](https://github.com/wert2all/previewly-backend/compare/v1.5.0...v1.6.0) (2024-09-30)
+
+
+### Features
+
+* add verifyToken method ([497ca23](https://github.com/wert2all/previewly-backend/commit/497ca2337f9952ceb919ff33d0eb2dd9b7366e9b))
+
+
+### Bug Fixes
+
+* fix non-random tokens ([821a55c](https://github.com/wert2all/previewly-backend/commit/821a55c30704af2ba9ab34b73383d398f96bdd67))
+
 ## [1.5.0](https://github.com/wert2all/previewly-backend/compare/v1.4.0...v1.5.0) (2024-09-29)
 
 

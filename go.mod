@@ -9,12 +9,12 @@ require (
 	github.com/99designs/gqlgen v0.17.40
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/golobby/container/v3 v3.3.2
+	github.com/google/uuid v1.6.0
 	github.com/gookit/goutil v0.6.15
 	github.com/lib/pq v1.10.9
 	github.com/rs/cors v1.11.0
 	github.com/sensepost/gowitness v0.0.0-20240924122032-737f59065bd4
 	github.com/vektah/gqlparser/v2 v2.5.12
-	golang.org/x/exp v0.0.0-20240904232852-e7e105dedf7e
 )
 
 require (
@@ -43,7 +43,6 @@ require (
 	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/gobwas/ws v1.4.0 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/gookit/color v1.5.4 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
@@ -79,6 +78,7 @@ require (
 	github.com/ysmood/leakless v0.9.0 // indirect
 	github.com/zclconf/go-cty v1.8.0 // indirect
 	golang.org/x/crypto v0.27.0 // indirect
+	golang.org/x/exp v0.0.0-20240904232852-e7e105dedf7e // indirect
 	golang.org/x/mod v0.21.0 // indirect
 	golang.org/x/net v0.29.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect

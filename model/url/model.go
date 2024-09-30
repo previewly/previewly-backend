@@ -14,6 +14,7 @@ import (
 type (
 	Url interface {
 		AddURL(string) (*preview.PreviewData, error)
+		GetPreviewData(string) (*preview.PreviewData, error)
 	}
 	urlImpl struct {
 		client                gowitness.Client
@@ -22,13 +23,22 @@ type (
 	}
 )
 
+// GetPreviewData implements Url.
+func (u urlImpl) GetPreviewData(url string) (*preview.PreviewData, error) {
+	entity, err := u.repository.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	return u.getPreviewData(entity)
+}
+
 // AddURL implements Url.
 func (u urlImpl) AddURL(url string) (*preview.PreviewData, error) {
 	_, err := netUrl.ParseRequestURI(url)
 	if err != nil {
 		return nil, err
 	}
-	urlEntity, err, isNew := u.getUrlEntity(url)
+	urlEntity, err, isNew := u.getOrCreateUrlEntity(url)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +63,7 @@ func (u urlImpl) updateUrlData(urlEntity *ent.Url, isNew bool) (*ent.Url, error)
 	return urlEntity, nil
 }
 
-func (u urlImpl) getUrlEntity(url string) (*ent.Url, error, bool) {
+func (u urlImpl) getOrCreateUrlEntity(url string) (*ent.Url, error, bool) {
 	entity := u.repository.TryGet(url)
 	if entity == nil {
 		entity, err := u.repository.Insert(url)

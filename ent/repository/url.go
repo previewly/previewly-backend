@@ -10,6 +10,7 @@ import (
 
 type (
 	Url interface {
+		Get(string) (*ent.Url, error)
 		TryGet(string) *ent.Url
 		Insert(string) (*ent.Url, error)
 		Update(string, url.Status, int, error) (*ent.Url, error)
@@ -20,6 +21,11 @@ type (
 		ctx    context.Context
 	}
 )
+
+// Get implements Url.
+func (u *urlImpl) Get(url string) (*ent.Url, error) {
+	return u.client.Url.Query().Where(entUrl.URL(url)).Only(u.ctx)
+}
 
 // Update implements Url.
 func (u *urlImpl) Update(relativePath string, status url.Status, ID int, _ error) (*ent.Url, error) {
@@ -37,7 +43,7 @@ func (u *urlImpl) Insert(url string) (*ent.Url, error) {
 
 // TryGet implements Url.
 func (u *urlImpl) TryGet(url string) *ent.Url {
-	entity, _ := u.client.Url.Query().Where(entUrl.URL(url)).Only(u.ctx)
+	entity, _ := u.Get(url)
 	return entity
 }
 

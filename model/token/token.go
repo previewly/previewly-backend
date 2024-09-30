@@ -1,7 +1,6 @@
 package token
 
 import (
-	"wsw/backend/domain/preview"
 	"wsw/backend/domain/token/generator"
 	"wsw/backend/ent/repository"
 )
@@ -9,7 +8,6 @@ import (
 type (
 	Token interface {
 		CreateToken() (*string, error)
-		GetPreviewData(string) (*preview.PreviewData, error)
 		IsTokenExist(string) bool
 	}
 	tokenImpl struct {
@@ -21,11 +19,6 @@ type (
 func (t tokenImpl) IsTokenExist(token string) bool {
 	_, err := t.repository.Find(token)
 	return err == nil
-}
-
-// GetPreviewData implements Token.
-func (t tokenImpl) GetPreviewData(token string) (*preview.PreviewData, error) {
-	panic("unimplemented")
 }
 
 // CreateToken implements Token.

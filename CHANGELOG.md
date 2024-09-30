@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.6.1](https://github.com/wert2all/previewly-backend/compare/v1.6.0...v1.6.1) (2024-09-30)
+
+
+### Bug Fixes
+
+* fix static test ([4ed046c](https://github.com/wert2all/previewly-backend/commit/4ed046c117f606785fef4630b47e6241aa69af43))
+* update deploy action ([fc99c94](https://github.com/wert2all/previewly-backend/commit/fc99c9419aaed231e410f3babf82ea3a8a1b0bdc))
+
 ## [1.6.0](https://github.com/wert2all/previewly-backend/compare/v1.5.0...v1.6.0) (2024-09-30)
 
 

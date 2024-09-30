@@ -11,6 +11,7 @@ type PreviewData {
 
 type Query {
   getPreviewData(token: String!, url: String!): PreviewData
+  verifyToken(token: String!): Boolean
 }
 
 type Mutation {

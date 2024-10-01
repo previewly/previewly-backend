@@ -35,15 +35,12 @@ type (
 )
 
 func initDi(config config.Config, appContext context.Context) {
+	initVoidServices(config)
+
 	initService(func() context.Context { return appContext })
 	initService(func() (*ent.Client, error) { return newDBClient(config.Postgres, appContext) })
 
 	initService(func() Middlewares {
-		err := sentry.Init(config.Sentry)
-		if err != nil {
-			utils.F("Sentry initialization failed: %v\n", err)
-		}
-
 		return Middlewares{
 			List: []func(http.Handler) http.Handler{
 				middleware.Logger,
@@ -110,6 +107,17 @@ func initDi(config config.Config, appContext context.Context) {
 	initService(func(urlRepository repository.Url, client gowitness.Client, provider screenshot.Provider) url.Url {
 		return url.NewUrl(urlRepository, client, provider)
 	})
+}
+
+func initVoidServices(config config.Config) {
+	initSentry(config.Sentry)
+}
+
+func initSentry(options sentry.ClientOptions) {
+	err := sentry.Init(options)
+	if err != nil {
+		utils.F("Sentry initialization failed: %v\n", err)
+	}
 }
 
 func initService(resolver interface{}) {

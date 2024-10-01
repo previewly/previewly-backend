@@ -25,12 +25,16 @@ type Gowitness struct {
 	ScreenshotBaseUrl string
 }
 
-type Config struct {
-	App       AppConfig
-	Postgres  Postgres
-	Gowitness Gowitness
-	Sentry    sentry.ClientOptions
-}
+type (
+	Rollbar struct{}
+	Config  struct {
+		App       AppConfig
+		Postgres  Postgres
+		Gowitness Gowitness
+		Sentry    sentry.ClientOptions
+		Rollbar   Rollbar
+	}
+)
 
 type ListenHost struct {
 	Host string
@@ -98,6 +102,7 @@ func NewConfig() Config {
 			Dsn:           "https://563bfbafd64427d650b376395d83765c@o390093.ingest.us.sentry.io/4508046587002880",
 			EnableTracing: false,
 		},
+		Rollbar: Rollbar{},
 	}
 	// utils.D(config)
 	return config

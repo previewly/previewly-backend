@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.7.0](https://github.com/wert2all/previewly-backend/compare/v1.6.1...v1.7.0) (2024-10-01)
+
+
+### Features
+
+* add rollbar ([1544cb0](https://github.com/wert2all/previewly-backend/commit/1544cb09d0f7e2a68abfdd57fe998995522062b1))
+* add sentry ([a40cc7e](https://github.com/wert2all/previewly-backend/commit/a40cc7e80b2634656092c78bc3135cd005de6a59))
+* expose image ([c3ce0ff](https://github.com/wert2all/previewly-backend/commit/c3ce0ff813df5924bcd42f4fdd9a456ae95fbc63))
+
 ## [1.6.1](https://github.com/wert2all/previewly-backend/compare/v1.6.0...v1.6.1) (2024-09-30)
 
 

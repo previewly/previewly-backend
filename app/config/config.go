@@ -3,6 +3,8 @@ package config
 import (
 	"flag"
 	"strconv"
+
+	"github.com/getsentry/sentry-go"
 )
 
 const (
@@ -27,6 +29,7 @@ type Config struct {
 	App       AppConfig
 	Postgres  Postgres
 	Gowitness Gowitness
+	Sentry    sentry.ClientOptions
 }
 
 type ListenHost struct {
@@ -90,6 +93,10 @@ func NewConfig() Config {
 		Gowitness: Gowitness{
 			ScreenshotPath:    screenShotPath,
 			ScreenshotBaseUrl: screenshotBaseURL,
+		},
+		Sentry: sentry.ClientOptions{
+			Dsn:           "https://563bfbafd64427d650b376395d83765c@o390093.ingest.us.sentry.io/4508046587002880",
+			EnableTracing: false,
 		},
 	}
 	// utils.D(config)

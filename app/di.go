@@ -3,6 +3,8 @@ package app
 import (
 	"context"
 	"log/slog"
+	"net/http"
+	"time"
 
 	"wsw/backend/app/config"
 	"wsw/backend/domain/gowitness"
@@ -15,23 +17,61 @@ import (
 	"wsw/backend/model/token"
 	"wsw/backend/model/url"
 
+	"github.com/getsentry/sentry-go"
+	sentryhttp "github.com/getsentry/sentry-go/http"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/golobby/container/v3"
+	"github.com/rs/cors"
 	"github.com/sensepost/gowitness/pkg/runner"
 	driver "github.com/sensepost/gowitness/pkg/runner/drivers"
 
 	writers "github.com/sensepost/gowitness/pkg/writers"
 )
 
+type (
+	Middlewares struct {
+		List []func(http.Handler) http.Handler
+	}
+)
+
 func initDi(config config.Config, appContext context.Context) {
 	initService(func() context.Context { return appContext })
 	initService(func() (*ent.Client, error) { return newDBClient(config.Postgres, appContext) })
 
-	initService(func(entClient *ent.Client) App {
+	initService(func() Middlewares {
+		err := sentry.Init(config.Sentry)
+		if err != nil {
+			utils.F("Sentry initialization failed: %v\n", err)
+		}
+
+		return Middlewares{
+			List: []func(http.Handler) http.Handler{
+				middleware.Logger,
+				middleware.Recoverer,
+				middleware.RealIP,
+				cors.New(cors.Options{
+					AllowedOrigins:     []string{"*"},
+					AllowCredentials:   true,
+					AllowedMethods:     []string{"GET", "POST", "OPTIONS"},
+					AllowedHeaders:     []string{"Content-Type", "Bearer", "Bearer ", "content-type", "Origin", "Accept", "Authorization"},
+					OptionsPassthrough: true,
+					Debug:              true,
+				}).
+					Handler,
+				sentryhttp.New(sentryhttp.Options{
+					Repanic: true,
+				}).Handle,
+			},
+		}
+	})
+
+	initService(func(entClient *ent.Client, middlewares Middlewares) App {
 		return appImpl{
-			router: newRouter(),
+			router: newRouter(middlewares),
 			listen: config.App.Listen,
 			closer: func() {
 				entClient.Close()
+				sentry.Flush(time.Second)
 			},
 		}
 	})

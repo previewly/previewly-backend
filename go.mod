@@ -13,6 +13,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gookit/goutil v0.6.15
 	github.com/lib/pq v1.10.9
+	github.com/rollbar/rollbar-go v1.4.5
 	github.com/rs/cors v1.11.0
 	github.com/sensepost/gowitness v0.0.0-20240924122032-737f59065bd4
 	github.com/vektah/gqlparser/v2 v2.5.12

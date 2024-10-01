@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.8.0](https://github.com/wert2all/previewly-backend/compare/v1.7.0...v1.8.0) (2024-10-01)
+
+
+### Features
+
+* add slogger to gowitness slog ([b91ea70](https://github.com/wert2all/previewly-backend/commit/b91ea70fd0df6b68c304cd90b0eb43136718eeb8))
+
+
+### Bug Fixes
+
+* fix docker image ([8a9a9e6](https://github.com/wert2all/previewly-backend/commit/8a9a9e61075dafdbcef897a36917f55fb732594b))
+
 ## [1.7.0](https://github.com/wert2all/previewly-backend/compare/v1.6.1...v1.7.0) (2024-10-01)
 
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.1](https://github.com/wert2all/previewly-backend/compare/v1.8.0...v1.8.1) (2024-10-01)
+
+
+### Bug Fixes
+
+* revert sentry logger ([d7f0300](https://github.com/wert2all/previewly-backend/commit/d7f03001162263f07b85ed59ce19a3b3ea5531cc))
+
 ## [1.8.0](https://github.com/wert2all/previewly-backend/compare/v1.7.0...v1.8.0) (2024-10-01)
 
 

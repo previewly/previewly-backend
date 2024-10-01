@@ -21,10 +21,10 @@ import (
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/golobby/container/v3"
+	"github.com/rollbar/rollbar-go"
 	"github.com/rs/cors"
 	"github.com/sensepost/gowitness/pkg/runner"
 	driver "github.com/sensepost/gowitness/pkg/runner/drivers"
-
 	writers "github.com/sensepost/gowitness/pkg/writers"
 )
 
@@ -69,6 +69,7 @@ func initDi(config config.Config, appContext context.Context) {
 			closer: func() {
 				entClient.Close()
 				sentry.Flush(time.Second)
+				rollbar.Close()
 			},
 		}
 	})
@@ -111,6 +112,11 @@ func initDi(config config.Config, appContext context.Context) {
 
 func initVoidServices(config config.Config) {
 	initSentry(config.Sentry)
+	initRollbar(config.Rollbar)
+}
+
+func initRollbar(config config.Rollbar) {
+	rollbar.SetToken(config.Token)
 }
 
 func initSentry(options sentry.ClientOptions) {

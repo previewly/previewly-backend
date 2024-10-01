@@ -26,8 +26,10 @@ type Gowitness struct {
 }
 
 type (
-	Rollbar struct{}
-	Config  struct {
+	Rollbar struct {
+		Token string
+	}
+	Config struct {
 		App       AppConfig
 		Postgres  Postgres
 		Gowitness Gowitness
@@ -102,7 +104,9 @@ func NewConfig() Config {
 			Dsn:           "https://563bfbafd64427d650b376395d83765c@o390093.ingest.us.sentry.io/4508046587002880",
 			EnableTracing: false,
 		},
-		Rollbar: Rollbar{},
+		Rollbar: Rollbar{
+			Token: "b4935a32816e485ca41d70d2ae2884dc",
+		},
 	}
 	// utils.D(config)
 	return config

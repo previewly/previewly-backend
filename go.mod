@@ -15,6 +15,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/rollbar/rollbar-go v1.4.5
 	github.com/rs/cors v1.11.0
+	github.com/samber/slog-sentry/v2 v2.8.0
 	github.com/sensepost/gowitness v0.0.0-20240924122032-737f59065bd4
 	github.com/vektah/gqlparser/v2 v2.5.12
 )
@@ -69,6 +70,8 @@ require (
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rogpeppe/go-internal v1.13.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/samber/lo v1.44.0 // indirect
+	github.com/samber/slog-common v0.17.0 // indirect
 	github.com/sosodev/duration v1.3.1 // indirect
 	github.com/urfave/cli/v2 v2.27.2 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect

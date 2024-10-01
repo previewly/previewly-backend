@@ -10,7 +10,7 @@ RUN cd ./source/ && CGO_ENABLED=0 GOOS=linux go build -o /app/previewly-backend 
 
 FROM ghcr.io/go-rod/rod
 
+WORKDIR /app
 COPY --from=build /app/previewly-backend /app/previewly-backend
 
 EXPOSE 8000
-WORKDIR /app

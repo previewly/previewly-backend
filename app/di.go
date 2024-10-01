@@ -23,7 +23,6 @@ import (
 	"github.com/golobby/container/v3"
 	"github.com/rollbar/rollbar-go"
 	"github.com/rs/cors"
-	slogsentry "github.com/samber/slog-sentry/v2"
 	"github.com/sensepost/gowitness/pkg/runner"
 	driver "github.com/sensepost/gowitness/pkg/runner/drivers"
 	writers "github.com/sensepost/gowitness/pkg/writers"
@@ -90,7 +89,8 @@ func initDi(config config.Config, appContext context.Context) {
 	})
 
 	initService(func() *slog.Logger {
-		return slog.New(slogsentry.Option{Level: slog.LevelDebug}.NewSentryHandler())
+		return slog.Default()
+		// return slog.New(slogsentry.Option{Level: slog.LevelDebug}.NewSentryHandler())
 	})
 	initService(func(repository repository.Url, relativePathProvider relative.Provider) gowitness.CreateWriter {
 		return func(url *ent.Url) writers.Writer {

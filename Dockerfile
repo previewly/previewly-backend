@@ -6,9 +6,7 @@ COPY . ./source
 
 RUN cd ./source/ && CGO_ENABLED=0 GOOS=linux go build -o /app/previewly-backend && rm -rf /app/source
 
-#CMD ["/app/wsw-backend"]
-
-FROM ghcr.io/go-rod/rod
+FROM ghcr.io/go-rod/rod:v0.116.2
 
 WORKDIR /app
 COPY --from=build /app/previewly-backend /app/previewly-backend

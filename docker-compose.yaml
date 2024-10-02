@@ -7,3 +7,14 @@ services:
       POSTGRES_DB: wsw
     ports:
       - 5434:5432
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    command: /app/previewly-backend -db-host wswdb
+    ports:
+      - 8000:8000
+    depends_on:
+      - wswdb

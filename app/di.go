@@ -98,10 +98,15 @@ func initDi(config config.Config, appContext context.Context) {
 		}
 	})
 	initService(func(logger *slog.Logger, createWriter gowitness.CreateWriter) gowitness.Client {
+		logger.Info("Starting gowitness")
+
 		options := runner.NewDefaultOptions()
 		options.Scan.ScreenshotPath = config.Gowitness.ScreenshotPath
 
-		driver, _ := driver.NewChromedp(logger, *options)
+		driver, err := driver.NewChromedp(logger, *options)
+		if err != nil {
+			utils.F("Could not create driver: %v", err)
+		}
 		return gowitness.NewClient(logger, createWriter, driver, *options)
 	})
 

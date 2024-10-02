@@ -28,11 +28,13 @@ func (r clientImlp) UpdateUrl(uri *ent.Url) {
 	r.logger.Info("Starting gowitness for: " + uri.URL)
 	writer := r.createWriter(uri)
 	runner := r.createRunner(writer)
-
-	runner.Targets <- uri.URL
-	close(runner.Targets)
+	go func() {
+		runner.Targets <- uri.URL
+		close(runner.Targets)
+	}()
 
 	runner.Run()
+	runner.Close()
 }
 
 func (r clientImlp) createRunner(writer writers.Writer) runner.Runner {

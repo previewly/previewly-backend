@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.8.2](https://github.com/wert2all/previewly-backend/compare/v1.8.1...v1.8.2) (2024-10-02)
+
+
+### Bug Fixes
+
+* add more logging ([b065fb1](https://github.com/wert2all/previewly-backend/commit/b065fb131ce43fd1fcc2048486d97fb348af4081))
+* fix dependencies ([0aa4e56](https://github.com/wert2all/previewly-backend/commit/0aa4e56697db7f19e66e5240a0ad46c380d23e13))
+
 ## [1.8.1](https://github.com/wert2all/previewly-backend/compare/v1.8.0...v1.8.1) (2024-10-01)
 
 

@@ -25,18 +25,22 @@ type (
 
 // UpdateUrl implements Client.
 func (r clientImlp) UpdateUrl(uri *ent.Url) {
+	r.logger.Info("Starting gowitness for: " + uri.URL)
 	writer := r.createWriter(uri)
 	runner := r.createRunner(writer)
-	go func() {
-		runner.Targets <- uri.URL
-		close(runner.Targets)
-	}()
+
+	runner.Targets <- uri.URL
+	close(runner.Targets)
 
 	runner.Run()
 }
 
 func (r clientImlp) createRunner(writer writers.Writer) runner.Runner {
-	runner, _ := runner.NewRunner(r.logger, r.driver, r.options, []writers.Writer{writer})
+	r.logger.Info("Creating gowitness runner")
+	runner, err := runner.NewRunner(r.logger, r.driver, r.options, []writers.Writer{writer})
+	if err != nil {
+		r.logger.Error("Error creating runner", slog.Any("runner error", err))
+	}
 	return *runner
 }
 

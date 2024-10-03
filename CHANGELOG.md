@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.8.5](https://github.com/wert2all/previewly-backend/compare/v1.8.4...v1.8.5) (2024-10-03)
+
+
+### Bug Fixes
+
+* fix docker image build ([5b231a7](https://github.com/wert2all/previewly-backend/commit/5b231a74d7c169937b865c62286bae0aa0823dd5))
+* try to fix chrome ([e5835b8](https://github.com/wert2all/previewly-backend/commit/e5835b8971832ecf590bb85bd12e020772a7c018))
+
 ## [1.8.4](https://github.com/wert2all/previewly-backend/compare/v1.8.3...v1.8.4) (2024-10-02)
 
 

@@ -11,12 +11,15 @@ import (
 
 	"wsw/backend/ent/migrate"
 
+	"wsw/backend/ent/errorresult"
+	"wsw/backend/ent/stat"
 	"wsw/backend/ent/token"
 	enturl "wsw/backend/ent/url"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // Client is the client that holds all ent builders.
@@ -24,6 +27,10 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// ErrorResult is the client for interacting with the ErrorResult builders.
+	ErrorResult *ErrorResultClient
+	// Stat is the client for interacting with the Stat builders.
+	Stat *StatClient
 	// Token is the client for interacting with the Token builders.
 	Token *TokenClient
 	// Url is the client for interacting with the Url builders.
@@ -39,6 +46,8 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.ErrorResult = NewErrorResultClient(c.config)
+	c.Stat = NewStatClient(c.config)
 	c.Token = NewTokenClient(c.config)
 	c.Url = NewURLClient(c.config)
 }
@@ -131,10 +140,12 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Token:  NewTokenClient(cfg),
-		Url:    NewURLClient(cfg),
+		ctx:         ctx,
+		config:      cfg,
+		ErrorResult: NewErrorResultClient(cfg),
+		Stat:        NewStatClient(cfg),
+		Token:       NewTokenClient(cfg),
+		Url:         NewURLClient(cfg),
 	}, nil
 }
 
@@ -152,17 +163,19 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Token:  NewTokenClient(cfg),
-		Url:    NewURLClient(cfg),
+		ctx:         ctx,
+		config:      cfg,
+		ErrorResult: NewErrorResultClient(cfg),
+		Stat:        NewStatClient(cfg),
+		Token:       NewTokenClient(cfg),
+		Url:         NewURLClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Token.
+//		ErrorResult.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -184,6 +197,8 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.ErrorResult.Use(hooks...)
+	c.Stat.Use(hooks...)
 	c.Token.Use(hooks...)
 	c.Url.Use(hooks...)
 }
@@ -191,6 +206,8 @@ func (c *Client) Use(hooks ...Hook) {
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
+	c.ErrorResult.Intercept(interceptors...)
+	c.Stat.Intercept(interceptors...)
 	c.Token.Intercept(interceptors...)
 	c.Url.Intercept(interceptors...)
 }
@@ -198,12 +215,282 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *ErrorResultMutation:
+		return c.ErrorResult.mutate(ctx, m)
+	case *StatMutation:
+		return c.Stat.mutate(ctx, m)
 	case *TokenMutation:
 		return c.Token.mutate(ctx, m)
 	case *URLMutation:
 		return c.Url.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// ErrorResultClient is a client for the ErrorResult schema.
+type ErrorResultClient struct {
+	config
+}
+
+// NewErrorResultClient returns a client for the ErrorResult from the given config.
+func NewErrorResultClient(c config) *ErrorResultClient {
+	return &ErrorResultClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `errorresult.Hooks(f(g(h())))`.
+func (c *ErrorResultClient) Use(hooks ...Hook) {
+	c.hooks.ErrorResult = append(c.hooks.ErrorResult, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `errorresult.Intercept(f(g(h())))`.
+func (c *ErrorResultClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ErrorResult = append(c.inters.ErrorResult, interceptors...)
+}
+
+// Create returns a builder for creating a ErrorResult entity.
+func (c *ErrorResultClient) Create() *ErrorResultCreate {
+	mutation := newErrorResultMutation(c.config, OpCreate)
+	return &ErrorResultCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ErrorResult entities.
+func (c *ErrorResultClient) CreateBulk(builders ...*ErrorResultCreate) *ErrorResultCreateBulk {
+	return &ErrorResultCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ErrorResultClient) MapCreateBulk(slice any, setFunc func(*ErrorResultCreate, int)) *ErrorResultCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ErrorResultCreateBulk{err: fmt.Errorf("calling to ErrorResultClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ErrorResultCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ErrorResultCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ErrorResult.
+func (c *ErrorResultClient) Update() *ErrorResultUpdate {
+	mutation := newErrorResultMutation(c.config, OpUpdate)
+	return &ErrorResultUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ErrorResultClient) UpdateOne(er *ErrorResult) *ErrorResultUpdateOne {
+	mutation := newErrorResultMutation(c.config, OpUpdateOne, withErrorResult(er))
+	return &ErrorResultUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ErrorResultClient) UpdateOneID(id int) *ErrorResultUpdateOne {
+	mutation := newErrorResultMutation(c.config, OpUpdateOne, withErrorResultID(id))
+	return &ErrorResultUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ErrorResult.
+func (c *ErrorResultClient) Delete() *ErrorResultDelete {
+	mutation := newErrorResultMutation(c.config, OpDelete)
+	return &ErrorResultDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ErrorResultClient) DeleteOne(er *ErrorResult) *ErrorResultDeleteOne {
+	return c.DeleteOneID(er.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ErrorResultClient) DeleteOneID(id int) *ErrorResultDeleteOne {
+	builder := c.Delete().Where(errorresult.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ErrorResultDeleteOne{builder}
+}
+
+// Query returns a query builder for ErrorResult.
+func (c *ErrorResultClient) Query() *ErrorResultQuery {
+	return &ErrorResultQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeErrorResult},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ErrorResult entity by its id.
+func (c *ErrorResultClient) Get(ctx context.Context, id int) (*ErrorResult, error) {
+	return c.Query().Where(errorresult.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ErrorResultClient) GetX(ctx context.Context, id int) *ErrorResult {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ErrorResultClient) Hooks() []Hook {
+	return c.hooks.ErrorResult
+}
+
+// Interceptors returns the client interceptors.
+func (c *ErrorResultClient) Interceptors() []Interceptor {
+	return c.inters.ErrorResult
+}
+
+func (c *ErrorResultClient) mutate(ctx context.Context, m *ErrorResultMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ErrorResultCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ErrorResultUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ErrorResultUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ErrorResultDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ErrorResult mutation op: %q", m.Op())
+	}
+}
+
+// StatClient is a client for the Stat schema.
+type StatClient struct {
+	config
+}
+
+// NewStatClient returns a client for the Stat from the given config.
+func NewStatClient(c config) *StatClient {
+	return &StatClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `stat.Hooks(f(g(h())))`.
+func (c *StatClient) Use(hooks ...Hook) {
+	c.hooks.Stat = append(c.hooks.Stat, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `stat.Intercept(f(g(h())))`.
+func (c *StatClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Stat = append(c.inters.Stat, interceptors...)
+}
+
+// Create returns a builder for creating a Stat entity.
+func (c *StatClient) Create() *StatCreate {
+	mutation := newStatMutation(c.config, OpCreate)
+	return &StatCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Stat entities.
+func (c *StatClient) CreateBulk(builders ...*StatCreate) *StatCreateBulk {
+	return &StatCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *StatClient) MapCreateBulk(slice any, setFunc func(*StatCreate, int)) *StatCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &StatCreateBulk{err: fmt.Errorf("calling to StatClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*StatCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &StatCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Stat.
+func (c *StatClient) Update() *StatUpdate {
+	mutation := newStatMutation(c.config, OpUpdate)
+	return &StatUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *StatClient) UpdateOne(s *Stat) *StatUpdateOne {
+	mutation := newStatMutation(c.config, OpUpdateOne, withStat(s))
+	return &StatUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *StatClient) UpdateOneID(id int) *StatUpdateOne {
+	mutation := newStatMutation(c.config, OpUpdateOne, withStatID(id))
+	return &StatUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Stat.
+func (c *StatClient) Delete() *StatDelete {
+	mutation := newStatMutation(c.config, OpDelete)
+	return &StatDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *StatClient) DeleteOne(s *Stat) *StatDeleteOne {
+	return c.DeleteOneID(s.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *StatClient) DeleteOneID(id int) *StatDeleteOne {
+	builder := c.Delete().Where(stat.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &StatDeleteOne{builder}
+}
+
+// Query returns a query builder for Stat.
+func (c *StatClient) Query() *StatQuery {
+	return &StatQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeStat},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Stat entity by its id.
+func (c *StatClient) Get(ctx context.Context, id int) (*Stat, error) {
+	return c.Query().Where(stat.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *StatClient) GetX(ctx context.Context, id int) *Stat {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *StatClient) Hooks() []Hook {
+	return c.hooks.Stat
+}
+
+// Interceptors returns the client interceptors.
+func (c *StatClient) Interceptors() []Interceptor {
+	return c.inters.Stat
+}
+
+func (c *StatClient) mutate(ctx context.Context, m *StatMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&StatCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&StatUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&StatUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&StatDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Stat mutation op: %q", m.Op())
 	}
 }
 
@@ -448,6 +735,38 @@ func (c *URLClient) GetX(ctx context.Context, id int) *Url {
 	return obj
 }
 
+// QueryErrorresult queries the errorresult edge of a Url.
+func (c *URLClient) QueryErrorresult(u *Url) *ErrorResultQuery {
+	query := (&ErrorResultClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(enturl.Table, enturl.FieldID, id),
+			sqlgraph.To(errorresult.Table, errorresult.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, enturl.ErrorresultTable, enturl.ErrorresultColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryStat queries the stat edge of a Url.
+func (c *URLClient) QueryStat(u *Url) *StatQuery {
+	query := (&StatClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(enturl.Table, enturl.FieldID, id),
+			sqlgraph.To(stat.Table, stat.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, enturl.StatTable, enturl.StatColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *URLClient) Hooks() []Hook {
 	return c.hooks.Url
@@ -476,9 +795,9 @@ func (c *URLClient) mutate(ctx context.Context, m *URLMutation) (Value, error) {
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Token, Url []ent.Hook
+		ErrorResult, Stat, Token, Url []ent.Hook
 	}
 	inters struct {
-		Token, Url []ent.Interceptor
+		ErrorResult, Stat, Token, Url []ent.Interceptor
 	}
 )

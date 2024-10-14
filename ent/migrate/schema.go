@@ -8,6 +8,49 @@ import (
 )
 
 var (
+	// ErrorResultsColumns holds the columns for the "error_results" table.
+	ErrorResultsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "message", Type: field.TypeString, Nullable: true},
+		{Name: "url_errorresult", Type: field.TypeInt, Nullable: true},
+	}
+	// ErrorResultsTable holds the schema information for the "error_results" table.
+	ErrorResultsTable = &schema.Table{
+		Name:       "error_results",
+		Columns:    ErrorResultsColumns,
+		PrimaryKey: []*schema.Column{ErrorResultsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "error_results_urls_errorresult",
+				Columns:    []*schema.Column{ErrorResultsColumns[3]},
+				RefColumns: []*schema.Column{UrlsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// StatsColumns holds the columns for the "stats" table.
+	StatsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "title", Type: field.TypeString, Nullable: true},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "url_stat", Type: field.TypeInt, Nullable: true},
+	}
+	// StatsTable holds the schema information for the "stats" table.
+	StatsTable = &schema.Table{
+		Name:       "stats",
+		Columns:    StatsColumns,
+		PrimaryKey: []*schema.Column{StatsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "stats_urls_stat",
+				Columns:    []*schema.Column{StatsColumns[4]},
+				RefColumns: []*schema.Column{UrlsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// TokensColumns holds the columns for the "tokens" table.
 	TokensColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -34,10 +77,14 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		ErrorResultsTable,
+		StatsTable,
 		TokensTable,
 		UrlsTable,
 	}
 )
 
 func init() {
+	ErrorResultsTable.ForeignKeys[0].RefTable = UrlsTable
+	StatsTable.ForeignKeys[0].RefTable = UrlsTable
 }

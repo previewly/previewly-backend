@@ -6,6 +6,12 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// ErrorResult is the predicate function for errorresult builders.
+type ErrorResult func(*sql.Selector)
+
+// Stat is the predicate function for stat builders.
+type Stat func(*sql.Selector)
+
 // Token is the predicate function for token builders.
 type Token func(*sql.Selector)
 

@@ -82,12 +82,7 @@ func initDi(config config.Config, appContext context.Context) {
 	})
 	initService(func() relative.Provider { return relative.NewProvider() })
 
-	initService(func(client *ent.Client, ctx context.Context) repository.Token {
-		return repository.NewToken(client, ctx)
-	})
-	initService(func(client *ent.Client, ctx context.Context) repository.Url {
-		return repository.NewUrl(client, ctx)
-	})
+	initRepositories()
 
 	initService(func() *slog.Logger {
 		return slog.Default()
@@ -116,6 +111,15 @@ func initDi(config config.Config, appContext context.Context) {
 	})
 	initService(func(urlRepository repository.Url, client gowitness.Client, provider screenshot.Provider) url.Url {
 		return url.NewUrl(urlRepository, client, provider)
+	})
+}
+
+func initRepositories() {
+	initService(func(client *ent.Client, ctx context.Context) repository.Token {
+		return repository.NewToken(client, ctx)
+	})
+	initService(func(client *ent.Client, ctx context.Context) repository.Url {
+		return repository.NewUrl(client, ctx)
 	})
 }
 

@@ -23,7 +23,39 @@ type Url struct {
 	Status url.Status `json:"status,omitempty"`
 	// RelativePath holds the value of the "relative_path" field.
 	RelativePath *string `json:"relative_path,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UrlQuery when eager-loading is set.
+	Edges        UrlEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// UrlEdges holds the relations/edges for other nodes in the graph.
+type UrlEdges struct {
+	// Errorresult holds the value of the errorresult edge.
+	Errorresult []*ErrorResult `json:"errorresult,omitempty"`
+	// Stat holds the value of the stat edge.
+	Stat []*Stat `json:"stat,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+}
+
+// ErrorresultOrErr returns the Errorresult value or an error if the edge
+// was not loaded in eager-loading.
+func (e UrlEdges) ErrorresultOrErr() ([]*ErrorResult, error) {
+	if e.loadedTypes[0] {
+		return e.Errorresult, nil
+	}
+	return nil, &NotLoadedError{edge: "errorresult"}
+}
+
+// StatOrErr returns the Stat value or an error if the edge
+// was not loaded in eager-loading.
+func (e UrlEdges) StatOrErr() ([]*Stat, error) {
+	if e.loadedTypes[1] {
+		return e.Stat, nil
+	}
+	return nil, &NotLoadedError{edge: "stat"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -86,6 +118,16 @@ func (u *Url) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (u *Url) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
+}
+
+// QueryErrorresult queries the "errorresult" edge of the Url entity.
+func (u *Url) QueryErrorresult() *ErrorResultQuery {
+	return NewURLClient(u.config).QueryErrorresult(u)
+}
+
+// QueryStat queries the "stat" edge of the Url entity.
+func (u *Url) QueryStat() *StatQuery {
+	return NewURLClient(u.config).QueryStat(u)
 }
 
 // Update returns a builder for updating this Url.

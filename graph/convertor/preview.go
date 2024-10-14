@@ -11,6 +11,7 @@ func ConvertPreviewData(data *preview.PreviewData) *model.PreviewData {
 		URL:    data.URL,
 		Image:  data.Image,
 		Status: convertPreviewStatus(data.Status),
+		Error:  data.Error,
 	}
 }
 

@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"wsw/backend/domain/url"
+	"wsw/backend/ent/errorresult"
+	"wsw/backend/ent/stat"
 	enturl "wsw/backend/ent/url"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -44,6 +46,36 @@ func (uc *URLCreate) SetNillableRelativePath(s *string) *URLCreate {
 		uc.SetRelativePath(*s)
 	}
 	return uc
+}
+
+// AddErrorresultIDs adds the "errorresult" edge to the ErrorResult entity by IDs.
+func (uc *URLCreate) AddErrorresultIDs(ids ...int) *URLCreate {
+	uc.mutation.AddErrorresultIDs(ids...)
+	return uc
+}
+
+// AddErrorresult adds the "errorresult" edges to the ErrorResult entity.
+func (uc *URLCreate) AddErrorresult(e ...*ErrorResult) *URLCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return uc.AddErrorresultIDs(ids...)
+}
+
+// AddStatIDs adds the "stat" edge to the Stat entity by IDs.
+func (uc *URLCreate) AddStatIDs(ids ...int) *URLCreate {
+	uc.mutation.AddStatIDs(ids...)
+	return uc
+}
+
+// AddStat adds the "stat" edges to the Stat entity.
+func (uc *URLCreate) AddStat(s ...*Stat) *URLCreate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uc.AddStatIDs(ids...)
 }
 
 // Mutation returns the URLMutation object of the builder.
@@ -128,6 +160,38 @@ func (uc *URLCreate) createSpec() (*Url, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.RelativePath(); ok {
 		_spec.SetField(enturl.FieldRelativePath, field.TypeString, value)
 		_node.RelativePath = &value
+	}
+	if nodes := uc.mutation.ErrorresultIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   enturl.ErrorresultTable,
+			Columns: []string{enturl.ErrorresultColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(errorresult.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.StatIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   enturl.StatTable,
+			Columns: []string{enturl.StatColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(stat.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

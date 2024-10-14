@@ -8,6 +8,30 @@ import (
 	"wsw/backend/ent"
 )
 
+// The ErrorResultFunc type is an adapter to allow the use of ordinary
+// function as ErrorResult mutator.
+type ErrorResultFunc func(context.Context, *ent.ErrorResultMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ErrorResultFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ErrorResultMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ErrorResultMutation", m)
+}
+
+// The StatFunc type is an adapter to allow the use of ordinary
+// function as Stat mutator.
+type StatFunc func(context.Context, *ent.StatMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f StatFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.StatMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.StatMutation", m)
+}
+
 // The TokenFunc type is an adapter to allow the use of ordinary
 // function as Token mutator.
 type TokenFunc func(context.Context, *ent.TokenMutation) (ent.Value, error)

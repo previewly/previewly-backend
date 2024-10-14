@@ -7,6 +7,7 @@ import (
 	"wsw/backend/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // ID filters vertices based on their ID field.
@@ -232,6 +233,52 @@ func RelativePathEqualFold(v string) predicate.Url {
 // RelativePathContainsFold applies the ContainsFold predicate on the "relative_path" field.
 func RelativePathContainsFold(v string) predicate.Url {
 	return predicate.Url(sql.FieldContainsFold(FieldRelativePath, v))
+}
+
+// HasErrorresult applies the HasEdge predicate on the "errorresult" edge.
+func HasErrorresult() predicate.Url {
+	return predicate.Url(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ErrorresultTable, ErrorresultColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasErrorresultWith applies the HasEdge predicate on the "errorresult" edge with a given conditions (other predicates).
+func HasErrorresultWith(preds ...predicate.ErrorResult) predicate.Url {
+	return predicate.Url(func(s *sql.Selector) {
+		step := newErrorresultStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasStat applies the HasEdge predicate on the "stat" edge.
+func HasStat() predicate.Url {
+	return predicate.Url(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, StatTable, StatColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasStatWith applies the HasEdge predicate on the "stat" edge with a given conditions (other predicates).
+func HasStatWith(preds ...predicate.Stat) predicate.Url {
+	return predicate.Url(func(s *sql.Selector) {
+		step := newStatStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

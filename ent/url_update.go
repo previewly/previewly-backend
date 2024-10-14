@@ -7,7 +7,9 @@ import (
 	"errors"
 	"fmt"
 	"wsw/backend/domain/url"
+	"wsw/backend/ent/errorresult"
 	"wsw/backend/ent/predicate"
+	"wsw/backend/ent/stat"
 	enturl "wsw/backend/ent/url"
 
 	"entgo.io/ent/dialect/sql"
@@ -76,9 +78,81 @@ func (uu *URLUpdate) ClearRelativePath() *URLUpdate {
 	return uu
 }
 
+// AddErrorresultIDs adds the "errorresult" edge to the ErrorResult entity by IDs.
+func (uu *URLUpdate) AddErrorresultIDs(ids ...int) *URLUpdate {
+	uu.mutation.AddErrorresultIDs(ids...)
+	return uu
+}
+
+// AddErrorresult adds the "errorresult" edges to the ErrorResult entity.
+func (uu *URLUpdate) AddErrorresult(e ...*ErrorResult) *URLUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return uu.AddErrorresultIDs(ids...)
+}
+
+// AddStatIDs adds the "stat" edge to the Stat entity by IDs.
+func (uu *URLUpdate) AddStatIDs(ids ...int) *URLUpdate {
+	uu.mutation.AddStatIDs(ids...)
+	return uu
+}
+
+// AddStat adds the "stat" edges to the Stat entity.
+func (uu *URLUpdate) AddStat(s ...*Stat) *URLUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uu.AddStatIDs(ids...)
+}
+
 // Mutation returns the URLMutation object of the builder.
 func (uu *URLUpdate) Mutation() *URLMutation {
 	return uu.mutation
+}
+
+// ClearErrorresult clears all "errorresult" edges to the ErrorResult entity.
+func (uu *URLUpdate) ClearErrorresult() *URLUpdate {
+	uu.mutation.ClearErrorresult()
+	return uu
+}
+
+// RemoveErrorresultIDs removes the "errorresult" edge to ErrorResult entities by IDs.
+func (uu *URLUpdate) RemoveErrorresultIDs(ids ...int) *URLUpdate {
+	uu.mutation.RemoveErrorresultIDs(ids...)
+	return uu
+}
+
+// RemoveErrorresult removes "errorresult" edges to ErrorResult entities.
+func (uu *URLUpdate) RemoveErrorresult(e ...*ErrorResult) *URLUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return uu.RemoveErrorresultIDs(ids...)
+}
+
+// ClearStat clears all "stat" edges to the Stat entity.
+func (uu *URLUpdate) ClearStat() *URLUpdate {
+	uu.mutation.ClearStat()
+	return uu
+}
+
+// RemoveStatIDs removes the "stat" edge to Stat entities by IDs.
+func (uu *URLUpdate) RemoveStatIDs(ids ...int) *URLUpdate {
+	uu.mutation.RemoveStatIDs(ids...)
+	return uu
+}
+
+// RemoveStat removes "stat" edges to Stat entities.
+func (uu *URLUpdate) RemoveStat(s ...*Stat) *URLUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uu.RemoveStatIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -141,6 +215,96 @@ func (uu *URLUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if uu.mutation.RelativePathCleared() {
 		_spec.ClearField(enturl.FieldRelativePath, field.TypeString)
+	}
+	if uu.mutation.ErrorresultCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   enturl.ErrorresultTable,
+			Columns: []string{enturl.ErrorresultColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(errorresult.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedErrorresultIDs(); len(nodes) > 0 && !uu.mutation.ErrorresultCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   enturl.ErrorresultTable,
+			Columns: []string{enturl.ErrorresultColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(errorresult.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.ErrorresultIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   enturl.ErrorresultTable,
+			Columns: []string{enturl.ErrorresultColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(errorresult.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.StatCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   enturl.StatTable,
+			Columns: []string{enturl.StatColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(stat.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedStatIDs(); len(nodes) > 0 && !uu.mutation.StatCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   enturl.StatTable,
+			Columns: []string{enturl.StatColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(stat.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.StatIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   enturl.StatTable,
+			Columns: []string{enturl.StatColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(stat.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -210,9 +374,81 @@ func (uuo *URLUpdateOne) ClearRelativePath() *URLUpdateOne {
 	return uuo
 }
 
+// AddErrorresultIDs adds the "errorresult" edge to the ErrorResult entity by IDs.
+func (uuo *URLUpdateOne) AddErrorresultIDs(ids ...int) *URLUpdateOne {
+	uuo.mutation.AddErrorresultIDs(ids...)
+	return uuo
+}
+
+// AddErrorresult adds the "errorresult" edges to the ErrorResult entity.
+func (uuo *URLUpdateOne) AddErrorresult(e ...*ErrorResult) *URLUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return uuo.AddErrorresultIDs(ids...)
+}
+
+// AddStatIDs adds the "stat" edge to the Stat entity by IDs.
+func (uuo *URLUpdateOne) AddStatIDs(ids ...int) *URLUpdateOne {
+	uuo.mutation.AddStatIDs(ids...)
+	return uuo
+}
+
+// AddStat adds the "stat" edges to the Stat entity.
+func (uuo *URLUpdateOne) AddStat(s ...*Stat) *URLUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uuo.AddStatIDs(ids...)
+}
+
 // Mutation returns the URLMutation object of the builder.
 func (uuo *URLUpdateOne) Mutation() *URLMutation {
 	return uuo.mutation
+}
+
+// ClearErrorresult clears all "errorresult" edges to the ErrorResult entity.
+func (uuo *URLUpdateOne) ClearErrorresult() *URLUpdateOne {
+	uuo.mutation.ClearErrorresult()
+	return uuo
+}
+
+// RemoveErrorresultIDs removes the "errorresult" edge to ErrorResult entities by IDs.
+func (uuo *URLUpdateOne) RemoveErrorresultIDs(ids ...int) *URLUpdateOne {
+	uuo.mutation.RemoveErrorresultIDs(ids...)
+	return uuo
+}
+
+// RemoveErrorresult removes "errorresult" edges to ErrorResult entities.
+func (uuo *URLUpdateOne) RemoveErrorresult(e ...*ErrorResult) *URLUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return uuo.RemoveErrorresultIDs(ids...)
+}
+
+// ClearStat clears all "stat" edges to the Stat entity.
+func (uuo *URLUpdateOne) ClearStat() *URLUpdateOne {
+	uuo.mutation.ClearStat()
+	return uuo
+}
+
+// RemoveStatIDs removes the "stat" edge to Stat entities by IDs.
+func (uuo *URLUpdateOne) RemoveStatIDs(ids ...int) *URLUpdateOne {
+	uuo.mutation.RemoveStatIDs(ids...)
+	return uuo
+}
+
+// RemoveStat removes "stat" edges to Stat entities.
+func (uuo *URLUpdateOne) RemoveStat(s ...*Stat) *URLUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uuo.RemoveStatIDs(ids...)
 }
 
 // Where appends a list predicates to the URLUpdate builder.
@@ -305,6 +541,96 @@ func (uuo *URLUpdateOne) sqlSave(ctx context.Context) (_node *Url, err error) {
 	}
 	if uuo.mutation.RelativePathCleared() {
 		_spec.ClearField(enturl.FieldRelativePath, field.TypeString)
+	}
+	if uuo.mutation.ErrorresultCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   enturl.ErrorresultTable,
+			Columns: []string{enturl.ErrorresultColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(errorresult.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedErrorresultIDs(); len(nodes) > 0 && !uuo.mutation.ErrorresultCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   enturl.ErrorresultTable,
+			Columns: []string{enturl.ErrorresultColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(errorresult.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.ErrorresultIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   enturl.ErrorresultTable,
+			Columns: []string{enturl.ErrorresultColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(errorresult.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.StatCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   enturl.StatTable,
+			Columns: []string{enturl.StatColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(stat.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedStatIDs(); len(nodes) > 0 && !uuo.mutation.StatCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   enturl.StatTable,
+			Columns: []string{enturl.StatColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(stat.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.StatIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   enturl.StatTable,
+			Columns: []string{enturl.StatColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(stat.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Url{config: uuo.config}
 	_spec.Assign = _node.assignValues

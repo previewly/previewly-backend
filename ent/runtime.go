@@ -2,8 +2,27 @@
 
 package ent
 
+import (
+	"time"
+	"wsw/backend/ent/errorresult"
+	"wsw/backend/ent/schema"
+	"wsw/backend/ent/stat"
+)
+
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	errorresultFields := schema.ErrorResult{}.Fields()
+	_ = errorresultFields
+	// errorresultDescCreatedAt is the schema descriptor for created_at field.
+	errorresultDescCreatedAt := errorresultFields[0].Descriptor()
+	// errorresult.DefaultCreatedAt holds the default value on creation for the created_at field.
+	errorresult.DefaultCreatedAt = errorresultDescCreatedAt.Default.(func() time.Time)
+	statFields := schema.Stat{}.Fields()
+	_ = statFields
+	// statDescCreatedAt is the schema descriptor for created_at field.
+	statDescCreatedAt := statFields[0].Descriptor()
+	// stat.DefaultCreatedAt holds the default value on creation for the created_at field.
+	stat.DefaultCreatedAt = statDescCreatedAt.Default.(func() time.Time)
 }

@@ -4,9 +4,12 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
+	"wsw/backend/ent/errorresult"
 	"wsw/backend/ent/predicate"
+	"wsw/backend/ent/stat"
 	enturl "wsw/backend/ent/url"
 
 	"entgo.io/ent/dialect/sql"
@@ -17,10 +20,12 @@ import (
 // URLQuery is the builder for querying Url entities.
 type URLQuery struct {
 	config
-	ctx        *QueryContext
-	order      []enturl.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Url
+	ctx             *QueryContext
+	order           []enturl.OrderOption
+	inters          []Interceptor
+	predicates      []predicate.Url
+	withErrorresult *ErrorResultQuery
+	withStat        *StatQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -55,6 +60,50 @@ func (uq *URLQuery) Unique(unique bool) *URLQuery {
 func (uq *URLQuery) Order(o ...enturl.OrderOption) *URLQuery {
 	uq.order = append(uq.order, o...)
 	return uq
+}
+
+// QueryErrorresult chains the current query on the "errorresult" edge.
+func (uq *URLQuery) QueryErrorresult() *ErrorResultQuery {
+	query := (&ErrorResultClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(enturl.Table, enturl.FieldID, selector),
+			sqlgraph.To(errorresult.Table, errorresult.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, enturl.ErrorresultTable, enturl.ErrorresultColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryStat chains the current query on the "stat" edge.
+func (uq *URLQuery) QueryStat() *StatQuery {
+	query := (&StatClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(enturl.Table, enturl.FieldID, selector),
+			sqlgraph.To(stat.Table, stat.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, enturl.StatTable, enturl.StatColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Url entity from the query.
@@ -244,15 +293,39 @@ func (uq *URLQuery) Clone() *URLQuery {
 		return nil
 	}
 	return &URLQuery{
-		config:     uq.config,
-		ctx:        uq.ctx.Clone(),
-		order:      append([]enturl.OrderOption{}, uq.order...),
-		inters:     append([]Interceptor{}, uq.inters...),
-		predicates: append([]predicate.Url{}, uq.predicates...),
+		config:          uq.config,
+		ctx:             uq.ctx.Clone(),
+		order:           append([]enturl.OrderOption{}, uq.order...),
+		inters:          append([]Interceptor{}, uq.inters...),
+		predicates:      append([]predicate.Url{}, uq.predicates...),
+		withErrorresult: uq.withErrorresult.Clone(),
+		withStat:        uq.withStat.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
 	}
+}
+
+// WithErrorresult tells the query-builder to eager-load the nodes that are connected to
+// the "errorresult" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *URLQuery) WithErrorresult(opts ...func(*ErrorResultQuery)) *URLQuery {
+	query := (&ErrorResultClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withErrorresult = query
+	return uq
+}
+
+// WithStat tells the query-builder to eager-load the nodes that are connected to
+// the "stat" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *URLQuery) WithStat(opts ...func(*StatQuery)) *URLQuery {
+	query := (&StatClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withStat = query
+	return uq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -331,8 +404,12 @@ func (uq *URLQuery) prepareQuery(ctx context.Context) error {
 
 func (uq *URLQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Url, error) {
 	var (
-		nodes = []*Url{}
-		_spec = uq.querySpec()
+		nodes       = []*Url{}
+		_spec       = uq.querySpec()
+		loadedTypes = [2]bool{
+			uq.withErrorresult != nil,
+			uq.withStat != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Url).scanValues(nil, columns)
@@ -340,6 +417,7 @@ func (uq *URLQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Url, err
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Url{config: uq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -351,7 +429,84 @@ func (uq *URLQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Url, err
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := uq.withErrorresult; query != nil {
+		if err := uq.loadErrorresult(ctx, query, nodes,
+			func(n *Url) { n.Edges.Errorresult = []*ErrorResult{} },
+			func(n *Url, e *ErrorResult) { n.Edges.Errorresult = append(n.Edges.Errorresult, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withStat; query != nil {
+		if err := uq.loadStat(ctx, query, nodes,
+			func(n *Url) { n.Edges.Stat = []*Stat{} },
+			func(n *Url, e *Stat) { n.Edges.Stat = append(n.Edges.Stat, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (uq *URLQuery) loadErrorresult(ctx context.Context, query *ErrorResultQuery, nodes []*Url, init func(*Url), assign func(*Url, *ErrorResult)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Url)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.ErrorResult(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(enturl.ErrorresultColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.url_errorresult
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "url_errorresult" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "url_errorresult" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (uq *URLQuery) loadStat(ctx context.Context, query *StatQuery, nodes []*Url, init func(*Url), assign func(*Url, *Stat)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Url)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Stat(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(enturl.StatColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.url_stat
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "url_stat" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "url_stat" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
 }
 
 func (uq *URLQuery) sqlCount(ctx context.Context) (int, error) {

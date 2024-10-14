@@ -9,10 +9,11 @@ import (
 )
 
 type PreviewData struct {
-	ID     int    `json:"id"`
-	URL    string `json:"url"`
-	Status Status `json:"status"`
-	Image  string `json:"image"`
+	ID     int     `json:"id"`
+	URL    string  `json:"url"`
+	Status Status  `json:"status"`
+	Image  string  `json:"image"`
+	Error  *string `json:"error,omitempty"`
 }
 
 type Status string

@@ -12,6 +12,10 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// ErrorResult is the client for interacting with the ErrorResult builders.
+	ErrorResult *ErrorResultClient
+	// Stat is the client for interacting with the Stat builders.
+	Stat *StatClient
 	// Token is the client for interacting with the Token builders.
 	Token *TokenClient
 	// Url is the client for interacting with the Url builders.
@@ -147,6 +151,8 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.ErrorResult = NewErrorResultClient(tx.config)
+	tx.Stat = NewStatClient(tx.config)
 	tx.Token = NewTokenClient(tx.config)
 	tx.Url = NewURLClient(tx.config)
 }
@@ -158,7 +164,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Token.QueryXXX(), the query will be executed
+// applies a query, for example: ErrorResult.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

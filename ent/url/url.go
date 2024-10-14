@@ -7,6 +7,7 @@ import (
 	"wsw/backend/domain/url"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -20,8 +21,26 @@ const (
 	FieldStatus = "status"
 	// FieldRelativePath holds the string denoting the relative_path field in the database.
 	FieldRelativePath = "relative_path"
+	// EdgeErrorresult holds the string denoting the errorresult edge name in mutations.
+	EdgeErrorresult = "errorresult"
+	// EdgeStat holds the string denoting the stat edge name in mutations.
+	EdgeStat = "stat"
 	// Table holds the table name of the url in the database.
 	Table = "urls"
+	// ErrorresultTable is the table that holds the errorresult relation/edge.
+	ErrorresultTable = "error_results"
+	// ErrorresultInverseTable is the table name for the ErrorResult entity.
+	// It exists in this package in order to avoid circular dependency with the "errorresult" package.
+	ErrorresultInverseTable = "error_results"
+	// ErrorresultColumn is the table column denoting the errorresult relation/edge.
+	ErrorresultColumn = "url_errorresult"
+	// StatTable is the table that holds the stat relation/edge.
+	StatTable = "stats"
+	// StatInverseTable is the table name for the Stat entity.
+	// It exists in this package in order to avoid circular dependency with the "stat" package.
+	StatInverseTable = "stats"
+	// StatColumn is the table column denoting the stat relation/edge.
+	StatColumn = "url_stat"
 )
 
 // Columns holds all SQL columns for url fields.
@@ -73,4 +92,46 @@ func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 // ByRelativePath orders the results by the relative_path field.
 func ByRelativePath(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRelativePath, opts...).ToFunc()
+}
+
+// ByErrorresultCount orders the results by errorresult count.
+func ByErrorresultCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newErrorresultStep(), opts...)
+	}
+}
+
+// ByErrorresult orders the results by errorresult terms.
+func ByErrorresult(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newErrorresultStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByStatCount orders the results by stat count.
+func ByStatCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newStatStep(), opts...)
+	}
+}
+
+// ByStat orders the results by stat terms.
+func ByStat(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newStatStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newErrorresultStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ErrorresultInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ErrorresultTable, ErrorresultColumn),
+	)
+}
+func newStatStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(StatInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, StatTable, StatColumn),
+	)
 }

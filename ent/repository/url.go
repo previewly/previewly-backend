@@ -14,6 +14,8 @@ type (
 		TryGet(string) *ent.Url
 		Insert(string) (*ent.Url, error)
 		Update(string, url.Status, int, error) (*ent.Url, error)
+
+		GetErrors(*ent.Url) ([]*ent.ErrorResult, error)
 	}
 
 	urlImpl struct {
@@ -21,6 +23,10 @@ type (
 		ctx    context.Context
 	}
 )
+
+func (u *urlImpl) GetErrors(entity *ent.Url) ([]*ent.ErrorResult, error) {
+	return entity.QueryErrorresult().All(u.ctx)
+}
 
 // Get implements Url.
 func (u *urlImpl) Get(url string) (*ent.Url, error) {

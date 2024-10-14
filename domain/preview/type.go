@@ -13,4 +13,5 @@ type PreviewData struct {
 	URL    string
 	Image  string
 	Status Status
+	Error  *string
 }

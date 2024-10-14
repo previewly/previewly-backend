@@ -18,18 +18,23 @@ type (
 	}
 	urlImpl struct {
 		client                gowitness.Client
-		repository            repository.Url
+		urlRepository         repository.Url
 		screenshotURLProvider screenshot.Provider
 	}
 )
 
 // GetPreviewData implements Url.
 func (u urlImpl) GetPreviewData(url string) (*preview.PreviewData, error) {
-	entity, err := u.repository.Get(url)
+	entity, err := u.urlRepository.Get(url)
 	if err != nil {
 		return nil, err
 	}
-	return u.getPreviewData(entity)
+
+	lastError, err := u.getLastError(entity)
+	if err != nil {
+		return nil, err
+	}
+	return u.getPreviewData(entity, lastError)
 }
 
 // AddURL implements Url.
@@ -47,11 +52,20 @@ func (u urlImpl) AddURL(url string) (*preview.PreviewData, error) {
 	if err != nil {
 		return nil, err
 	}
-	return u.getPreviewData(updatedEntity)
+
+	lastError, err := u.getLastError(updatedEntity)
+	if err != nil {
+		return nil, err
+	}
+	return u.getPreviewData(updatedEntity, lastError)
 }
 
 func NewUrl(urlRepository repository.Url, client gowitness.Client, provider screenshot.Provider) Url {
-	return urlImpl{repository: urlRepository, client: client, screenshotURLProvider: provider}
+	return urlImpl{
+		urlRepository:         urlRepository,
+		client:                client,
+		screenshotURLProvider: provider,
+	}
 }
 
 func (u urlImpl) updateUrlData(urlEntity *ent.Url, isNew bool) (*ent.Url, error) {
@@ -64,21 +78,30 @@ func (u urlImpl) updateUrlData(urlEntity *ent.Url, isNew bool) (*ent.Url, error)
 }
 
 func (u urlImpl) getOrCreateUrlEntity(url string) (*ent.Url, error, bool) {
-	entity := u.repository.TryGet(url)
+	entity := u.urlRepository.TryGet(url)
 	if entity == nil {
-		entity, err := u.repository.Insert(url)
+		entity, err := u.urlRepository.Insert(url)
 		return entity, err, true
 	}
 	return entity, nil, false
 }
 
-func (u urlImpl) getPreviewData(url *ent.Url) (*preview.PreviewData, error) {
+func (u urlImpl) getPreviewData(url *ent.Url, lastError *ent.ErrorResult) (*preview.PreviewData, error) {
 	return &preview.PreviewData{
 		ID:     url.ID,
 		URL:    url.URL,
 		Image:  u.screenshotURLProvider.Provide(url.RelativePath),
 		Status: u.getPreviewDataStatus(url.Status),
+		Error:  lastError.Message,
 	}, nil
+}
+
+func (u urlImpl) getLastError(entity *ent.Url) (*ent.ErrorResult, error) {
+	errors, error := u.urlRepository.GetErrors(entity)
+	if error != nil {
+		return nil, error
+	}
+	return errors[len(errors)-1], nil
 }
 
 func (u urlImpl) getPreviewDataStatus(status url.Status) preview.Status {

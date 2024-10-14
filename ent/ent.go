@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"reflect"
 	"sync"
+	"wsw/backend/ent/errorresult"
+	"wsw/backend/ent/stat"
 	"wsw/backend/ent/token"
 
 	"entgo.io/ent"
@@ -75,8 +77,10 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			token.Table:  token.ValidColumn,
-			enturl.Table: enturl.ValidColumn,
+			errorresult.Table: errorresult.ValidColumn,
+			stat.Table:        stat.ValidColumn,
+			token.Table:       token.ValidColumn,
+			enturl.Table:      enturl.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

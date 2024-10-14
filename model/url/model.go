@@ -34,7 +34,13 @@ func (u urlImpl) GetPreviewData(url string) (*preview.PreviewData, error) {
 	if err != nil {
 		return nil, err
 	}
-	return u.getPreviewData(entity, lastError)
+
+	lastStat, err := u.getLastStat(entity)
+	if err != nil {
+		return nil, err
+	}
+
+	return u.getPreviewData(entity, lastError, lastStat)
 }
 
 // AddURL implements Url.
@@ -57,7 +63,12 @@ func (u urlImpl) AddURL(url string) (*preview.PreviewData, error) {
 	if err != nil {
 		return nil, err
 	}
-	return u.getPreviewData(updatedEntity, lastError)
+	lastStat, err := u.getLastStat(updatedEntity)
+	if err != nil {
+		return nil, err
+	}
+
+	return u.getPreviewData(updatedEntity, lastError, lastStat)
 }
 
 func NewUrl(urlRepository repository.Url, client gowitness.Client, provider screenshot.Provider) Url {
@@ -86,13 +97,15 @@ func (u urlImpl) getOrCreateUrlEntity(url string) (*ent.Url, error, bool) {
 	return entity, nil, false
 }
 
-func (u urlImpl) getPreviewData(url *ent.Url, lastError *ent.ErrorResult) (*preview.PreviewData, error) {
+func (u urlImpl) getPreviewData(url *ent.Url, lastError *ent.ErrorResult, lastStat *ent.Stat) (*preview.PreviewData, error) {
 	return &preview.PreviewData{
-		ID:     url.ID,
-		URL:    url.URL,
-		Image:  u.screenshotURLProvider.Provide(url.RelativePath),
-		Status: u.getPreviewDataStatus(url.Status),
-		Error:  lastError.Message,
+		ID:          url.ID,
+		URL:         url.URL,
+		Image:       u.screenshotURLProvider.Provide(url.RelativePath),
+		Status:      u.getPreviewDataStatus(url.Status),
+		Error:       lastError.Message,
+		Title:       lastStat.Title,
+		Description: lastStat.Description,
 	}, nil
 }
 
@@ -102,6 +115,14 @@ func (u urlImpl) getLastError(entity *ent.Url) (*ent.ErrorResult, error) {
 		return nil, error
 	}
 	return errors[len(errors)-1], nil
+}
+
+func (u urlImpl) getLastStat(entity *ent.Url) (*ent.Stat, error) {
+	stats, error := u.urlRepository.GetStats(entity)
+	if error != nil {
+		return nil, error
+	}
+	return stats[len(stats)-1], nil
 }
 
 func (u urlImpl) getPreviewDataStatus(status url.Status) preview.Status {

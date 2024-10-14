@@ -8,6 +8,8 @@ type PreviewData {
   status: Status!
   image: String!
   error: String
+  title: String
+  description: String
 }
 
 type Query {

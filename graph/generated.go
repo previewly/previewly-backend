@@ -53,11 +53,13 @@ type ComplexityRoot struct {
 	}
 
 	PreviewData struct {
-		Error  func(childComplexity int) int
-		ID     func(childComplexity int) int
-		Image  func(childComplexity int) int
-		Status func(childComplexity int) int
-		URL    func(childComplexity int) int
+		Description func(childComplexity int) int
+		Error       func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Image       func(childComplexity int) int
+		Status      func(childComplexity int) int
+		Title       func(childComplexity int) int
+		URL         func(childComplexity int) int
 	}
 
 	Query struct {
@@ -113,6 +115,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateToken(childComplexity), true
 
+	case "PreviewData.description":
+		if e.complexity.PreviewData.Description == nil {
+			break
+		}
+
+		return e.complexity.PreviewData.Description(childComplexity), true
+
 	case "PreviewData.error":
 		if e.complexity.PreviewData.Error == nil {
 			break
@@ -140,6 +149,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PreviewData.Status(childComplexity), true
+
+	case "PreviewData.title":
+		if e.complexity.PreviewData.Title == nil {
+			break
+		}
+
+		return e.complexity.PreviewData.Title(childComplexity), true
 
 	case "PreviewData.url":
 		if e.complexity.PreviewData.URL == nil {
@@ -501,6 +517,10 @@ func (ec *executionContext) fieldContext_Mutation_addUrl(ctx context.Context, fi
 				return ec.fieldContext_PreviewData_image(ctx, field)
 			case "error":
 				return ec.fieldContext_PreviewData_error(ctx, field)
+			case "title":
+				return ec.fieldContext_PreviewData_title(ctx, field)
+			case "description":
+				return ec.fieldContext_PreviewData_description(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type PreviewData", field.Name)
 		},
@@ -736,6 +756,88 @@ func (ec *executionContext) fieldContext_PreviewData_error(ctx context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _PreviewData_title(ctx context.Context, field graphql.CollectedField, obj *model.PreviewData) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PreviewData_title(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PreviewData_title(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PreviewData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PreviewData_description(ctx context.Context, field graphql.CollectedField, obj *model.PreviewData) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PreviewData_description(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PreviewData_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PreviewData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_getPreviewData(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_getPreviewData(ctx, field)
 	if err != nil {
@@ -782,6 +884,10 @@ func (ec *executionContext) fieldContext_Query_getPreviewData(ctx context.Contex
 				return ec.fieldContext_PreviewData_image(ctx, field)
 			case "error":
 				return ec.fieldContext_PreviewData_error(ctx, field)
+			case "title":
+				return ec.fieldContext_PreviewData_title(ctx, field)
+			case "description":
+				return ec.fieldContext_PreviewData_description(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type PreviewData", field.Name)
 		},
@@ -2848,6 +2954,10 @@ func (ec *executionContext) _PreviewData(ctx context.Context, sel ast.SelectionS
 			}
 		case "error":
 			out.Values[i] = ec._PreviewData_error(ctx, field, obj)
+		case "title":
+			out.Values[i] = ec._PreviewData_title(ctx, field, obj)
+		case "description":
+			out.Values[i] = ec._PreviewData_description(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

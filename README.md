@@ -1,6 +1,8 @@
-#wsw-backend
+# Previewly Backend
 
-## Tips
+API code of [previewly](https://previewly.top) application build with Go.
 
-1. Build docker image - `docker build ./ -t wsw-backend`
-2. Run docker image - `docker run -it --network="host" --env-file=.env.local -t wsw-backend  /app/wsw-backend`
+## Run dev api server
+
+1. start s docker compose: `docker-compose up`
+2. execute a gaper: `gaper --program-args="-db-port=5434"`

@@ -13,6 +13,7 @@ import (
 	"wsw/backend/domain/url/screenshot"
 	"wsw/backend/ent"
 	"wsw/backend/ent/repository"
+	log "wsw/backend/lib/log"
 	"wsw/backend/lib/utils"
 	"wsw/backend/model/token"
 	"wsw/backend/model/url"
@@ -90,8 +91,8 @@ func initDi(config config.Config, appContext context.Context) {
 
 	initService(func() *slog.Logger {
 		return slog.Default()
-		// return slog.New(slogsentry.Option{Level: slog.LevelDebug}.NewSentryHandler())
 	})
+
 	initService(func(repository repository.Url, relativePathProvider relative.Provider) gowitness.CreateWriter {
 		return func(url *ent.Url) writers.Writer {
 			return gowitness.NewRunnerWriter(url, repository, relativePathProvider)
@@ -121,6 +122,7 @@ func initDi(config config.Config, appContext context.Context) {
 func initVoidServices(config config.Config) {
 	initSentry(config.Sentry)
 	initRollbar(config.Rollbar)
+	initLogger()
 }
 
 func initRollbar(config config.Rollbar) {
@@ -132,6 +134,11 @@ func initSentry(options sentry.ClientOptions) {
 	if err != nil {
 		utils.F("Sentry initialization failed: %v\n", err)
 	}
+}
+
+func initLogger() {
+	logger := slog.New(log.NewHandler(nil))
+	slog.SetDefault(logger)
 }
 
 func initService(resolver interface{}) {

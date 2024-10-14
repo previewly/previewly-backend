@@ -16,6 +16,7 @@ type (
 		Update(string, url.Status, int, error) (*ent.Url, error)
 
 		GetErrors(*ent.Url) ([]*ent.ErrorResult, error)
+		GetStats(*ent.Url) ([]*ent.Stat, error)
 	}
 
 	urlImpl struct {
@@ -26,6 +27,10 @@ type (
 
 func (u *urlImpl) GetErrors(entity *ent.Url) ([]*ent.ErrorResult, error) {
 	return entity.QueryErrorresult().All(u.ctx)
+}
+
+func (u *urlImpl) GetStats(entity *ent.Url) ([]*ent.Stat, error) {
+	return entity.QueryStat().All(u.ctx)
 }
 
 // Get implements Url.

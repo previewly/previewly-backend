@@ -9,9 +9,11 @@ const (
 )
 
 type PreviewData struct {
-	ID     int
-	URL    string
-	Image  string
-	Status Status
-	Error  *string
+	ID          int
+	URL         string
+	Image       string
+	Status      Status
+	Error       *string
+	Title       *string
+	Description *string
 }

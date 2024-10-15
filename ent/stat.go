@@ -20,9 +20,7 @@ type Stat struct {
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Title holds the value of the "title" field.
-	Title *string `json:"title,omitempty"`
-	// Description holds the value of the "description" field.
-	Description  *string `json:"description,omitempty"`
+	Title        *string `json:"title,omitempty"`
 	url_stat     *int
 	selectValues sql.SelectValues
 }
@@ -34,7 +32,7 @@ func (*Stat) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case stat.FieldID:
 			values[i] = new(sql.NullInt64)
-		case stat.FieldTitle, stat.FieldDescription:
+		case stat.FieldTitle:
 			values[i] = new(sql.NullString)
 		case stat.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -73,13 +71,6 @@ func (s *Stat) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.Title = new(string)
 				*s.Title = value.String
-			}
-		case stat.FieldDescription:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field description", values[i])
-			} else if value.Valid {
-				s.Description = new(string)
-				*s.Description = value.String
 			}
 		case stat.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -129,11 +120,6 @@ func (s *Stat) String() string {
 	builder.WriteString(", ")
 	if v := s.Title; v != nil {
 		builder.WriteString("title=")
-		builder.WriteString(*v)
-	}
-	builder.WriteString(", ")
-	if v := s.Description; v != nil {
-		builder.WriteString("description=")
 		builder.WriteString(*v)
 	}
 	builder.WriteByte(')')

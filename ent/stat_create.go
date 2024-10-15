@@ -48,20 +48,6 @@ func (sc *StatCreate) SetNillableTitle(s *string) *StatCreate {
 	return sc
 }
 
-// SetDescription sets the "description" field.
-func (sc *StatCreate) SetDescription(s string) *StatCreate {
-	sc.mutation.SetDescription(s)
-	return sc
-}
-
-// SetNillableDescription sets the "description" field if the given value is not nil.
-func (sc *StatCreate) SetNillableDescription(s *string) *StatCreate {
-	if s != nil {
-		sc.SetDescription(*s)
-	}
-	return sc
-}
-
 // Mutation returns the StatMutation object of the builder.
 func (sc *StatCreate) Mutation() *StatMutation {
 	return sc.mutation
@@ -141,10 +127,6 @@ func (sc *StatCreate) createSpec() (*Stat, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.Title(); ok {
 		_spec.SetField(stat.FieldTitle, field.TypeString, value)
 		_node.Title = &value
-	}
-	if value, ok := sc.mutation.Description(); ok {
-		_spec.SetField(stat.FieldDescription, field.TypeString, value)
-		_node.Description = &value
 	}
 	return _node, _spec
 }

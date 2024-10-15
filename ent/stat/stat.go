@@ -17,8 +17,6 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldTitle holds the string denoting the title field in the database.
 	FieldTitle = "title"
-	// FieldDescription holds the string denoting the description field in the database.
-	FieldDescription = "description"
 	// Table holds the table name of the stat in the database.
 	Table = "stats"
 )
@@ -28,7 +26,6 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldTitle,
-	FieldDescription,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "stats"
@@ -73,9 +70,4 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByTitle orders the results by the title field.
 func ByTitle(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTitle, opts...).ToFunc()
-}
-
-// ByDescription orders the results by the description field.
-func ByDescription(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDescription, opts...).ToFunc()
 }

@@ -62,26 +62,6 @@ func (su *StatUpdate) ClearTitle() *StatUpdate {
 	return su
 }
 
-// SetDescription sets the "description" field.
-func (su *StatUpdate) SetDescription(s string) *StatUpdate {
-	su.mutation.SetDescription(s)
-	return su
-}
-
-// SetNillableDescription sets the "description" field if the given value is not nil.
-func (su *StatUpdate) SetNillableDescription(s *string) *StatUpdate {
-	if s != nil {
-		su.SetDescription(*s)
-	}
-	return su
-}
-
-// ClearDescription clears the value of the "description" field.
-func (su *StatUpdate) ClearDescription() *StatUpdate {
-	su.mutation.ClearDescription()
-	return su
-}
-
 // Mutation returns the StatMutation object of the builder.
 func (su *StatUpdate) Mutation() *StatMutation {
 	return su.mutation
@@ -131,12 +111,6 @@ func (su *StatUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if su.mutation.TitleCleared() {
 		_spec.ClearField(stat.FieldTitle, field.TypeString)
-	}
-	if value, ok := su.mutation.Description(); ok {
-		_spec.SetField(stat.FieldDescription, field.TypeString, value)
-	}
-	if su.mutation.DescriptionCleared() {
-		_spec.ClearField(stat.FieldDescription, field.TypeString)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -189,26 +163,6 @@ func (suo *StatUpdateOne) SetNillableTitle(s *string) *StatUpdateOne {
 // ClearTitle clears the value of the "title" field.
 func (suo *StatUpdateOne) ClearTitle() *StatUpdateOne {
 	suo.mutation.ClearTitle()
-	return suo
-}
-
-// SetDescription sets the "description" field.
-func (suo *StatUpdateOne) SetDescription(s string) *StatUpdateOne {
-	suo.mutation.SetDescription(s)
-	return suo
-}
-
-// SetNillableDescription sets the "description" field if the given value is not nil.
-func (suo *StatUpdateOne) SetNillableDescription(s *string) *StatUpdateOne {
-	if s != nil {
-		suo.SetDescription(*s)
-	}
-	return suo
-}
-
-// ClearDescription clears the value of the "description" field.
-func (suo *StatUpdateOne) ClearDescription() *StatUpdateOne {
-	suo.mutation.ClearDescription()
 	return suo
 }
 
@@ -291,12 +245,6 @@ func (suo *StatUpdateOne) sqlSave(ctx context.Context) (_node *Stat, err error) 
 	}
 	if suo.mutation.TitleCleared() {
 		_spec.ClearField(stat.FieldTitle, field.TypeString)
-	}
-	if value, ok := suo.mutation.Description(); ok {
-		_spec.SetField(stat.FieldDescription, field.TypeString, value)
-	}
-	if suo.mutation.DescriptionCleared() {
-		_spec.ClearField(stat.FieldDescription, field.TypeString)
 	}
 	_node = &Stat{config: suo.config}
 	_spec.Assign = _node.assignValues

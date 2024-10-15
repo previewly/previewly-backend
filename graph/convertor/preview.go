@@ -7,13 +7,12 @@ import (
 
 func ConvertPreviewData(data *preview.PreviewData) *model.PreviewData {
 	return &model.PreviewData{
-		ID:          data.ID,
-		URL:         data.URL,
-		Image:       data.Image,
-		Status:      convertPreviewStatus(data.Status),
-		Error:       data.Error,
-		Title:       data.Title,
-		Description: data.Description,
+		ID:     data.ID,
+		URL:    data.URL,
+		Image:  data.Image,
+		Status: convertPreviewStatus(data.Status),
+		Error:  data.Error,
+		Title:  data.Title,
 	}
 }
 

@@ -34,7 +34,6 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "title", Type: field.TypeString, Nullable: true},
-		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "url_stat", Type: field.TypeInt, Nullable: true},
 	}
 	// StatsTable holds the schema information for the "stats" table.
@@ -45,7 +44,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "stats_urls_stat",
-				Columns:    []*schema.Column{StatsColumns[4]},
+				Columns:    []*schema.Column{StatsColumns[3]},
 				RefColumns: []*schema.Column{UrlsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

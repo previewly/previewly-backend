@@ -444,7 +444,6 @@ type StatMutation struct {
 	id            *int
 	created_at    *time.Time
 	title         *string
-	description   *string
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Stat, error)
@@ -634,55 +633,6 @@ func (m *StatMutation) ResetTitle() {
 	delete(m.clearedFields, stat.FieldTitle)
 }
 
-// SetDescription sets the "description" field.
-func (m *StatMutation) SetDescription(s string) {
-	m.description = &s
-}
-
-// Description returns the value of the "description" field in the mutation.
-func (m *StatMutation) Description() (r string, exists bool) {
-	v := m.description
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDescription returns the old "description" field's value of the Stat entity.
-// If the Stat object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *StatMutation) OldDescription(ctx context.Context) (v *string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDescription requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
-	}
-	return oldValue.Description, nil
-}
-
-// ClearDescription clears the value of the "description" field.
-func (m *StatMutation) ClearDescription() {
-	m.description = nil
-	m.clearedFields[stat.FieldDescription] = struct{}{}
-}
-
-// DescriptionCleared returns if the "description" field was cleared in this mutation.
-func (m *StatMutation) DescriptionCleared() bool {
-	_, ok := m.clearedFields[stat.FieldDescription]
-	return ok
-}
-
-// ResetDescription resets all changes to the "description" field.
-func (m *StatMutation) ResetDescription() {
-	m.description = nil
-	delete(m.clearedFields, stat.FieldDescription)
-}
-
 // Where appends a list predicates to the StatMutation builder.
 func (m *StatMutation) Where(ps ...predicate.Stat) {
 	m.predicates = append(m.predicates, ps...)
@@ -717,15 +667,12 @@ func (m *StatMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *StatMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 2)
 	if m.created_at != nil {
 		fields = append(fields, stat.FieldCreatedAt)
 	}
 	if m.title != nil {
 		fields = append(fields, stat.FieldTitle)
-	}
-	if m.description != nil {
-		fields = append(fields, stat.FieldDescription)
 	}
 	return fields
 }
@@ -739,8 +686,6 @@ func (m *StatMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case stat.FieldTitle:
 		return m.Title()
-	case stat.FieldDescription:
-		return m.Description()
 	}
 	return nil, false
 }
@@ -754,8 +699,6 @@ func (m *StatMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldCreatedAt(ctx)
 	case stat.FieldTitle:
 		return m.OldTitle(ctx)
-	case stat.FieldDescription:
-		return m.OldDescription(ctx)
 	}
 	return nil, fmt.Errorf("unknown Stat field %s", name)
 }
@@ -778,13 +721,6 @@ func (m *StatMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTitle(v)
-		return nil
-	case stat.FieldDescription:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDescription(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Stat field %s", name)
@@ -819,9 +755,6 @@ func (m *StatMutation) ClearedFields() []string {
 	if m.FieldCleared(stat.FieldTitle) {
 		fields = append(fields, stat.FieldTitle)
 	}
-	if m.FieldCleared(stat.FieldDescription) {
-		fields = append(fields, stat.FieldDescription)
-	}
 	return fields
 }
 
@@ -839,9 +772,6 @@ func (m *StatMutation) ClearField(name string) error {
 	case stat.FieldTitle:
 		m.ClearTitle()
 		return nil
-	case stat.FieldDescription:
-		m.ClearDescription()
-		return nil
 	}
 	return fmt.Errorf("unknown Stat nullable field %s", name)
 }
@@ -855,9 +785,6 @@ func (m *StatMutation) ResetField(name string) error {
 		return nil
 	case stat.FieldTitle:
 		m.ResetTitle()
-		return nil
-	case stat.FieldDescription:
-		m.ResetDescription()
 		return nil
 	}
 	return fmt.Errorf("unknown Stat field %s", name)

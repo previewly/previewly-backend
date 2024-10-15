@@ -17,7 +17,6 @@ func (Stat) Fields() []ent.Field {
 	return []ent.Field{
 		field.Time("created_at").Default(time.Now),
 		field.String("title").Nillable().Optional(),
-		field.String("description").Nillable().Optional(),
 	}
 }
 

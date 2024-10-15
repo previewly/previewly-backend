@@ -95,20 +95,17 @@ func (u urlImpl) createPreviewData(url *ent.Url) (*preview.PreviewData, error) {
 	}
 
 	var title *string = nil
-	var description *string = nil
 	if lastStat != nil {
 		title = lastStat.Title
-		description = lastStat.Description
 	}
 
 	return &preview.PreviewData{
-		ID:          url.ID,
-		URL:         url.URL,
-		Image:       u.screenshotURLProvider.Provide(url.RelativePath),
-		Status:      u.getPreviewDataStatus(url.Status),
-		Error:       errorMessage,
-		Title:       title,
-		Description: description,
+		ID:     url.ID,
+		URL:    url.URL,
+		Image:  u.screenshotURLProvider.Provide(url.RelativePath),
+		Status: u.getPreviewDataStatus(url.Status),
+		Error:  errorMessage,
+		Title:  title,
 	}, nil
 }
 

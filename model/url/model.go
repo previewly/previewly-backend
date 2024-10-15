@@ -30,17 +30,7 @@ func (u urlImpl) GetPreviewData(url string) (*preview.PreviewData, error) {
 		return nil, err
 	}
 
-	lastError, err := u.getLastError(entity)
-	if err != nil {
-		return nil, err
-	}
-
-	lastStat, err := u.getLastStat(entity)
-	if err != nil {
-		return nil, err
-	}
-
-	return u.getPreviewData(entity, lastError, lastStat)
+	return u.createPreviewData(entity)
 }
 
 // AddURL implements Url.
@@ -59,16 +49,7 @@ func (u urlImpl) AddURL(url string) (*preview.PreviewData, error) {
 		return nil, err
 	}
 
-	lastError, err := u.getLastError(updatedEntity)
-	if err != nil {
-		return nil, err
-	}
-	lastStat, err := u.getLastStat(updatedEntity)
-	if err != nil {
-		return nil, err
-	}
-
-	return u.getPreviewData(updatedEntity, lastError, lastStat)
+	return u.createPreviewData(updatedEntity)
 }
 
 func NewUrl(urlRepository repository.Url, client gowitness.Client, provider screenshot.Provider) Url {
@@ -97,15 +78,37 @@ func (u urlImpl) getOrCreateUrlEntity(url string) (*ent.Url, error, bool) {
 	return entity, nil, false
 }
 
-func (u urlImpl) getPreviewData(url *ent.Url, lastError *ent.ErrorResult, lastStat *ent.Stat) (*preview.PreviewData, error) {
+func (u urlImpl) createPreviewData(url *ent.Url) (*preview.PreviewData, error) {
+	lastError, err := u.getLastError(url)
+	if err != nil {
+		return nil, err
+	}
+
+	lastStat, err := u.getLastStat(url)
+	if err != nil {
+		return nil, err
+	}
+
+	var errorMessage *string = nil
+	if lastError != nil {
+		errorMessage = lastError.Message
+	}
+
+	var title *string = nil
+	var description *string = nil
+	if lastStat != nil {
+		title = lastStat.Title
+		description = lastStat.Description
+	}
+
 	return &preview.PreviewData{
 		ID:          url.ID,
 		URL:         url.URL,
 		Image:       u.screenshotURLProvider.Provide(url.RelativePath),
 		Status:      u.getPreviewDataStatus(url.Status),
-		Error:       lastError.Message,
-		Title:       lastStat.Title,
-		Description: lastStat.Description,
+		Error:       errorMessage,
+		Title:       title,
+		Description: description,
 	}, nil
 }
 
@@ -114,7 +117,11 @@ func (u urlImpl) getLastError(entity *ent.Url) (*ent.ErrorResult, error) {
 	if error != nil {
 		return nil, error
 	}
-	return errors[len(errors)-1], nil
+	count := len(errors)
+	if count == 0 {
+		return nil, nil
+	}
+	return errors[count-1], nil
 }
 
 func (u urlImpl) getLastStat(entity *ent.Url) (*ent.Stat, error) {
@@ -122,7 +129,11 @@ func (u urlImpl) getLastStat(entity *ent.Url) (*ent.Stat, error) {
 	if error != nil {
 		return nil, error
 	}
-	return stats[len(stats)-1], nil
+	count := len(stats)
+	if count == 0 {
+		return nil, nil
+	}
+	return stats[count-1], nil
 }
 
 func (u urlImpl) getPreviewDataStatus(status url.Status) preview.Status {

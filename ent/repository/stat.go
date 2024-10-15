@@ -2,13 +2,14 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"wsw/backend/ent"
 )
 
 type (
 	Stat interface {
-		Insert(*ent.Stat) (*ent.Stat, error)
+		Insert(*string) (*ent.Stat, error)
 	}
 
 	statImp struct {
@@ -18,8 +19,12 @@ type (
 )
 
 // Insert implements Stat.
-func (s *statImp) Insert(*ent.Stat) (*ent.Stat, error) {
-	panic("unimplemented")
+func (s *statImp) Insert(title *string) (*ent.Stat, error) {
+	statEntity, err := s.client.Stat.Create().SetTitle(*title).SetCreatedAt(time.Now()).Save(s.ctx)
+	if err != nil {
+		return nil, err
+	}
+	return statEntity, nil
 }
 
 func NewStat(client *ent.Client, ctx context.Context) Stat {

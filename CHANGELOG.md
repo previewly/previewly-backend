@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.9.0](https://github.com/wert2all/previewly-backend/compare/v1.8.5...v1.9.0) (2024-10-15)
+
+
+### Features
+
+* add custom logger ([c8a04b2](https://github.com/wert2all/previewly-backend/commit/c8a04b295a74774a3519e875515afb0d6c150cb3))
+* add idx support ([56e2241](https://github.com/wert2all/previewly-backend/commit/56e22412bc336dea0ae13f2ff74ef2132a9367e5))
+* add saving preview stat ([2200d9b](https://github.com/wert2all/previewly-backend/commit/2200d9b4a4b928c1b16c6de7d054ddab638c549e))
+* expose title and description ([8bf8139](https://github.com/wert2all/previewly-backend/commit/8bf813908bd5093dd62a1cae4e69aef511370a70))
+* expose url error ([193b898](https://github.com/wert2all/previewly-backend/commit/193b898e40b90c67c30da7574155fe86abe76252))
+
+
+### Bug Fixes
+
+* fix application README.md ([a2b00c4](https://github.com/wert2all/previewly-backend/commit/a2b00c4a458d4e91487b1b23e5d37d82550eee5d))
+* fix exposing error message and stat ([b9c5b84](https://github.com/wert2all/previewly-backend/commit/b9c5b84c1351123ad15d5074bf919d4be619d114))
+* remove description from stat ([9bfb812](https://github.com/wert2all/previewly-backend/commit/9bfb812984ea8c2b36a360db400d6cf2ffa4626d))
+* remove starting app from docker compose ([689b8f2](https://github.com/wert2all/previewly-backend/commit/689b8f27f7e03128ae355dc22181abb4946c9ea6))
+
 ## [1.8.5](https://github.com/wert2all/previewly-backend/compare/v1.8.4...v1.8.5) (2024-10-03)
 
 

@@ -88,9 +88,9 @@ func initDi(config config.Config, appContext context.Context) {
 		return slog.Default()
 	})
 
-	initService(func(repository repository.Url, relativePathProvider relative.Provider) gowitness.CreateWriter {
+	initService(func(urlRepository repository.Url, statRepository repository.Stat, relativePathProvider relative.Provider) gowitness.CreateWriter {
 		return func(url *ent.Url) writers.Writer {
-			return gowitness.NewRunnerWriter(url, repository, relativePathProvider)
+			return gowitness.NewRunnerWriter(url, urlRepository, statRepository, relativePathProvider)
 		}
 	})
 	initService(func(logger *slog.Logger, createWriter gowitness.CreateWriter) gowitness.Client {
@@ -120,6 +120,9 @@ func initRepositories() {
 	})
 	initService(func(client *ent.Client, ctx context.Context) repository.Url {
 		return repository.NewUrl(client, ctx)
+	})
+	initService(func(client *ent.Client, ctx context.Context) repository.Stat {
+		return repository.NewStat(client, ctx)
 	})
 }
 

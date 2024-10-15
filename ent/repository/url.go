@@ -13,7 +13,8 @@ type (
 		Get(string) (*ent.Url, error)
 		TryGet(string) *ent.Url
 		Insert(string) (*ent.Url, error)
-		Update(string, url.Status, int, error) (*ent.Url, error)
+
+		SaveSuccess(string, *ent.Stat, int) (*ent.Url, error)
 
 		GetErrors(*ent.Url) ([]*ent.ErrorResult, error)
 		GetStats(*ent.Url) ([]*ent.Stat, error)
@@ -24,6 +25,15 @@ type (
 		ctx    context.Context
 	}
 )
+
+// SaveSuccess implements Url.
+func (u *urlImpl) SaveSuccess(relativePath string, statEntity *ent.Stat, ID int) (*ent.Url, error) {
+	urlEntity, err := u.client.Url.Query().Where(entUrl.ID(ID)).Only(u.ctx)
+	if err != nil {
+		return nil, err
+	}
+	return u.client.Url.UpdateOne(urlEntity).SetStatus(url.Success).SetRelativePath(relativePath).AddStat(statEntity).Save(u.ctx)
+}
 
 func (u *urlImpl) GetErrors(entity *ent.Url) ([]*ent.ErrorResult, error) {
 	return entity.QueryErrorresult().All(u.ctx)
@@ -39,7 +49,7 @@ func (u *urlImpl) Get(url string) (*ent.Url, error) {
 }
 
 // Update implements Url.
-func (u *urlImpl) Update(relativePath string, status url.Status, ID int, _ error) (*ent.Url, error) {
+func (u *urlImpl) Update(relativePath string, status url.Status, ID int) (*ent.Url, error) {
 	urlEntity, err := u.client.Url.Query().Where(entUrl.ID(ID)).Only(u.ctx)
 	if err != nil {
 		return nil, err

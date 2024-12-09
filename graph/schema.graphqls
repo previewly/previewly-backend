@@ -19,6 +19,8 @@ type Query {
 type Mutation {
   createToken: String!
   addUrl(token: String!, url: String!): PreviewData
+
+  upload(images: [Upload!]!): [UploadImageStatus!]!
 }
 
 enum Status {
@@ -26,3 +28,12 @@ enum Status {
   error
   pending
 }
+
+type UploadImageStatus {
+  id: Int!
+  name: String!
+  status: Status!
+  error: String
+}
+
+scalar Upload

@@ -46,6 +46,8 @@ type ListenHost struct {
 type AppConfig struct {
 	Listen        ListenHost
 	AssetsBaseURL string
+	BaseDataPath  string
+	UploadPath    string
 }
 
 func NewConfig() Config {
@@ -54,6 +56,8 @@ func NewConfig() Config {
 		listenPortFlag int
 
 		assetsBaseURL string
+		baseDataPath  string
+		uploadPath    string
 
 		postgresHost     string
 		postgresPort     int
@@ -69,6 +73,8 @@ func NewConfig() Config {
 	flag.IntVar(&listenPortFlag, "listen-port", 8000, "Listen port")
 
 	flag.StringVar(&assetsBaseURL, "assets-base-url", defaultHTTPHost+":"+strconv.Itoa(listenPortFlag)+"/assets/", "Assets base url")
+	flag.StringVar(&baseDataPath, "base-data-path", "data/", "Base data directory")
+	flag.StringVar(&uploadPath, "upload-path", baseDataPath+"uploads/", "Upload directory")
 
 	flag.StringVar(&postgresHost, "postgres-host", defaultHost, "Database host")
 	flag.IntVar(&postgresPort, "postgres-port", 5432, "Database port")
@@ -76,7 +82,7 @@ func NewConfig() Config {
 	flag.StringVar(&postgresUser, "postgres-user", "wsw", "Database user name")
 	flag.StringVar(&postgresPassword, "postgres-password", "wsw", "Database user password")
 
-	flag.StringVar(&screenShotPath, "screenshot-path", "data/screenshots", "Screenshot path")
+	flag.StringVar(&screenShotPath, "screenshot-path", baseDataPath+"screenshots", "Screenshot path")
 	flag.StringVar(&screenshotBaseURL, "screenshot-base-url", "http://localhost:8000/screenshot/", "Base url for screenshot")
 
 	flag.Parse()
@@ -88,6 +94,8 @@ func NewConfig() Config {
 				Port: listenPortFlag,
 			},
 			AssetsBaseURL: assetsBaseURL,
+			BaseDataPath:  baseDataPath,
+			UploadPath:    uploadPath,
 		},
 		Postgres: Postgres{
 			Host:     postgresHost,

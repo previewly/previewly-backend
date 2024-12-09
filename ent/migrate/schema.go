@@ -61,6 +61,20 @@ var (
 		Columns:    TokensColumns,
 		PrimaryKey: []*schema.Column{TokensColumns[0]},
 	}
+	// UploadImagesColumns holds the columns for the "upload_images" table.
+	UploadImagesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "filename", Type: field.TypeString},
+		{Name: "destination_path", Type: field.TypeString},
+		{Name: "original_filename", Type: field.TypeString},
+		{Name: "type", Type: field.TypeString},
+	}
+	// UploadImagesTable holds the schema information for the "upload_images" table.
+	UploadImagesTable = &schema.Table{
+		Name:       "upload_images",
+		Columns:    UploadImagesColumns,
+		PrimaryKey: []*schema.Column{UploadImagesColumns[0]},
+	}
 	// UrlsColumns holds the columns for the "urls" table.
 	UrlsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -79,6 +93,7 @@ var (
 		ErrorResultsTable,
 		StatsTable,
 		TokensTable,
+		UploadImagesTable,
 		UrlsTable,
 	}
 )

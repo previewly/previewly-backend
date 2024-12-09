@@ -14,6 +14,7 @@ import (
 	"wsw/backend/ent/errorresult"
 	"wsw/backend/ent/stat"
 	"wsw/backend/ent/token"
+	"wsw/backend/ent/uploadimage"
 	enturl "wsw/backend/ent/url"
 
 	"entgo.io/ent"
@@ -33,6 +34,8 @@ type Client struct {
 	Stat *StatClient
 	// Token is the client for interacting with the Token builders.
 	Token *TokenClient
+	// UploadImage is the client for interacting with the UploadImage builders.
+	UploadImage *UploadImageClient
 	// Url is the client for interacting with the Url builders.
 	Url *URLClient
 }
@@ -49,6 +52,7 @@ func (c *Client) init() {
 	c.ErrorResult = NewErrorResultClient(c.config)
 	c.Stat = NewStatClient(c.config)
 	c.Token = NewTokenClient(c.config)
+	c.UploadImage = NewUploadImageClient(c.config)
 	c.Url = NewURLClient(c.config)
 }
 
@@ -145,6 +149,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ErrorResult: NewErrorResultClient(cfg),
 		Stat:        NewStatClient(cfg),
 		Token:       NewTokenClient(cfg),
+		UploadImage: NewUploadImageClient(cfg),
 		Url:         NewURLClient(cfg),
 	}, nil
 }
@@ -168,6 +173,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ErrorResult: NewErrorResultClient(cfg),
 		Stat:        NewStatClient(cfg),
 		Token:       NewTokenClient(cfg),
+		UploadImage: NewUploadImageClient(cfg),
 		Url:         NewURLClient(cfg),
 	}, nil
 }
@@ -200,6 +206,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.ErrorResult.Use(hooks...)
 	c.Stat.Use(hooks...)
 	c.Token.Use(hooks...)
+	c.UploadImage.Use(hooks...)
 	c.Url.Use(hooks...)
 }
 
@@ -209,6 +216,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.ErrorResult.Intercept(interceptors...)
 	c.Stat.Intercept(interceptors...)
 	c.Token.Intercept(interceptors...)
+	c.UploadImage.Intercept(interceptors...)
 	c.Url.Intercept(interceptors...)
 }
 
@@ -221,6 +229,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Stat.mutate(ctx, m)
 	case *TokenMutation:
 		return c.Token.mutate(ctx, m)
+	case *UploadImageMutation:
+		return c.UploadImage.mutate(ctx, m)
 	case *URLMutation:
 		return c.Url.mutate(ctx, m)
 	default:
@@ -627,6 +637,139 @@ func (c *TokenClient) mutate(ctx context.Context, m *TokenMutation) (Value, erro
 	}
 }
 
+// UploadImageClient is a client for the UploadImage schema.
+type UploadImageClient struct {
+	config
+}
+
+// NewUploadImageClient returns a client for the UploadImage from the given config.
+func NewUploadImageClient(c config) *UploadImageClient {
+	return &UploadImageClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `uploadimage.Hooks(f(g(h())))`.
+func (c *UploadImageClient) Use(hooks ...Hook) {
+	c.hooks.UploadImage = append(c.hooks.UploadImage, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `uploadimage.Intercept(f(g(h())))`.
+func (c *UploadImageClient) Intercept(interceptors ...Interceptor) {
+	c.inters.UploadImage = append(c.inters.UploadImage, interceptors...)
+}
+
+// Create returns a builder for creating a UploadImage entity.
+func (c *UploadImageClient) Create() *UploadImageCreate {
+	mutation := newUploadImageMutation(c.config, OpCreate)
+	return &UploadImageCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of UploadImage entities.
+func (c *UploadImageClient) CreateBulk(builders ...*UploadImageCreate) *UploadImageCreateBulk {
+	return &UploadImageCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *UploadImageClient) MapCreateBulk(slice any, setFunc func(*UploadImageCreate, int)) *UploadImageCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &UploadImageCreateBulk{err: fmt.Errorf("calling to UploadImageClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*UploadImageCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &UploadImageCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for UploadImage.
+func (c *UploadImageClient) Update() *UploadImageUpdate {
+	mutation := newUploadImageMutation(c.config, OpUpdate)
+	return &UploadImageUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *UploadImageClient) UpdateOne(ui *UploadImage) *UploadImageUpdateOne {
+	mutation := newUploadImageMutation(c.config, OpUpdateOne, withUploadImage(ui))
+	return &UploadImageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *UploadImageClient) UpdateOneID(id int) *UploadImageUpdateOne {
+	mutation := newUploadImageMutation(c.config, OpUpdateOne, withUploadImageID(id))
+	return &UploadImageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for UploadImage.
+func (c *UploadImageClient) Delete() *UploadImageDelete {
+	mutation := newUploadImageMutation(c.config, OpDelete)
+	return &UploadImageDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *UploadImageClient) DeleteOne(ui *UploadImage) *UploadImageDeleteOne {
+	return c.DeleteOneID(ui.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *UploadImageClient) DeleteOneID(id int) *UploadImageDeleteOne {
+	builder := c.Delete().Where(uploadimage.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &UploadImageDeleteOne{builder}
+}
+
+// Query returns a query builder for UploadImage.
+func (c *UploadImageClient) Query() *UploadImageQuery {
+	return &UploadImageQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeUploadImage},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a UploadImage entity by its id.
+func (c *UploadImageClient) Get(ctx context.Context, id int) (*UploadImage, error) {
+	return c.Query().Where(uploadimage.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *UploadImageClient) GetX(ctx context.Context, id int) *UploadImage {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *UploadImageClient) Hooks() []Hook {
+	return c.hooks.UploadImage
+}
+
+// Interceptors returns the client interceptors.
+func (c *UploadImageClient) Interceptors() []Interceptor {
+	return c.inters.UploadImage
+}
+
+func (c *UploadImageClient) mutate(ctx context.Context, m *UploadImageMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UploadImageCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UploadImageUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UploadImageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UploadImageDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown UploadImage mutation op: %q", m.Op())
+	}
+}
+
 // URLClient is a client for the Url schema.
 type URLClient struct {
 	config
@@ -795,9 +938,9 @@ func (c *URLClient) mutate(ctx context.Context, m *URLMutation) (Value, error) {
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		ErrorResult, Stat, Token, Url []ent.Hook
+		ErrorResult, Stat, Token, UploadImage, Url []ent.Hook
 	}
 	inters struct {
-		ErrorResult, Stat, Token, Url []ent.Interceptor
+		ErrorResult, Stat, Token, UploadImage, Url []ent.Interceptor
 	}
 )

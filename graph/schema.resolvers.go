@@ -7,12 +7,14 @@ package graph
 import (
 	"context"
 	"errors"
+	"wsw/backend/domain/upload"
 	"wsw/backend/graph/convertor"
 	"wsw/backend/graph/model"
 	"wsw/backend/lib/utils"
 	tokenModel "wsw/backend/model/token"
 	urlModel "wsw/backend/model/url"
 
+	"github.com/99designs/gqlgen/graphql"
 	container "github.com/golobby/container/v3"
 )
 
@@ -53,6 +55,17 @@ func (r *mutationResolver) AddURL(ctx context.Context, token string, url string)
 		return nil, errData
 	}
 	return convertor.ConvertPreviewData(previewData), nil
+}
+
+// Upload is the resolver for the upload field.
+func (r *mutationResolver) Upload(ctx context.Context, images []*graphql.Upload) ([]*model.UploadImageStatus, error) {
+	var resolver upload.Resolver
+	err := container.Resolve(&resolver)
+	if err != nil {
+		utils.F("Couldnt resolve UploadResolver: %v", err)
+		return nil, err
+	}
+	return resolver.Resolve(ctx, images)
 }
 
 // GetPreviewData is the resolver for the getPreviewData field.

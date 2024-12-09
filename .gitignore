@@ -6,3 +6,4 @@ wsw-backend
 .env.local
 previewly-backend
 data/screenshots
+data/uploads

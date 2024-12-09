@@ -15,6 +15,7 @@ require (
 	github.com/rs/cors v1.11.1
 	github.com/sensepost/gowitness v0.0.0-20241022125912-a433caac372c
 	github.com/vektah/gqlparser/v2 v2.5.20
+	github.com/xorcare/pointer v1.2.2
 )
 
 require (

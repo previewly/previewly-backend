@@ -8,6 +8,9 @@ import (
 	"strconv"
 )
 
+type Mutation struct {
+}
+
 type PreviewData struct {
 	ID     int     `json:"id"`
 	URL    string  `json:"url"`
@@ -15,6 +18,9 @@ type PreviewData struct {
 	Image  string  `json:"image"`
 	Error  *string `json:"error,omitempty"`
 	Title  *string `json:"title,omitempty"`
+}
+
+type Query struct {
 }
 
 type Status string

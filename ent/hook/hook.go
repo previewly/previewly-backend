@@ -44,6 +44,18 @@ func (f TokenFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TokenMutation", m)
 }
 
+// The UploadImageFunc type is an adapter to allow the use of ordinary
+// function as UploadImage mutator.
+type UploadImageFunc func(context.Context, *ent.UploadImageMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f UploadImageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.UploadImageMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UploadImageMutation", m)
+}
+
 // The UrlFunc type is an adapter to allow the use of ordinary
 // function as Url mutator.
 type UrlFunc func(context.Context, *ent.URLMutation) (ent.Value, error)

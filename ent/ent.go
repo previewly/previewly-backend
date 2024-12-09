@@ -11,6 +11,7 @@ import (
 	"wsw/backend/ent/errorresult"
 	"wsw/backend/ent/stat"
 	"wsw/backend/ent/token"
+	"wsw/backend/ent/uploadimage"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -80,6 +81,7 @@ func checkColumn(table, column string) error {
 			errorresult.Table: errorresult.ValidColumn,
 			stat.Table:        stat.ValidColumn,
 			token.Table:       token.ValidColumn,
+			uploadimage.Table: uploadimage.ValidColumn,
 			enturl.Table:      enturl.ValidColumn,
 		})
 	})

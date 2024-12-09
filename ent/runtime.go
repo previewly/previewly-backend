@@ -7,6 +7,7 @@ import (
 	"wsw/backend/ent/errorresult"
 	"wsw/backend/ent/schema"
 	"wsw/backend/ent/stat"
+	"wsw/backend/ent/uploadimage"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -25,4 +26,22 @@ func init() {
 	statDescCreatedAt := statFields[0].Descriptor()
 	// stat.DefaultCreatedAt holds the default value on creation for the created_at field.
 	stat.DefaultCreatedAt = statDescCreatedAt.Default.(func() time.Time)
+	uploadimageFields := schema.UploadImage{}.Fields()
+	_ = uploadimageFields
+	// uploadimageDescFilename is the schema descriptor for filename field.
+	uploadimageDescFilename := uploadimageFields[0].Descriptor()
+	// uploadimage.FilenameValidator is a validator for the "filename" field. It is called by the builders before save.
+	uploadimage.FilenameValidator = uploadimageDescFilename.Validators[0].(func(string) error)
+	// uploadimageDescDestinationPath is the schema descriptor for destination_path field.
+	uploadimageDescDestinationPath := uploadimageFields[1].Descriptor()
+	// uploadimage.DestinationPathValidator is a validator for the "destination_path" field. It is called by the builders before save.
+	uploadimage.DestinationPathValidator = uploadimageDescDestinationPath.Validators[0].(func(string) error)
+	// uploadimageDescOriginalFilename is the schema descriptor for original_filename field.
+	uploadimageDescOriginalFilename := uploadimageFields[2].Descriptor()
+	// uploadimage.OriginalFilenameValidator is a validator for the "original_filename" field. It is called by the builders before save.
+	uploadimage.OriginalFilenameValidator = uploadimageDescOriginalFilename.Validators[0].(func(string) error)
+	// uploadimageDescType is the schema descriptor for type field.
+	uploadimageDescType := uploadimageFields[3].Descriptor()
+	// uploadimage.TypeValidator is a validator for the "type" field. It is called by the builders before save.
+	uploadimage.TypeValidator = uploadimageDescType.Validators[0].(func(string) error)
 }

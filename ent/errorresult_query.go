@@ -9,6 +9,7 @@ import (
 	"wsw/backend/ent/errorresult"
 	"wsw/backend/ent/predicate"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -61,7 +62,7 @@ func (erq *ErrorResultQuery) Order(o ...errorresult.OrderOption) *ErrorResultQue
 // First returns the first ErrorResult entity from the query.
 // Returns a *NotFoundError when no ErrorResult was found.
 func (erq *ErrorResultQuery) First(ctx context.Context) (*ErrorResult, error) {
-	nodes, err := erq.Limit(1).All(setContextOp(ctx, erq.ctx, "First"))
+	nodes, err := erq.Limit(1).All(setContextOp(ctx, erq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +85,7 @@ func (erq *ErrorResultQuery) FirstX(ctx context.Context) *ErrorResult {
 // Returns a *NotFoundError when no ErrorResult ID was found.
 func (erq *ErrorResultQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = erq.Limit(1).IDs(setContextOp(ctx, erq.ctx, "FirstID")); err != nil {
+	if ids, err = erq.Limit(1).IDs(setContextOp(ctx, erq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -107,7 +108,7 @@ func (erq *ErrorResultQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one ErrorResult entity is found.
 // Returns a *NotFoundError when no ErrorResult entities are found.
 func (erq *ErrorResultQuery) Only(ctx context.Context) (*ErrorResult, error) {
-	nodes, err := erq.Limit(2).All(setContextOp(ctx, erq.ctx, "Only"))
+	nodes, err := erq.Limit(2).All(setContextOp(ctx, erq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +136,7 @@ func (erq *ErrorResultQuery) OnlyX(ctx context.Context) *ErrorResult {
 // Returns a *NotFoundError when no entities are found.
 func (erq *ErrorResultQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = erq.Limit(2).IDs(setContextOp(ctx, erq.ctx, "OnlyID")); err != nil {
+	if ids, err = erq.Limit(2).IDs(setContextOp(ctx, erq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -160,7 +161,7 @@ func (erq *ErrorResultQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of ErrorResults.
 func (erq *ErrorResultQuery) All(ctx context.Context) ([]*ErrorResult, error) {
-	ctx = setContextOp(ctx, erq.ctx, "All")
+	ctx = setContextOp(ctx, erq.ctx, ent.OpQueryAll)
 	if err := erq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -182,7 +183,7 @@ func (erq *ErrorResultQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if erq.ctx.Unique == nil && erq.path != nil {
 		erq.Unique(true)
 	}
-	ctx = setContextOp(ctx, erq.ctx, "IDs")
+	ctx = setContextOp(ctx, erq.ctx, ent.OpQueryIDs)
 	if err = erq.Select(errorresult.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -200,7 +201,7 @@ func (erq *ErrorResultQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (erq *ErrorResultQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, erq.ctx, "Count")
+	ctx = setContextOp(ctx, erq.ctx, ent.OpQueryCount)
 	if err := erq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -218,7 +219,7 @@ func (erq *ErrorResultQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (erq *ErrorResultQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, erq.ctx, "Exist")
+	ctx = setContextOp(ctx, erq.ctx, ent.OpQueryExist)
 	switch _, err := erq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -454,7 +455,7 @@ func (ergb *ErrorResultGroupBy) Aggregate(fns ...AggregateFunc) *ErrorResultGrou
 
 // Scan applies the selector query and scans the result into the given value.
 func (ergb *ErrorResultGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ergb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, ergb.build.ctx, ent.OpQueryGroupBy)
 	if err := ergb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -502,7 +503,7 @@ func (ers *ErrorResultSelect) Aggregate(fns ...AggregateFunc) *ErrorResultSelect
 
 // Scan applies the selector query and scans the result into the given value.
 func (ers *ErrorResultSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ers.ctx, "Select")
+	ctx = setContextOp(ctx, ers.ctx, ent.OpQuerySelect)
 	if err := ers.prepareQuery(ctx); err != nil {
 		return err
 	}

@@ -18,6 +18,8 @@ type Tx struct {
 	Stat *StatClient
 	// Token is the client for interacting with the Token builders.
 	Token *TokenClient
+	// UploadImage is the client for interacting with the UploadImage builders.
+	UploadImage *UploadImageClient
 	// Url is the client for interacting with the Url builders.
 	Url *URLClient
 
@@ -154,6 +156,7 @@ func (tx *Tx) init() {
 	tx.ErrorResult = NewErrorResultClient(tx.config)
 	tx.Stat = NewStatClient(tx.config)
 	tx.Token = NewTokenClient(tx.config)
+	tx.UploadImage = NewUploadImageClient(tx.config)
 	tx.Url = NewURLClient(tx.config)
 }
 

@@ -10,6 +10,7 @@ import (
 	"wsw/backend/domain/gowitness"
 	"wsw/backend/domain/path/screenshot/relative"
 	"wsw/backend/domain/token/generator"
+	"wsw/backend/domain/upload"
 	"wsw/backend/domain/url/screenshot"
 	"wsw/backend/ent"
 	"wsw/backend/ent/repository"
@@ -17,6 +18,9 @@ import (
 	"wsw/backend/lib/utils"
 	"wsw/backend/model/token"
 	"wsw/backend/model/url"
+
+	domainStorage "wsw/backend/domain/upload/storage"
+	uploadModel "wsw/backend/model/upload"
 
 	"github.com/getsentry/sentry-go"
 	sentryhttp "github.com/getsentry/sentry-go/http"
@@ -106,11 +110,22 @@ func initDi(config config.Config, appContext context.Context) {
 		return gowitness.NewClient(logger, createWriter, driver, *options)
 	})
 
+	initModels()
+
+	initService(func() domainStorage.Storage { return domainStorage.NewUploadStorage(config.App.UploadPath) })
+
+	initService(func(model uploadModel.UploadImage) upload.Resolver { return upload.NewUploadResolver(model) })
+}
+
+func initModels() {
 	initService(func(generator generator.TokenGenerator, tokenRepository repository.Token) token.Token {
 		return token.NewModel(generator, tokenRepository)
 	})
 	initService(func(urlRepository repository.Url, client gowitness.Client, provider screenshot.Provider) url.Url {
 		return url.NewUrl(urlRepository, client, provider)
+	})
+	initService(func(uploadRepository repository.UploadImageRepository) uploadModel.UploadImage {
+		return uploadModel.NewModel(uploadRepository)
 	})
 }
 
@@ -123,6 +138,9 @@ func initRepositories() {
 	})
 	initService(func(client *ent.Client, ctx context.Context) repository.Stat {
 		return repository.NewStat(client, ctx)
+	})
+	initService(func(client *ent.Client, ctx context.Context) repository.UploadImageRepository {
+		return repository.NewUploadImageRepository(client, ctx)
 	})
 }
 

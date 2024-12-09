@@ -7,12 +7,15 @@ package graph
 import (
 	"context"
 	"errors"
+
+	"wsw/backend/domain/upload"
 	"wsw/backend/graph/convertor"
 	"wsw/backend/graph/model"
 	"wsw/backend/lib/utils"
 	tokenModel "wsw/backend/model/token"
 	urlModel "wsw/backend/model/url"
 
+	"github.com/99designs/gqlgen/graphql"
 	container "github.com/golobby/container/v3"
 )
 
@@ -53,6 +56,17 @@ func (r *mutationResolver) AddURL(ctx context.Context, token string, url string)
 		return nil, errData
 	}
 	return convertor.ConvertPreviewData(previewData), nil
+}
+
+// Upload is the resolver for the upload field.
+func (r *mutationResolver) Upload(ctx context.Context, images []*graphql.Upload) ([]*model.UploadImageStatus, error) {
+	var resolver upload.Resolver
+	err := container.Resolve(&resolver)
+	if err != nil {
+		utils.F("Couldnt resolve UploadResolver: %v", err)
+		return nil, err
+	}
+	return resolver.Resolve(ctx, images)
 }
 
 // GetPreviewData is the resolver for the getPreviewData field.
@@ -98,5 +112,19 @@ func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
-type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }
+type (
+	mutationResolver struct{ *Resolver }
+	queryResolver    struct{ *Resolver }
+)
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *mutationResolver) MultipleUpload(ctx context.Context, files []*graphql.Upload) ([]*model.File, error) {
+	panic(fmt.Errorf("not implemented: MultipleUpload - multipleUpload"))
+}
+*/

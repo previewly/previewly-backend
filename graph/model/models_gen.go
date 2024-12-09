@@ -23,6 +23,13 @@ type PreviewData struct {
 type Query struct {
 }
 
+type UploadImageStatus struct {
+	ID     int     `json:"id"`
+	Name   string  `json:"name"`
+	Status Status  `json:"status"`
+	Error  *string `json:"error,omitempty"`
+}
+
 type Status string
 
 const (

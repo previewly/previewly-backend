@@ -55,11 +55,11 @@ func NewConfig() Config {
 
 		assetsBaseURL string
 
-		dbHostFlag         string
-		dbPortFlag         int
-		dbNameFlag         string
-		dbUserNameFlag     string
-		dbUserPasswordFlag string
+		postgresHost     string
+		postgresPort     int
+		postgresDB       string
+		postgresUser     string
+		postgresPassword string
 
 		screenShotPath    string
 		screenshotBaseURL string
@@ -70,11 +70,11 @@ func NewConfig() Config {
 
 	flag.StringVar(&assetsBaseURL, "assets-base-url", defaultHTTPHost+":"+strconv.Itoa(listenPortFlag)+"/assets/", "Assets base url")
 
-	flag.StringVar(&dbHostFlag, "db-host", defaultHost, "Database host")
-	flag.IntVar(&dbPortFlag, "db-port", 5432, "Database port")
-	flag.StringVar(&dbNameFlag, "db-name", "wsw", "Database name")
-	flag.StringVar(&dbUserNameFlag, "db-user-name", "wsw", "Database user name")
-	flag.StringVar(&dbUserPasswordFlag, "db-user-password", "wsw", "Database user password")
+	flag.StringVar(&postgresHost, "postgres-host", defaultHost, "Database host")
+	flag.IntVar(&postgresPort, "postgres-port", 5432, "Database port")
+	flag.StringVar(&postgresDB, "postgres-db", "wsw", "Database name")
+	flag.StringVar(&postgresUser, "postgres-user", "wsw", "Database user name")
+	flag.StringVar(&postgresPassword, "postgres-password", "wsw", "Database user password")
 
 	flag.StringVar(&screenShotPath, "screenshot-path", "data/screenshots", "Screenshot path")
 	flag.StringVar(&screenshotBaseURL, "screenshot-base-url", "http://localhost:8000/screenshot/", "Base url for screenshot")
@@ -90,11 +90,11 @@ func NewConfig() Config {
 			AssetsBaseURL: assetsBaseURL,
 		},
 		Postgres: Postgres{
-			Host:     dbHostFlag,
-			Port:     dbPortFlag,
-			DB:       dbNameFlag,
-			User:     dbUserNameFlag,
-			Password: dbUserPasswordFlag,
+			Host:     postgresHost,
+			Port:     postgresPort,
+			DB:       postgresDB,
+			User:     postgresUser,
+			Password: postgresPassword,
 		},
 		Gowitness: Gowitness{
 			ScreenshotPath:    screenShotPath,

@@ -15,5 +15,8 @@ type Stat func(*sql.Selector)
 // Token is the predicate function for token builders.
 type Token func(*sql.Selector)
 
+// UploadImage is the predicate function for uploadimage builders.
+type UploadImage func(*sql.Selector)
+
 // Url is the predicate function for enturl builders.
 type Url func(*sql.Selector)

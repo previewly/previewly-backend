@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.10.0](https://github.com/previewly/previewly-backend/compare/v1.9.0...v1.10.0) (2024-12-11)
+
+
+### Features
+
+* add mutation for uploading images ([895e0ee](https://github.com/previewly/previewly-backend/commit/895e0eefcef47f193637e02a599b810c14329641))
+
+
+### Bug Fixes
+
+* fix go generate ([f8d96d3](https://github.com/previewly/previewly-backend/commit/f8d96d3da4da9c578287e2d785be97260bf7b4cf))
+* fix names of cli backend server start script ([860897f](https://github.com/previewly/previewly-backend/commit/860897f6e42da947d0add645c8890f5568a1f6ce))
+
 ## [1.9.0](https://github.com/wert2all/previewly-backend/compare/v1.8.5...v1.9.0) (2024-10-15)
 
 

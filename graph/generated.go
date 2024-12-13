@@ -50,7 +50,7 @@ type ComplexityRoot struct {
 	Mutation struct {
 		AddURL      func(childComplexity int, token string, url string) int
 		CreateToken func(childComplexity int) int
-		Upload      func(childComplexity int, images []*graphql.Upload) int
+		Upload      func(childComplexity int, token string, images []*graphql.Upload) int
 	}
 
 	PreviewData struct {
@@ -78,7 +78,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateToken(ctx context.Context) (string, error)
 	AddURL(ctx context.Context, token string, url string) (*model.PreviewData, error)
-	Upload(ctx context.Context, images []*graphql.Upload) ([]*model.UploadImageStatus, error)
+	Upload(ctx context.Context, token string, images []*graphql.Upload) ([]*model.UploadImageStatus, error)
 }
 type QueryResolver interface {
 	GetPreviewData(ctx context.Context, token string, url string) (*model.PreviewData, error)
@@ -133,7 +133,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.Upload(childComplexity, args["images"].([]*graphql.Upload)), true
+		return e.complexity.Mutation.Upload(childComplexity, args["token"].(string), args["images"].([]*graphql.Upload)), true
 
 	case "PreviewData.error":
 		if e.complexity.PreviewData.Error == nil {
@@ -414,13 +414,40 @@ func (ec *executionContext) field_Mutation_addUrl_argsURL(
 func (ec *executionContext) field_Mutation_upload_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	arg0, err := ec.field_Mutation_upload_argsImages(ctx, rawArgs)
+	arg0, err := ec.field_Mutation_upload_argsToken(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
-	args["images"] = arg0
+	args["token"] = arg0
+	arg1, err := ec.field_Mutation_upload_argsImages(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["images"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_upload_argsToken(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (string, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["token"]
+	if !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
+	if tmp, ok := rawArgs["token"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_upload_argsImages(
 	ctx context.Context,
 	rawArgs map[string]interface{},
@@ -762,7 +789,7 @@ func (ec *executionContext) _Mutation_upload(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Upload(rctx, fc.Args["images"].([]*graphql.Upload))
+		return ec.resolvers.Mutation().Upload(rctx, fc.Args["token"].(string), fc.Args["images"].([]*graphql.Upload))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

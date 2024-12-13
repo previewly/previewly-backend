@@ -20,7 +20,7 @@ type Mutation {
   createToken: String!
   addUrl(token: String!, url: String!): PreviewData
 
-  upload(images: [Upload!]!): [UploadImageStatus!]!
+  upload(token: String!, images: [Upload!]!): [UploadImageStatus!]!
 }
 
 enum Status {

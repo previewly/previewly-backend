@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.11.0](https://github.com/previewly/previewly-backend/compare/v1.10.0...v1.11.0) (2024-12-13)
+
+
+### Features
+
+* add token to upload images mutation ([7aff3b0](https://github.com/previewly/previewly-backend/commit/7aff3b06962401906a2dfecdbfba25af60c438e6))
+
+
+### Bug Fixes
+
+* fix static test ([1fda83d](https://github.com/previewly/previewly-backend/commit/1fda83dcced87cc77c7e747d1cc8364bb09f7ddb))
+
 ## [1.10.0](https://github.com/previewly/previewly-backend/compare/v1.9.0...v1.10.0) (2024-12-11)
 
 

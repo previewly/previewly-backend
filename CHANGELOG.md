@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.11.2](https://github.com/previewly/previewly-backend/compare/v1.11.1...v1.11.2) (2024-12-14)
+
+
+### Bug Fixes
+
+* do not run runner on fail ([a94f8a6](https://github.com/previewly/previewly-backend/commit/a94f8a68560892fc9a0a64c17f13669f37f12f26))
+* fix saving error message ([6ac5b5f](https://github.com/previewly/previewly-backend/commit/6ac5b5f0444d72b415f1971c6830882af67b1ab1))
+
 ## [1.11.1](https://github.com/previewly/previewly-backend/compare/v1.11.0...v1.11.1) (2024-12-14)
 
 

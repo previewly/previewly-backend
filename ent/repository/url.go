@@ -33,8 +33,13 @@ func (u *urlImpl) SaveFailure(errorMessage string, ID int) (*ent.Url, error) {
 	if err != nil {
 		return nil, err
 	}
+	errorResult, err := u.client.ErrorResult.Create().SetMessage(errorMessage).Save(u.ctx)
+	if err != nil {
+		return nil, err
+	}
 	return u.client.Url.UpdateOne(urlEntity).
 		SetStatus(url.Error).
+		AddErrorresult(errorResult).
 		Save(u.ctx)
 }
 

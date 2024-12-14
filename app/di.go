@@ -30,7 +30,6 @@ import (
 	"github.com/rs/cors"
 	"github.com/sensepost/gowitness/pkg/runner"
 	driver "github.com/sensepost/gowitness/pkg/runner/drivers"
-	writers "github.com/sensepost/gowitness/pkg/writers"
 )
 
 type (
@@ -93,7 +92,7 @@ func initDi(config config.Config, appContext context.Context) {
 	})
 
 	initService(func(urlRepository repository.Url, statRepository repository.Stat, relativePathProvider relative.Provider) gowitness.CreateWriter {
-		return func(url *ent.Url) writers.Writer {
+		return func(url *ent.Url) gowitness.Writer {
 			return gowitness.NewRunnerWriter(url, urlRepository, statRepository, relativePathProvider)
 		}
 	})

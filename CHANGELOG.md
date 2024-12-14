@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.1](https://github.com/previewly/previewly-backend/compare/v1.11.0...v1.11.1) (2024-12-14)
+
+
+### Bug Fixes
+
+* runner error log as error of url ([86a281e](https://github.com/previewly/previewly-backend/commit/86a281ecf035626fb0097e09540a0be222a98288))
+
 ## [1.11.0](https://github.com/previewly/previewly-backend/compare/v1.10.0...v1.11.0) (2024-12-13)
 
 

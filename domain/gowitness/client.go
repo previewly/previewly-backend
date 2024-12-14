@@ -13,7 +13,7 @@ type (
 	Client interface {
 		UpdateUrl(*ent.Url)
 	}
-	CreateWriter func(*ent.Url) writers.Writer
+	CreateWriter func(*ent.Url) Writer
 
 	clientImlp struct {
 		logger       *slog.Logger
@@ -40,11 +40,12 @@ func (r clientImlp) UpdateUrl(uri *ent.Url) {
 	r.logger.Info("Finished gowitness for: " + uri.URL)
 }
 
-func (r clientImlp) createRunner(writer writers.Writer) runner.Runner {
+func (r clientImlp) createRunner(writer Writer) runner.Runner {
 	r.logger.Info("Creating gowitness runner")
 	runner, err := runner.NewRunner(r.logger, r.driver, r.options, []writers.Writer{writer})
 	if err != nil {
 		r.logger.Error("Error creating runner", slog.Any("runner error", err))
+		writer.Error(err)
 	}
 	return *runner
 }

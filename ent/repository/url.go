@@ -14,6 +14,7 @@ type (
 		TryGet(string) *ent.Url
 		Insert(string) (*ent.Url, error)
 
+		SaveFailure(string, int) (*ent.Url, error)
 		SaveSuccess(string, *ent.Stat, int) (*ent.Url, error)
 
 		GetErrors(*ent.Url) ([]*ent.ErrorResult, error)
@@ -26,13 +27,28 @@ type (
 	}
 )
 
+// SaveFailure implements Url.
+func (u *urlImpl) SaveFailure(errorMessage string, ID int) (*ent.Url, error) {
+	urlEntity, err := u.client.Url.Query().Where(entUrl.ID(ID)).Only(u.ctx)
+	if err != nil {
+		return nil, err
+	}
+	return u.client.Url.UpdateOne(urlEntity).
+		SetStatus(url.Error).
+		Save(u.ctx)
+}
+
 // SaveSuccess implements Url.
 func (u *urlImpl) SaveSuccess(relativePath string, statEntity *ent.Stat, ID int) (*ent.Url, error) {
 	urlEntity, err := u.client.Url.Query().Where(entUrl.ID(ID)).Only(u.ctx)
 	if err != nil {
 		return nil, err
 	}
-	return u.client.Url.UpdateOne(urlEntity).SetStatus(url.Success).SetRelativePath(relativePath).AddStat(statEntity).Save(u.ctx)
+	return u.client.Url.UpdateOne(urlEntity).
+		SetStatus(url.Success).
+		SetRelativePath(relativePath).
+		AddStat(statEntity).
+		Save(u.ctx)
 }
 
 func (u *urlImpl) GetErrors(entity *ent.Url) ([]*ent.ErrorResult, error) {

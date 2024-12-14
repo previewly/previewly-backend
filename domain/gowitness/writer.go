@@ -10,6 +10,10 @@ import (
 )
 
 type (
+	Writer interface {
+		writers.Writer
+		Error(error) error
+	}
 	writerImpl struct {
 		url                  *ent.Url
 		urlRepository        repository.Url
@@ -17,6 +21,12 @@ type (
 		relativePathProvider relative.Provider
 	}
 )
+
+// Error implements Writer.
+func (w writerImpl) Error(err error) error {
+	_, saveErr := w.urlRepository.SaveFailure(err.Error(), w.url.ID)
+	return saveErr
+}
 
 // Write implements writers.Writer.
 func (w writerImpl) Write(result *models.Result) error {
@@ -32,7 +42,7 @@ func (w writerImpl) Write(result *models.Result) error {
 	return nil
 }
 
-func NewRunnerWriter(url *ent.Url, urlRepository repository.Url, statRepository repository.Stat, relativePathProvider relative.Provider) writers.Writer {
+func NewRunnerWriter(url *ent.Url, urlRepository repository.Url, statRepository repository.Stat, relativePathProvider relative.Provider) Writer {
 	return writerImpl{
 		url:                  url,
 		urlRepository:        urlRepository,

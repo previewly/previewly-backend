@@ -27,8 +27,12 @@ type (
 func (r clientImlp) UpdateUrl(uri *ent.Url) {
 	r.logger.Info("Starting gowitness for: " + uri.URL)
 	writer := r.createWriter(uri)
-	runner := r.createRunner(writer)
-
+	runner, err := r.createRunner(writer)
+	if err != nil {
+		writer.Error(err)
+		r.logger.Error("Error creating runner", slog.Any("runner error", err))
+		return
+	}
 	go func() {
 		runner.Targets <- uri.URL
 		close(runner.Targets)
@@ -40,14 +44,13 @@ func (r clientImlp) UpdateUrl(uri *ent.Url) {
 	r.logger.Info("Finished gowitness for: " + uri.URL)
 }
 
-func (r clientImlp) createRunner(writer Writer) runner.Runner {
+func (r clientImlp) createRunner(writer Writer) (*runner.Runner, error) {
 	r.logger.Info("Creating gowitness runner")
 	runner, err := runner.NewRunner(r.logger, r.driver, r.options, []writers.Writer{writer})
 	if err != nil {
-		r.logger.Error("Error creating runner", slog.Any("runner error", err))
-		writer.Error(err)
+		return nil, err
 	}
-	return *runner
+	return runner, nil
 }
 
 func NewClient(logger *slog.Logger, createWriter CreateWriter, driver runner.Driver, opts runner.Options) Client {

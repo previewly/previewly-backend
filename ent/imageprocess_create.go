@@ -33,6 +33,12 @@ func (ipc *ImageProcessCreate) SetProcess(tp types.ImageProcess) *ImageProcessCr
 	return ipc
 }
 
+// SetProcessOptions sets the "process_options" field.
+func (ipc *ImageProcessCreate) SetProcessOptions(tpo []types.ImageProcessOptions) *ImageProcessCreate {
+	ipc.mutation.SetProcessOptions(tpo)
+	return ipc
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (ipc *ImageProcessCreate) SetCreatedAt(t time.Time) *ImageProcessCreate {
 	ipc.mutation.SetCreatedAt(t)
@@ -124,6 +130,9 @@ func (ipc *ImageProcessCreate) check() error {
 			return &ValidationError{Name: "process", err: fmt.Errorf(`ent: validator failed for field "ImageProcess.process": %w`, err)}
 		}
 	}
+	if _, ok := ipc.mutation.ProcessOptions(); !ok {
+		return &ValidationError{Name: "process_options", err: errors.New(`ent: missing required field "ImageProcess.process_options"`)}
+	}
 	if _, ok := ipc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ImageProcess.created_at"`)}
 	}
@@ -163,6 +172,10 @@ func (ipc *ImageProcessCreate) createSpec() (*ImageProcess, *sqlgraph.CreateSpec
 	if value, ok := ipc.mutation.Process(); ok {
 		_spec.SetField(imageprocess.FieldProcess, field.TypeEnum, value)
 		_node.Process = value
+	}
+	if value, ok := ipc.mutation.ProcessOptions(); ok {
+		_spec.SetField(imageprocess.FieldProcessOptions, field.TypeJSON, value)
+		_node.ProcessOptions = value
 	}
 	if value, ok := ipc.mutation.CreatedAt(); ok {
 		_spec.SetField(imageprocess.FieldCreatedAt, field.TypeTime, value)

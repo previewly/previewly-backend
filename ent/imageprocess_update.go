@@ -13,6 +13,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 )
 
@@ -54,6 +55,18 @@ func (ipu *ImageProcessUpdate) SetNillableProcess(tp *types.ImageProcess) *Image
 	if tp != nil {
 		ipu.SetProcess(*tp)
 	}
+	return ipu
+}
+
+// SetProcessOptions sets the "process_options" field.
+func (ipu *ImageProcessUpdate) SetProcessOptions(tpo []types.ImageProcessOptions) *ImageProcessUpdate {
+	ipu.mutation.SetProcessOptions(tpo)
+	return ipu
+}
+
+// AppendProcessOptions appends tpo to the "process_options" field.
+func (ipu *ImageProcessUpdate) AppendProcessOptions(tpo []types.ImageProcessOptions) *ImageProcessUpdate {
+	ipu.mutation.AppendProcessOptions(tpo)
 	return ipu
 }
 
@@ -151,6 +164,14 @@ func (ipu *ImageProcessUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := ipu.mutation.Process(); ok {
 		_spec.SetField(imageprocess.FieldProcess, field.TypeEnum, value)
 	}
+	if value, ok := ipu.mutation.ProcessOptions(); ok {
+		_spec.SetField(imageprocess.FieldProcessOptions, field.TypeJSON, value)
+	}
+	if value, ok := ipu.mutation.AppendedProcessOptions(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, imageprocess.FieldProcessOptions, value)
+		})
+	}
 	if value, ok := ipu.mutation.CreatedAt(); ok {
 		_spec.SetField(imageprocess.FieldCreatedAt, field.TypeTime, value)
 	}
@@ -202,6 +223,18 @@ func (ipuo *ImageProcessUpdateOne) SetNillableProcess(tp *types.ImageProcess) *I
 	if tp != nil {
 		ipuo.SetProcess(*tp)
 	}
+	return ipuo
+}
+
+// SetProcessOptions sets the "process_options" field.
+func (ipuo *ImageProcessUpdateOne) SetProcessOptions(tpo []types.ImageProcessOptions) *ImageProcessUpdateOne {
+	ipuo.mutation.SetProcessOptions(tpo)
+	return ipuo
+}
+
+// AppendProcessOptions appends tpo to the "process_options" field.
+func (ipuo *ImageProcessUpdateOne) AppendProcessOptions(tpo []types.ImageProcessOptions) *ImageProcessUpdateOne {
+	ipuo.mutation.AppendProcessOptions(tpo)
 	return ipuo
 }
 
@@ -328,6 +361,14 @@ func (ipuo *ImageProcessUpdateOne) sqlSave(ctx context.Context) (_node *ImagePro
 	}
 	if value, ok := ipuo.mutation.Process(); ok {
 		_spec.SetField(imageprocess.FieldProcess, field.TypeEnum, value)
+	}
+	if value, ok := ipuo.mutation.ProcessOptions(); ok {
+		_spec.SetField(imageprocess.FieldProcessOptions, field.TypeJSON, value)
+	}
+	if value, ok := ipuo.mutation.AppendedProcessOptions(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, imageprocess.FieldProcessOptions, value)
+		})
 	}
 	if value, ok := ipuo.mutation.CreatedAt(); ok {
 		_spec.SetField(imageprocess.FieldCreatedAt, field.TypeTime, value)

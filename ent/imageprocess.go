@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -22,6 +23,8 @@ type ImageProcess struct {
 	Status types.StatusEnum `json:"status,omitempty"`
 	// Process holds the value of the "process" field.
 	Process types.ImageProcess `json:"process,omitempty"`
+	// ProcessOptions holds the value of the "process_options" field.
+	ProcessOptions []types.ImageProcessOptions `json:"process_options,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -35,6 +38,8 @@ func (*ImageProcess) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case imageprocess.FieldProcessOptions:
+			values[i] = new([]byte)
 		case imageprocess.FieldID:
 			values[i] = new(sql.NullInt64)
 		case imageprocess.FieldStatus, imageprocess.FieldProcess:
@@ -75,6 +80,14 @@ func (ip *ImageProcess) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field process", values[i])
 			} else if value.Valid {
 				ip.Process = types.ImageProcess(value.String)
+			}
+		case imageprocess.FieldProcessOptions:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field process_options", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &ip.ProcessOptions); err != nil {
+					return fmt.Errorf("unmarshal field process_options: %w", err)
+				}
 			}
 		case imageprocess.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -136,6 +149,9 @@ func (ip *ImageProcess) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("process=")
 	builder.WriteString(fmt.Sprintf("%v", ip.Process))
+	builder.WriteString(", ")
+	builder.WriteString("process_options=")
+	builder.WriteString(fmt.Sprintf("%v", ip.ProcessOptions))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(ip.CreatedAt.Format(time.ANSIC))

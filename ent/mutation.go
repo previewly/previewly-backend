@@ -8,13 +8,13 @@ import (
 	"fmt"
 	"sync"
 	"time"
-	"wsw/backend/domain/url"
 	"wsw/backend/ent/errorresult"
 	"wsw/backend/ent/predicate"
 	"wsw/backend/ent/stat"
 	"wsw/backend/ent/token"
+	"wsw/backend/ent/types"
 	"wsw/backend/ent/uploadimage"
-	enturl "wsw/backend/ent/url"
+	"wsw/backend/ent/url"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -1661,7 +1661,7 @@ type URLMutation struct {
 	typ                string
 	id                 *int
 	url                *string
-	status             *url.Status
+	status             *types.StatusEnum
 	relative_path      *string
 	clearedFields      map[string]struct{}
 	errorresult        map[int]struct{}
@@ -1810,12 +1810,12 @@ func (m *URLMutation) ResetURL() {
 }
 
 // SetStatus sets the "status" field.
-func (m *URLMutation) SetStatus(u url.Status) {
-	m.status = &u
+func (m *URLMutation) SetStatus(te types.StatusEnum) {
+	m.status = &te
 }
 
 // Status returns the value of the "status" field in the mutation.
-func (m *URLMutation) Status() (r url.Status, exists bool) {
+func (m *URLMutation) Status() (r types.StatusEnum, exists bool) {
 	v := m.status
 	if v == nil {
 		return
@@ -1826,7 +1826,7 @@ func (m *URLMutation) Status() (r url.Status, exists bool) {
 // OldStatus returns the old "status" field's value of the Url entity.
 // If the Url object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *URLMutation) OldStatus(ctx context.Context) (v url.Status, err error) {
+func (m *URLMutation) OldStatus(ctx context.Context) (v types.StatusEnum, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
 	}
@@ -1879,19 +1879,19 @@ func (m *URLMutation) OldRelativePath(ctx context.Context) (v *string, err error
 // ClearRelativePath clears the value of the "relative_path" field.
 func (m *URLMutation) ClearRelativePath() {
 	m.relative_path = nil
-	m.clearedFields[enturl.FieldRelativePath] = struct{}{}
+	m.clearedFields[url.FieldRelativePath] = struct{}{}
 }
 
 // RelativePathCleared returns if the "relative_path" field was cleared in this mutation.
 func (m *URLMutation) RelativePathCleared() bool {
-	_, ok := m.clearedFields[enturl.FieldRelativePath]
+	_, ok := m.clearedFields[url.FieldRelativePath]
 	return ok
 }
 
 // ResetRelativePath resets all changes to the "relative_path" field.
 func (m *URLMutation) ResetRelativePath() {
 	m.relative_path = nil
-	delete(m.clearedFields, enturl.FieldRelativePath)
+	delete(m.clearedFields, url.FieldRelativePath)
 }
 
 // AddErrorresultIDs adds the "errorresult" edge to the ErrorResult entity by ids.
@@ -2038,13 +2038,13 @@ func (m *URLMutation) Type() string {
 func (m *URLMutation) Fields() []string {
 	fields := make([]string, 0, 3)
 	if m.url != nil {
-		fields = append(fields, enturl.FieldURL)
+		fields = append(fields, url.FieldURL)
 	}
 	if m.status != nil {
-		fields = append(fields, enturl.FieldStatus)
+		fields = append(fields, url.FieldStatus)
 	}
 	if m.relative_path != nil {
-		fields = append(fields, enturl.FieldRelativePath)
+		fields = append(fields, url.FieldRelativePath)
 	}
 	return fields
 }
@@ -2054,11 +2054,11 @@ func (m *URLMutation) Fields() []string {
 // schema.
 func (m *URLMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case enturl.FieldURL:
+	case url.FieldURL:
 		return m.URL()
-	case enturl.FieldStatus:
+	case url.FieldStatus:
 		return m.Status()
-	case enturl.FieldRelativePath:
+	case url.FieldRelativePath:
 		return m.RelativePath()
 	}
 	return nil, false
@@ -2069,11 +2069,11 @@ func (m *URLMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *URLMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case enturl.FieldURL:
+	case url.FieldURL:
 		return m.OldURL(ctx)
-	case enturl.FieldStatus:
+	case url.FieldStatus:
 		return m.OldStatus(ctx)
-	case enturl.FieldRelativePath:
+	case url.FieldRelativePath:
 		return m.OldRelativePath(ctx)
 	}
 	return nil, fmt.Errorf("unknown Url field %s", name)
@@ -2084,21 +2084,21 @@ func (m *URLMutation) OldField(ctx context.Context, name string) (ent.Value, err
 // type.
 func (m *URLMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case enturl.FieldURL:
+	case url.FieldURL:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetURL(v)
 		return nil
-	case enturl.FieldStatus:
-		v, ok := value.(url.Status)
+	case url.FieldStatus:
+		v, ok := value.(types.StatusEnum)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStatus(v)
 		return nil
-	case enturl.FieldRelativePath:
+	case url.FieldRelativePath:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
@@ -2135,8 +2135,8 @@ func (m *URLMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *URLMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(enturl.FieldRelativePath) {
-		fields = append(fields, enturl.FieldRelativePath)
+	if m.FieldCleared(url.FieldRelativePath) {
+		fields = append(fields, url.FieldRelativePath)
 	}
 	return fields
 }
@@ -2152,7 +2152,7 @@ func (m *URLMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *URLMutation) ClearField(name string) error {
 	switch name {
-	case enturl.FieldRelativePath:
+	case url.FieldRelativePath:
 		m.ClearRelativePath()
 		return nil
 	}
@@ -2163,13 +2163,13 @@ func (m *URLMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *URLMutation) ResetField(name string) error {
 	switch name {
-	case enturl.FieldURL:
+	case url.FieldURL:
 		m.ResetURL()
 		return nil
-	case enturl.FieldStatus:
+	case url.FieldStatus:
 		m.ResetStatus()
 		return nil
-	case enturl.FieldRelativePath:
+	case url.FieldRelativePath:
 		m.ResetRelativePath()
 		return nil
 	}
@@ -2180,10 +2180,10 @@ func (m *URLMutation) ResetField(name string) error {
 func (m *URLMutation) AddedEdges() []string {
 	edges := make([]string, 0, 2)
 	if m.errorresult != nil {
-		edges = append(edges, enturl.EdgeErrorresult)
+		edges = append(edges, url.EdgeErrorresult)
 	}
 	if m.stat != nil {
-		edges = append(edges, enturl.EdgeStat)
+		edges = append(edges, url.EdgeStat)
 	}
 	return edges
 }
@@ -2192,13 +2192,13 @@ func (m *URLMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *URLMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case enturl.EdgeErrorresult:
+	case url.EdgeErrorresult:
 		ids := make([]ent.Value, 0, len(m.errorresult))
 		for id := range m.errorresult {
 			ids = append(ids, id)
 		}
 		return ids
-	case enturl.EdgeStat:
+	case url.EdgeStat:
 		ids := make([]ent.Value, 0, len(m.stat))
 		for id := range m.stat {
 			ids = append(ids, id)
@@ -2212,10 +2212,10 @@ func (m *URLMutation) AddedIDs(name string) []ent.Value {
 func (m *URLMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 2)
 	if m.removederrorresult != nil {
-		edges = append(edges, enturl.EdgeErrorresult)
+		edges = append(edges, url.EdgeErrorresult)
 	}
 	if m.removedstat != nil {
-		edges = append(edges, enturl.EdgeStat)
+		edges = append(edges, url.EdgeStat)
 	}
 	return edges
 }
@@ -2224,13 +2224,13 @@ func (m *URLMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *URLMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case enturl.EdgeErrorresult:
+	case url.EdgeErrorresult:
 		ids := make([]ent.Value, 0, len(m.removederrorresult))
 		for id := range m.removederrorresult {
 			ids = append(ids, id)
 		}
 		return ids
-	case enturl.EdgeStat:
+	case url.EdgeStat:
 		ids := make([]ent.Value, 0, len(m.removedstat))
 		for id := range m.removedstat {
 			ids = append(ids, id)
@@ -2244,10 +2244,10 @@ func (m *URLMutation) RemovedIDs(name string) []ent.Value {
 func (m *URLMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 2)
 	if m.clearederrorresult {
-		edges = append(edges, enturl.EdgeErrorresult)
+		edges = append(edges, url.EdgeErrorresult)
 	}
 	if m.clearedstat {
-		edges = append(edges, enturl.EdgeStat)
+		edges = append(edges, url.EdgeStat)
 	}
 	return edges
 }
@@ -2256,9 +2256,9 @@ func (m *URLMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *URLMutation) EdgeCleared(name string) bool {
 	switch name {
-	case enturl.EdgeErrorresult:
+	case url.EdgeErrorresult:
 		return m.clearederrorresult
-	case enturl.EdgeStat:
+	case url.EdgeStat:
 		return m.clearedstat
 	}
 	return false
@@ -2276,10 +2276,10 @@ func (m *URLMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *URLMutation) ResetEdge(name string) error {
 	switch name {
-	case enturl.EdgeErrorresult:
+	case url.EdgeErrorresult:
 		m.ResetErrorresult()
 		return nil
-	case enturl.EdgeStat:
+	case url.EdgeStat:
 		m.ResetStat()
 		return nil
 	}

@@ -5,10 +5,10 @@ import (
 
 	"wsw/backend/domain/gowitness"
 	"wsw/backend/domain/preview"
-	"wsw/backend/domain/url"
 	"wsw/backend/domain/url/screenshot"
 	"wsw/backend/ent"
 	"wsw/backend/ent/repository"
+	"wsw/backend/ent/types"
 )
 
 type (
@@ -133,13 +133,13 @@ func (u urlImpl) getLastStat(entity *ent.Url) (*ent.Stat, error) {
 	return stats[count-1], nil
 }
 
-func (u urlImpl) getPreviewDataStatus(status url.Status) preview.Status {
+func (u urlImpl) getPreviewDataStatus(status types.StatusEnum) preview.Status {
 	switch status {
-	case url.Success:
+	case types.Success:
 		return preview.StatusSuccess
-	case url.Error:
+	case types.Error:
 		return preview.StatusError
-	case url.Pending:
+	case types.Pending:
 		return preview.StatusPending
 	default:
 		return preview.StatusPending

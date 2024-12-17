@@ -6,11 +6,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"wsw/backend/domain/url"
 	"wsw/backend/ent/errorresult"
 	"wsw/backend/ent/predicate"
 	"wsw/backend/ent/stat"
-	enturl "wsw/backend/ent/url"
+	"wsw/backend/ent/types"
+	"wsw/backend/ent/url"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -45,15 +45,15 @@ func (uu *URLUpdate) SetNillableURL(s *string) *URLUpdate {
 }
 
 // SetStatus sets the "status" field.
-func (uu *URLUpdate) SetStatus(u url.Status) *URLUpdate {
-	uu.mutation.SetStatus(u)
+func (uu *URLUpdate) SetStatus(te types.StatusEnum) *URLUpdate {
+	uu.mutation.SetStatus(te)
 	return uu
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (uu *URLUpdate) SetNillableStatus(u *url.Status) *URLUpdate {
-	if u != nil {
-		uu.SetStatus(*u)
+func (uu *URLUpdate) SetNillableStatus(te *types.StatusEnum) *URLUpdate {
+	if te != nil {
+		uu.SetStatus(*te)
 	}
 	return uu
 }
@@ -185,7 +185,7 @@ func (uu *URLUpdate) ExecX(ctx context.Context) {
 // check runs all checks and user-defined validators on the builder.
 func (uu *URLUpdate) check() error {
 	if v, ok := uu.mutation.Status(); ok {
-		if err := enturl.StatusValidator(v); err != nil {
+		if err := url.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Url.status": %w`, err)}
 		}
 	}
@@ -196,7 +196,7 @@ func (uu *URLUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := uu.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(enturl.Table, enturl.Columns, sqlgraph.NewFieldSpec(enturl.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(url.Table, url.Columns, sqlgraph.NewFieldSpec(url.FieldID, field.TypeInt))
 	if ps := uu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -205,23 +205,23 @@ func (uu *URLUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if value, ok := uu.mutation.URL(); ok {
-		_spec.SetField(enturl.FieldURL, field.TypeString, value)
+		_spec.SetField(url.FieldURL, field.TypeString, value)
 	}
 	if value, ok := uu.mutation.Status(); ok {
-		_spec.SetField(enturl.FieldStatus, field.TypeEnum, value)
+		_spec.SetField(url.FieldStatus, field.TypeEnum, value)
 	}
 	if value, ok := uu.mutation.RelativePath(); ok {
-		_spec.SetField(enturl.FieldRelativePath, field.TypeString, value)
+		_spec.SetField(url.FieldRelativePath, field.TypeString, value)
 	}
 	if uu.mutation.RelativePathCleared() {
-		_spec.ClearField(enturl.FieldRelativePath, field.TypeString)
+		_spec.ClearField(url.FieldRelativePath, field.TypeString)
 	}
 	if uu.mutation.ErrorresultCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   enturl.ErrorresultTable,
-			Columns: []string{enturl.ErrorresultColumn},
+			Table:   url.ErrorresultTable,
+			Columns: []string{url.ErrorresultColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(errorresult.FieldID, field.TypeInt),
@@ -233,8 +233,8 @@ func (uu *URLUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   enturl.ErrorresultTable,
-			Columns: []string{enturl.ErrorresultColumn},
+			Table:   url.ErrorresultTable,
+			Columns: []string{url.ErrorresultColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(errorresult.FieldID, field.TypeInt),
@@ -249,8 +249,8 @@ func (uu *URLUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   enturl.ErrorresultTable,
-			Columns: []string{enturl.ErrorresultColumn},
+			Table:   url.ErrorresultTable,
+			Columns: []string{url.ErrorresultColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(errorresult.FieldID, field.TypeInt),
@@ -265,8 +265,8 @@ func (uu *URLUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   enturl.StatTable,
-			Columns: []string{enturl.StatColumn},
+			Table:   url.StatTable,
+			Columns: []string{url.StatColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(stat.FieldID, field.TypeInt),
@@ -278,8 +278,8 @@ func (uu *URLUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   enturl.StatTable,
-			Columns: []string{enturl.StatColumn},
+			Table:   url.StatTable,
+			Columns: []string{url.StatColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(stat.FieldID, field.TypeInt),
@@ -294,8 +294,8 @@ func (uu *URLUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   enturl.StatTable,
-			Columns: []string{enturl.StatColumn},
+			Table:   url.StatTable,
+			Columns: []string{url.StatColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(stat.FieldID, field.TypeInt),
@@ -308,7 +308,7 @@ func (uu *URLUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
-			err = &NotFoundError{enturl.Label}
+			err = &NotFoundError{url.Label}
 		} else if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -341,15 +341,15 @@ func (uuo *URLUpdateOne) SetNillableURL(s *string) *URLUpdateOne {
 }
 
 // SetStatus sets the "status" field.
-func (uuo *URLUpdateOne) SetStatus(u url.Status) *URLUpdateOne {
-	uuo.mutation.SetStatus(u)
+func (uuo *URLUpdateOne) SetStatus(te types.StatusEnum) *URLUpdateOne {
+	uuo.mutation.SetStatus(te)
 	return uuo
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (uuo *URLUpdateOne) SetNillableStatus(u *url.Status) *URLUpdateOne {
-	if u != nil {
-		uuo.SetStatus(*u)
+func (uuo *URLUpdateOne) SetNillableStatus(te *types.StatusEnum) *URLUpdateOne {
+	if te != nil {
+		uuo.SetStatus(*te)
 	}
 	return uuo
 }
@@ -494,7 +494,7 @@ func (uuo *URLUpdateOne) ExecX(ctx context.Context) {
 // check runs all checks and user-defined validators on the builder.
 func (uuo *URLUpdateOne) check() error {
 	if v, ok := uuo.mutation.Status(); ok {
-		if err := enturl.StatusValidator(v); err != nil {
+		if err := url.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Url.status": %w`, err)}
 		}
 	}
@@ -505,7 +505,7 @@ func (uuo *URLUpdateOne) sqlSave(ctx context.Context) (_node *Url, err error) {
 	if err := uuo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(enturl.Table, enturl.Columns, sqlgraph.NewFieldSpec(enturl.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(url.Table, url.Columns, sqlgraph.NewFieldSpec(url.FieldID, field.TypeInt))
 	id, ok := uuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Url.id" for update`)}
@@ -513,12 +513,12 @@ func (uuo *URLUpdateOne) sqlSave(ctx context.Context) (_node *Url, err error) {
 	_spec.Node.ID.Value = id
 	if fields := uuo.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, enturl.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, url.FieldID)
 		for _, f := range fields {
-			if !enturl.ValidColumn(f) {
+			if !url.ValidColumn(f) {
 				return nil, &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 			}
-			if f != enturl.FieldID {
+			if f != url.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, f)
 			}
 		}
@@ -531,23 +531,23 @@ func (uuo *URLUpdateOne) sqlSave(ctx context.Context) (_node *Url, err error) {
 		}
 	}
 	if value, ok := uuo.mutation.URL(); ok {
-		_spec.SetField(enturl.FieldURL, field.TypeString, value)
+		_spec.SetField(url.FieldURL, field.TypeString, value)
 	}
 	if value, ok := uuo.mutation.Status(); ok {
-		_spec.SetField(enturl.FieldStatus, field.TypeEnum, value)
+		_spec.SetField(url.FieldStatus, field.TypeEnum, value)
 	}
 	if value, ok := uuo.mutation.RelativePath(); ok {
-		_spec.SetField(enturl.FieldRelativePath, field.TypeString, value)
+		_spec.SetField(url.FieldRelativePath, field.TypeString, value)
 	}
 	if uuo.mutation.RelativePathCleared() {
-		_spec.ClearField(enturl.FieldRelativePath, field.TypeString)
+		_spec.ClearField(url.FieldRelativePath, field.TypeString)
 	}
 	if uuo.mutation.ErrorresultCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   enturl.ErrorresultTable,
-			Columns: []string{enturl.ErrorresultColumn},
+			Table:   url.ErrorresultTable,
+			Columns: []string{url.ErrorresultColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(errorresult.FieldID, field.TypeInt),
@@ -559,8 +559,8 @@ func (uuo *URLUpdateOne) sqlSave(ctx context.Context) (_node *Url, err error) {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   enturl.ErrorresultTable,
-			Columns: []string{enturl.ErrorresultColumn},
+			Table:   url.ErrorresultTable,
+			Columns: []string{url.ErrorresultColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(errorresult.FieldID, field.TypeInt),
@@ -575,8 +575,8 @@ func (uuo *URLUpdateOne) sqlSave(ctx context.Context) (_node *Url, err error) {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   enturl.ErrorresultTable,
-			Columns: []string{enturl.ErrorresultColumn},
+			Table:   url.ErrorresultTable,
+			Columns: []string{url.ErrorresultColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(errorresult.FieldID, field.TypeInt),
@@ -591,8 +591,8 @@ func (uuo *URLUpdateOne) sqlSave(ctx context.Context) (_node *Url, err error) {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   enturl.StatTable,
-			Columns: []string{enturl.StatColumn},
+			Table:   url.StatTable,
+			Columns: []string{url.StatColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(stat.FieldID, field.TypeInt),
@@ -604,8 +604,8 @@ func (uuo *URLUpdateOne) sqlSave(ctx context.Context) (_node *Url, err error) {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   enturl.StatTable,
-			Columns: []string{enturl.StatColumn},
+			Table:   url.StatTable,
+			Columns: []string{url.StatColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(stat.FieldID, field.TypeInt),
@@ -620,8 +620,8 @@ func (uuo *URLUpdateOne) sqlSave(ctx context.Context) (_node *Url, err error) {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   enturl.StatTable,
-			Columns: []string{enturl.StatColumn},
+			Table:   url.StatTable,
+			Columns: []string{url.StatColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(stat.FieldID, field.TypeInt),
@@ -637,7 +637,7 @@ func (uuo *URLUpdateOne) sqlSave(ctx context.Context) (_node *Url, err error) {
 	_spec.ScanValues = _node.scanValues
 	if err = sqlgraph.UpdateNode(ctx, uuo.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
-			err = &NotFoundError{enturl.Label}
+			err = &NotFoundError{url.Label}
 		} else if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}

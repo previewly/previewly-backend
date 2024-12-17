@@ -12,12 +12,11 @@ import (
 	"wsw/backend/ent/stat"
 	"wsw/backend/ent/token"
 	"wsw/backend/ent/uploadimage"
+	"wsw/backend/ent/url"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-
-	enturl "wsw/backend/ent/url"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -82,7 +81,7 @@ func checkColumn(table, column string) error {
 			stat.Table:        stat.ValidColumn,
 			token.Table:       token.ValidColumn,
 			uploadimage.Table: uploadimage.ValidColumn,
-			enturl.Table:      enturl.ValidColumn,
+			url.Table:         url.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

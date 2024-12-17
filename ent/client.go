@@ -15,7 +15,7 @@ import (
 	"wsw/backend/ent/stat"
 	"wsw/backend/ent/token"
 	"wsw/backend/ent/uploadimage"
-	enturl "wsw/backend/ent/url"
+	"wsw/backend/ent/url"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -781,13 +781,13 @@ func NewURLClient(c config) *URLClient {
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `enturl.Hooks(f(g(h())))`.
+// A call to `Use(f, g, h)` equals to `url.Hooks(f(g(h())))`.
 func (c *URLClient) Use(hooks ...Hook) {
 	c.hooks.Url = append(c.hooks.Url, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `enturl.Intercept(f(g(h())))`.
+// A call to `Intercept(f, g, h)` equals to `url.Intercept(f(g(h())))`.
 func (c *URLClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Url = append(c.inters.Url, interceptors...)
 }
@@ -849,7 +849,7 @@ func (c *URLClient) DeleteOne(u *Url) *URLDeleteOne {
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *URLClient) DeleteOneID(id int) *URLDeleteOne {
-	builder := c.Delete().Where(enturl.ID(id))
+	builder := c.Delete().Where(url.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
 	return &URLDeleteOne{builder}
@@ -866,7 +866,7 @@ func (c *URLClient) Query() *URLQuery {
 
 // Get returns a Url entity by its id.
 func (c *URLClient) Get(ctx context.Context, id int) (*Url, error) {
-	return c.Query().Where(enturl.ID(id)).Only(ctx)
+	return c.Query().Where(url.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
@@ -884,9 +884,9 @@ func (c *URLClient) QueryErrorresult(u *Url) *ErrorResultQuery {
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(enturl.Table, enturl.FieldID, id),
+			sqlgraph.From(url.Table, url.FieldID, id),
 			sqlgraph.To(errorresult.Table, errorresult.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, enturl.ErrorresultTable, enturl.ErrorresultColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, url.ErrorresultTable, url.ErrorresultColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil
@@ -900,9 +900,9 @@ func (c *URLClient) QueryStat(u *Url) *StatQuery {
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(enturl.Table, enturl.FieldID, id),
+			sqlgraph.From(url.Table, url.FieldID, id),
 			sqlgraph.To(stat.Table, stat.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, enturl.StatTable, enturl.StatColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, url.StatTable, url.StatColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil

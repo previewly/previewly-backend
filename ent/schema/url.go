@@ -1,7 +1,7 @@
 package schema
 
 import (
-	"wsw/backend/domain/url"
+	"wsw/backend/ent/types"
 
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
@@ -17,7 +17,7 @@ type Url struct {
 func (Url) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("url").Unique(),
-		field.Enum("status").GoType(url.Status("pending")),
+		field.Enum("status").GoType(types.StatusEnum("pending")),
 		field.String("relative_path").Nillable().Optional(),
 	}
 }

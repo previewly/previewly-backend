@@ -5,8 +5,8 @@ package ent
 import (
 	"fmt"
 	"strings"
-	"wsw/backend/domain/url"
-	enturl "wsw/backend/ent/url"
+	"wsw/backend/ent/types"
+	"wsw/backend/ent/url"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -20,7 +20,7 @@ type Url struct {
 	// URL holds the value of the "url" field.
 	URL string `json:"url,omitempty"`
 	// Status holds the value of the "status" field.
-	Status url.Status `json:"status,omitempty"`
+	Status types.StatusEnum `json:"status,omitempty"`
 	// RelativePath holds the value of the "relative_path" field.
 	RelativePath *string `json:"relative_path,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -63,9 +63,9 @@ func (*Url) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case enturl.FieldID:
+		case url.FieldID:
 			values[i] = new(sql.NullInt64)
-		case enturl.FieldURL, enturl.FieldStatus, enturl.FieldRelativePath:
+		case url.FieldURL, url.FieldStatus, url.FieldRelativePath:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -82,25 +82,25 @@ func (u *Url) assignValues(columns []string, values []any) error {
 	}
 	for i := range columns {
 		switch columns[i] {
-		case enturl.FieldID:
+		case url.FieldID:
 			value, ok := values[i].(*sql.NullInt64)
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			u.ID = int(value.Int64)
-		case enturl.FieldURL:
+		case url.FieldURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field url", values[i])
 			} else if value.Valid {
 				u.URL = value.String
 			}
-		case enturl.FieldStatus:
+		case url.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				u.Status = url.Status(value.String)
+				u.Status = types.StatusEnum(value.String)
 			}
-		case enturl.FieldRelativePath:
+		case url.FieldRelativePath:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field relative_path", values[i])
 			} else if value.Valid {

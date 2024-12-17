@@ -5,12 +5,11 @@ package ent
 import (
 	"context"
 	"wsw/backend/ent/predicate"
+	"wsw/backend/ent/url"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-
-	enturl "wsw/backend/ent/url"
 )
 
 // URLDelete is the builder for deleting a Url entity.
@@ -41,7 +40,7 @@ func (ud *URLDelete) ExecX(ctx context.Context) int {
 }
 
 func (ud *URLDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(enturl.Table, sqlgraph.NewFieldSpec(enturl.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewDeleteSpec(url.Table, sqlgraph.NewFieldSpec(url.FieldID, field.TypeInt))
 	if ps := ud.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -75,7 +74,7 @@ func (udo *URLDeleteOne) Exec(ctx context.Context) error {
 	case err != nil:
 		return err
 	case n == 0:
-		return &NotFoundError{enturl.Label}
+		return &NotFoundError{url.Label}
 	default:
 		return nil
 	}

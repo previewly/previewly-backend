@@ -19,6 +19,8 @@ const (
 	FieldStatus = "status"
 	// FieldProcess holds the string denoting the process field in the database.
 	FieldProcess = "process"
+	// FieldProcessOptions holds the string denoting the process_options field in the database.
+	FieldProcessOptions = "process_options"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -32,6 +34,7 @@ var Columns = []string{
 	FieldID,
 	FieldStatus,
 	FieldProcess,
+	FieldProcessOptions,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }

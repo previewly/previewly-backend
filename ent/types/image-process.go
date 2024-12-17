@@ -1,6 +1,12 @@
 package types
 
-type ImageProcess string
+type (
+	ImageProcess        string
+	ImageProcessOptions struct {
+		Key   string
+		Value *string
+	}
+)
 
 const (
 	Resize ImageProcess = "resize"

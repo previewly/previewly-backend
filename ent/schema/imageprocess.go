@@ -19,6 +19,7 @@ func (ImageProcess) Fields() []ent.Field {
 	return []ent.Field{
 		field.Enum("status").GoType(types.StatusEnum("pending")),
 		field.Enum("process").GoType(types.ImageProcess("resize")),
+		field.JSON("process_options", []types.ImageProcessOptions{}),
 		field.Time("created_at").Default(time.Now),
 		field.Time("updated_at").
 			Default(time.Now).

@@ -3,8 +3,8 @@ package repository
 import (
 	"context"
 
-	"wsw/backend/domain/url"
 	"wsw/backend/ent"
+	"wsw/backend/ent/types"
 	entUrl "wsw/backend/ent/url"
 )
 
@@ -38,7 +38,7 @@ func (u *urlImpl) SaveFailure(errorMessage string, ID int) (*ent.Url, error) {
 		return nil, err
 	}
 	return u.client.Url.UpdateOne(urlEntity).
-		SetStatus(url.Error).
+		SetStatus(types.Error).
 		AddErrorresult(errorResult).
 		Save(u.ctx)
 }
@@ -50,7 +50,7 @@ func (u *urlImpl) SaveSuccess(relativePath string, statEntity *ent.Stat, ID int)
 		return nil, err
 	}
 	return u.client.Url.UpdateOne(urlEntity).
-		SetStatus(url.Success).
+		SetStatus(types.Success).
 		SetRelativePath(relativePath).
 		AddStat(statEntity).
 		Save(u.ctx)
@@ -70,7 +70,7 @@ func (u *urlImpl) Get(url string) (*ent.Url, error) {
 }
 
 // Update implements Url.
-func (u *urlImpl) Update(relativePath string, status url.Status, ID int) (*ent.Url, error) {
+func (u *urlImpl) Update(relativePath string, status types.StatusEnum, ID int) (*ent.Url, error) {
 	urlEntity, err := u.client.Url.Query().Where(entUrl.ID(ID)).Only(u.ctx)
 	if err != nil {
 		return nil, err

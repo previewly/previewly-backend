@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -22,5 +23,7 @@ func (UploadImage) Fields() []ent.Field {
 
 // Edges of the UploadImage.
 func (UploadImage) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.To("imageprocess", ImageProcess.Type),
+	}
 }

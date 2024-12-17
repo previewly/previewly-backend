@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"wsw/backend/ent/imageprocess"
 	"wsw/backend/ent/predicate"
 	"wsw/backend/ent/uploadimage"
 
@@ -27,9 +28,45 @@ func (uiu *UploadImageUpdate) Where(ps ...predicate.UploadImage) *UploadImageUpd
 	return uiu
 }
 
+// AddImageprocesIDs adds the "imageprocess" edge to the ImageProcess entity by IDs.
+func (uiu *UploadImageUpdate) AddImageprocesIDs(ids ...int) *UploadImageUpdate {
+	uiu.mutation.AddImageprocesIDs(ids...)
+	return uiu
+}
+
+// AddImageprocess adds the "imageprocess" edges to the ImageProcess entity.
+func (uiu *UploadImageUpdate) AddImageprocess(i ...*ImageProcess) *UploadImageUpdate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return uiu.AddImageprocesIDs(ids...)
+}
+
 // Mutation returns the UploadImageMutation object of the builder.
 func (uiu *UploadImageUpdate) Mutation() *UploadImageMutation {
 	return uiu.mutation
+}
+
+// ClearImageprocess clears all "imageprocess" edges to the ImageProcess entity.
+func (uiu *UploadImageUpdate) ClearImageprocess() *UploadImageUpdate {
+	uiu.mutation.ClearImageprocess()
+	return uiu
+}
+
+// RemoveImageprocesIDs removes the "imageprocess" edge to ImageProcess entities by IDs.
+func (uiu *UploadImageUpdate) RemoveImageprocesIDs(ids ...int) *UploadImageUpdate {
+	uiu.mutation.RemoveImageprocesIDs(ids...)
+	return uiu
+}
+
+// RemoveImageprocess removes "imageprocess" edges to ImageProcess entities.
+func (uiu *UploadImageUpdate) RemoveImageprocess(i ...*ImageProcess) *UploadImageUpdate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return uiu.RemoveImageprocesIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -68,6 +105,51 @@ func (uiu *UploadImageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if uiu.mutation.ImageprocessCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   uploadimage.ImageprocessTable,
+			Columns: []string{uploadimage.ImageprocessColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(imageprocess.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uiu.mutation.RemovedImageprocessIDs(); len(nodes) > 0 && !uiu.mutation.ImageprocessCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   uploadimage.ImageprocessTable,
+			Columns: []string{uploadimage.ImageprocessColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(imageprocess.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uiu.mutation.ImageprocessIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   uploadimage.ImageprocessTable,
+			Columns: []string{uploadimage.ImageprocessColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(imageprocess.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uiu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{uploadimage.Label}
@@ -88,9 +170,45 @@ type UploadImageUpdateOne struct {
 	mutation *UploadImageMutation
 }
 
+// AddImageprocesIDs adds the "imageprocess" edge to the ImageProcess entity by IDs.
+func (uiuo *UploadImageUpdateOne) AddImageprocesIDs(ids ...int) *UploadImageUpdateOne {
+	uiuo.mutation.AddImageprocesIDs(ids...)
+	return uiuo
+}
+
+// AddImageprocess adds the "imageprocess" edges to the ImageProcess entity.
+func (uiuo *UploadImageUpdateOne) AddImageprocess(i ...*ImageProcess) *UploadImageUpdateOne {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return uiuo.AddImageprocesIDs(ids...)
+}
+
 // Mutation returns the UploadImageMutation object of the builder.
 func (uiuo *UploadImageUpdateOne) Mutation() *UploadImageMutation {
 	return uiuo.mutation
+}
+
+// ClearImageprocess clears all "imageprocess" edges to the ImageProcess entity.
+func (uiuo *UploadImageUpdateOne) ClearImageprocess() *UploadImageUpdateOne {
+	uiuo.mutation.ClearImageprocess()
+	return uiuo
+}
+
+// RemoveImageprocesIDs removes the "imageprocess" edge to ImageProcess entities by IDs.
+func (uiuo *UploadImageUpdateOne) RemoveImageprocesIDs(ids ...int) *UploadImageUpdateOne {
+	uiuo.mutation.RemoveImageprocesIDs(ids...)
+	return uiuo
+}
+
+// RemoveImageprocess removes "imageprocess" edges to ImageProcess entities.
+func (uiuo *UploadImageUpdateOne) RemoveImageprocess(i ...*ImageProcess) *UploadImageUpdateOne {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return uiuo.RemoveImageprocesIDs(ids...)
 }
 
 // Where appends a list predicates to the UploadImageUpdate builder.
@@ -158,6 +276,51 @@ func (uiuo *UploadImageUpdateOne) sqlSave(ctx context.Context) (_node *UploadIma
 				ps[i](selector)
 			}
 		}
+	}
+	if uiuo.mutation.ImageprocessCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   uploadimage.ImageprocessTable,
+			Columns: []string{uploadimage.ImageprocessColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(imageprocess.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uiuo.mutation.RemovedImageprocessIDs(); len(nodes) > 0 && !uiuo.mutation.ImageprocessCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   uploadimage.ImageprocessTable,
+			Columns: []string{uploadimage.ImageprocessColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(imageprocess.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uiuo.mutation.ImageprocessIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   uploadimage.ImageprocessTable,
+			Columns: []string{uploadimage.ImageprocessColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(imageprocess.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &UploadImage{config: uiuo.config}
 	_spec.Assign = _node.assignValues

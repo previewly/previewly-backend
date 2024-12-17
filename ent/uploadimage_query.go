@@ -4,8 +4,10 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
+	"wsw/backend/ent/imageprocess"
 	"wsw/backend/ent/predicate"
 	"wsw/backend/ent/uploadimage"
 
@@ -18,10 +20,11 @@ import (
 // UploadImageQuery is the builder for querying UploadImage entities.
 type UploadImageQuery struct {
 	config
-	ctx        *QueryContext
-	order      []uploadimage.OrderOption
-	inters     []Interceptor
-	predicates []predicate.UploadImage
+	ctx              *QueryContext
+	order            []uploadimage.OrderOption
+	inters           []Interceptor
+	predicates       []predicate.UploadImage
+	withImageprocess *ImageProcessQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -56,6 +59,28 @@ func (uiq *UploadImageQuery) Unique(unique bool) *UploadImageQuery {
 func (uiq *UploadImageQuery) Order(o ...uploadimage.OrderOption) *UploadImageQuery {
 	uiq.order = append(uiq.order, o...)
 	return uiq
+}
+
+// QueryImageprocess chains the current query on the "imageprocess" edge.
+func (uiq *UploadImageQuery) QueryImageprocess() *ImageProcessQuery {
+	query := (&ImageProcessClient{config: uiq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uiq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uiq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(uploadimage.Table, uploadimage.FieldID, selector),
+			sqlgraph.To(imageprocess.Table, imageprocess.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, uploadimage.ImageprocessTable, uploadimage.ImageprocessColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uiq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first UploadImage entity from the query.
@@ -245,15 +270,27 @@ func (uiq *UploadImageQuery) Clone() *UploadImageQuery {
 		return nil
 	}
 	return &UploadImageQuery{
-		config:     uiq.config,
-		ctx:        uiq.ctx.Clone(),
-		order:      append([]uploadimage.OrderOption{}, uiq.order...),
-		inters:     append([]Interceptor{}, uiq.inters...),
-		predicates: append([]predicate.UploadImage{}, uiq.predicates...),
+		config:           uiq.config,
+		ctx:              uiq.ctx.Clone(),
+		order:            append([]uploadimage.OrderOption{}, uiq.order...),
+		inters:           append([]Interceptor{}, uiq.inters...),
+		predicates:       append([]predicate.UploadImage{}, uiq.predicates...),
+		withImageprocess: uiq.withImageprocess.Clone(),
 		// clone intermediate query.
 		sql:  uiq.sql.Clone(),
 		path: uiq.path,
 	}
+}
+
+// WithImageprocess tells the query-builder to eager-load the nodes that are connected to
+// the "imageprocess" edge. The optional arguments are used to configure the query builder of the edge.
+func (uiq *UploadImageQuery) WithImageprocess(opts ...func(*ImageProcessQuery)) *UploadImageQuery {
+	query := (&ImageProcessClient{config: uiq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uiq.withImageprocess = query
+	return uiq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -332,8 +369,11 @@ func (uiq *UploadImageQuery) prepareQuery(ctx context.Context) error {
 
 func (uiq *UploadImageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*UploadImage, error) {
 	var (
-		nodes = []*UploadImage{}
-		_spec = uiq.querySpec()
+		nodes       = []*UploadImage{}
+		_spec       = uiq.querySpec()
+		loadedTypes = [1]bool{
+			uiq.withImageprocess != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*UploadImage).scanValues(nil, columns)
@@ -341,6 +381,7 @@ func (uiq *UploadImageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &UploadImage{config: uiq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -352,7 +393,46 @@ func (uiq *UploadImageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := uiq.withImageprocess; query != nil {
+		if err := uiq.loadImageprocess(ctx, query, nodes,
+			func(n *UploadImage) { n.Edges.Imageprocess = []*ImageProcess{} },
+			func(n *UploadImage, e *ImageProcess) { n.Edges.Imageprocess = append(n.Edges.Imageprocess, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (uiq *UploadImageQuery) loadImageprocess(ctx context.Context, query *ImageProcessQuery, nodes []*UploadImage, init func(*UploadImage), assign func(*UploadImage, *ImageProcess)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*UploadImage)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.ImageProcess(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(uploadimage.ImageprocessColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.upload_image_imageprocess
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "upload_image_imageprocess" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "upload_image_imageprocess" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
 }
 
 func (uiq *UploadImageQuery) sqlCount(ctx context.Context) (int, error) {

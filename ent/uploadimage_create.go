@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"wsw/backend/ent/imageprocess"
 	"wsw/backend/ent/uploadimage"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -41,6 +42,21 @@ func (uic *UploadImageCreate) SetOriginalFilename(s string) *UploadImageCreate {
 func (uic *UploadImageCreate) SetType(s string) *UploadImageCreate {
 	uic.mutation.SetType(s)
 	return uic
+}
+
+// AddImageprocesIDs adds the "imageprocess" edge to the ImageProcess entity by IDs.
+func (uic *UploadImageCreate) AddImageprocesIDs(ids ...int) *UploadImageCreate {
+	uic.mutation.AddImageprocesIDs(ids...)
+	return uic
+}
+
+// AddImageprocess adds the "imageprocess" edges to the ImageProcess entity.
+func (uic *UploadImageCreate) AddImageprocess(i ...*ImageProcess) *UploadImageCreate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return uic.AddImageprocesIDs(ids...)
 }
 
 // Mutation returns the UploadImageMutation object of the builder.
@@ -150,6 +166,22 @@ func (uic *UploadImageCreate) createSpec() (*UploadImage, *sqlgraph.CreateSpec) 
 	if value, ok := uic.mutation.GetType(); ok {
 		_spec.SetField(uploadimage.FieldType, field.TypeString, value)
 		_node.Type = value
+	}
+	if nodes := uic.mutation.ImageprocessIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   uploadimage.ImageprocessTable,
+			Columns: []string{uploadimage.ImageprocessColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(imageprocess.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

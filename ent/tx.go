@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// ErrorResult is the client for interacting with the ErrorResult builders.
 	ErrorResult *ErrorResultClient
+	// ImageProcess is the client for interacting with the ImageProcess builders.
+	ImageProcess *ImageProcessClient
 	// Stat is the client for interacting with the Stat builders.
 	Stat *StatClient
 	// Token is the client for interacting with the Token builders.
@@ -154,6 +156,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.ErrorResult = NewErrorResultClient(tx.config)
+	tx.ImageProcess = NewImageProcessClient(tx.config)
 	tx.Stat = NewStatClient(tx.config)
 	tx.Token = NewTokenClient(tx.config)
 	tx.UploadImage = NewUploadImageClient(tx.config)

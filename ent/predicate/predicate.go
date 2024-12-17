@@ -9,6 +9,9 @@ import (
 // ErrorResult is the predicate function for errorresult builders.
 type ErrorResult func(*sql.Selector)
 
+// ImageProcess is the predicate function for imageprocess builders.
+type ImageProcess func(*sql.Selector)
+
 // Stat is the predicate function for stat builders.
 type Stat func(*sql.Selector)
 

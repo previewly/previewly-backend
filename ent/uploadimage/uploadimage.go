@@ -4,6 +4,7 @@ package uploadimage
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -19,8 +20,17 @@ const (
 	FieldOriginalFilename = "original_filename"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
+	// EdgeImageprocess holds the string denoting the imageprocess edge name in mutations.
+	EdgeImageprocess = "imageprocess"
 	// Table holds the table name of the uploadimage in the database.
 	Table = "upload_images"
+	// ImageprocessTable is the table that holds the imageprocess relation/edge.
+	ImageprocessTable = "image_processes"
+	// ImageprocessInverseTable is the table name for the ImageProcess entity.
+	// It exists in this package in order to avoid circular dependency with the "imageprocess" package.
+	ImageprocessInverseTable = "image_processes"
+	// ImageprocessColumn is the table column denoting the imageprocess relation/edge.
+	ImageprocessColumn = "upload_image_imageprocess"
 )
 
 // Columns holds all SQL columns for uploadimage fields.
@@ -79,4 +89,25 @@ func ByOriginalFilename(opts ...sql.OrderTermOption) OrderOption {
 // ByType orders the results by the type field.
 func ByType(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldType, opts...).ToFunc()
+}
+
+// ByImageprocessCount orders the results by imageprocess count.
+func ByImageprocessCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newImageprocessStep(), opts...)
+	}
+}
+
+// ByImageprocess orders the results by imageprocess terms.
+func ByImageprocess(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newImageprocessStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newImageprocessStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ImageprocessInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ImageprocessTable, ImageprocessColumn),
+	)
 }

@@ -12,6 +12,7 @@ import (
 	"wsw/backend/ent/migrate"
 
 	"wsw/backend/ent/errorresult"
+	"wsw/backend/ent/imageprocess"
 	"wsw/backend/ent/stat"
 	"wsw/backend/ent/token"
 	"wsw/backend/ent/uploadimage"
@@ -30,6 +31,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// ErrorResult is the client for interacting with the ErrorResult builders.
 	ErrorResult *ErrorResultClient
+	// ImageProcess is the client for interacting with the ImageProcess builders.
+	ImageProcess *ImageProcessClient
 	// Stat is the client for interacting with the Stat builders.
 	Stat *StatClient
 	// Token is the client for interacting with the Token builders.
@@ -50,6 +53,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.ErrorResult = NewErrorResultClient(c.config)
+	c.ImageProcess = NewImageProcessClient(c.config)
 	c.Stat = NewStatClient(c.config)
 	c.Token = NewTokenClient(c.config)
 	c.UploadImage = NewUploadImageClient(c.config)
@@ -144,13 +148,14 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:         ctx,
-		config:      cfg,
-		ErrorResult: NewErrorResultClient(cfg),
-		Stat:        NewStatClient(cfg),
-		Token:       NewTokenClient(cfg),
-		UploadImage: NewUploadImageClient(cfg),
-		Url:         NewURLClient(cfg),
+		ctx:          ctx,
+		config:       cfg,
+		ErrorResult:  NewErrorResultClient(cfg),
+		ImageProcess: NewImageProcessClient(cfg),
+		Stat:         NewStatClient(cfg),
+		Token:        NewTokenClient(cfg),
+		UploadImage:  NewUploadImageClient(cfg),
+		Url:          NewURLClient(cfg),
 	}, nil
 }
 
@@ -168,13 +173,14 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:         ctx,
-		config:      cfg,
-		ErrorResult: NewErrorResultClient(cfg),
-		Stat:        NewStatClient(cfg),
-		Token:       NewTokenClient(cfg),
-		UploadImage: NewUploadImageClient(cfg),
-		Url:         NewURLClient(cfg),
+		ctx:          ctx,
+		config:       cfg,
+		ErrorResult:  NewErrorResultClient(cfg),
+		ImageProcess: NewImageProcessClient(cfg),
+		Stat:         NewStatClient(cfg),
+		Token:        NewTokenClient(cfg),
+		UploadImage:  NewUploadImageClient(cfg),
+		Url:          NewURLClient(cfg),
 	}, nil
 }
 
@@ -203,21 +209,21 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.ErrorResult.Use(hooks...)
-	c.Stat.Use(hooks...)
-	c.Token.Use(hooks...)
-	c.UploadImage.Use(hooks...)
-	c.Url.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.ErrorResult, c.ImageProcess, c.Stat, c.Token, c.UploadImage, c.Url,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.ErrorResult.Intercept(interceptors...)
-	c.Stat.Intercept(interceptors...)
-	c.Token.Intercept(interceptors...)
-	c.UploadImage.Intercept(interceptors...)
-	c.Url.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.ErrorResult, c.ImageProcess, c.Stat, c.Token, c.UploadImage, c.Url,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -225,6 +231,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *ErrorResultMutation:
 		return c.ErrorResult.mutate(ctx, m)
+	case *ImageProcessMutation:
+		return c.ImageProcess.mutate(ctx, m)
 	case *StatMutation:
 		return c.Stat.mutate(ctx, m)
 	case *TokenMutation:
@@ -368,6 +376,139 @@ func (c *ErrorResultClient) mutate(ctx context.Context, m *ErrorResultMutation) 
 		return (&ErrorResultDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown ErrorResult mutation op: %q", m.Op())
+	}
+}
+
+// ImageProcessClient is a client for the ImageProcess schema.
+type ImageProcessClient struct {
+	config
+}
+
+// NewImageProcessClient returns a client for the ImageProcess from the given config.
+func NewImageProcessClient(c config) *ImageProcessClient {
+	return &ImageProcessClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `imageprocess.Hooks(f(g(h())))`.
+func (c *ImageProcessClient) Use(hooks ...Hook) {
+	c.hooks.ImageProcess = append(c.hooks.ImageProcess, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `imageprocess.Intercept(f(g(h())))`.
+func (c *ImageProcessClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ImageProcess = append(c.inters.ImageProcess, interceptors...)
+}
+
+// Create returns a builder for creating a ImageProcess entity.
+func (c *ImageProcessClient) Create() *ImageProcessCreate {
+	mutation := newImageProcessMutation(c.config, OpCreate)
+	return &ImageProcessCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ImageProcess entities.
+func (c *ImageProcessClient) CreateBulk(builders ...*ImageProcessCreate) *ImageProcessCreateBulk {
+	return &ImageProcessCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ImageProcessClient) MapCreateBulk(slice any, setFunc func(*ImageProcessCreate, int)) *ImageProcessCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ImageProcessCreateBulk{err: fmt.Errorf("calling to ImageProcessClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ImageProcessCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ImageProcessCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ImageProcess.
+func (c *ImageProcessClient) Update() *ImageProcessUpdate {
+	mutation := newImageProcessMutation(c.config, OpUpdate)
+	return &ImageProcessUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ImageProcessClient) UpdateOne(ip *ImageProcess) *ImageProcessUpdateOne {
+	mutation := newImageProcessMutation(c.config, OpUpdateOne, withImageProcess(ip))
+	return &ImageProcessUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ImageProcessClient) UpdateOneID(id int) *ImageProcessUpdateOne {
+	mutation := newImageProcessMutation(c.config, OpUpdateOne, withImageProcessID(id))
+	return &ImageProcessUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ImageProcess.
+func (c *ImageProcessClient) Delete() *ImageProcessDelete {
+	mutation := newImageProcessMutation(c.config, OpDelete)
+	return &ImageProcessDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ImageProcessClient) DeleteOne(ip *ImageProcess) *ImageProcessDeleteOne {
+	return c.DeleteOneID(ip.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ImageProcessClient) DeleteOneID(id int) *ImageProcessDeleteOne {
+	builder := c.Delete().Where(imageprocess.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ImageProcessDeleteOne{builder}
+}
+
+// Query returns a query builder for ImageProcess.
+func (c *ImageProcessClient) Query() *ImageProcessQuery {
+	return &ImageProcessQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeImageProcess},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ImageProcess entity by its id.
+func (c *ImageProcessClient) Get(ctx context.Context, id int) (*ImageProcess, error) {
+	return c.Query().Where(imageprocess.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ImageProcessClient) GetX(ctx context.Context, id int) *ImageProcess {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ImageProcessClient) Hooks() []Hook {
+	return c.hooks.ImageProcess
+}
+
+// Interceptors returns the client interceptors.
+func (c *ImageProcessClient) Interceptors() []Interceptor {
+	return c.inters.ImageProcess
+}
+
+func (c *ImageProcessClient) mutate(ctx context.Context, m *ImageProcessMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ImageProcessCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ImageProcessUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ImageProcessUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ImageProcessDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ImageProcess mutation op: %q", m.Op())
 	}
 }
 
@@ -745,6 +886,22 @@ func (c *UploadImageClient) GetX(ctx context.Context, id int) *UploadImage {
 	return obj
 }
 
+// QueryImageprocess queries the imageprocess edge of a UploadImage.
+func (c *UploadImageClient) QueryImageprocess(ui *UploadImage) *ImageProcessQuery {
+	query := (&ImageProcessClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ui.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(uploadimage.Table, uploadimage.FieldID, id),
+			sqlgraph.To(imageprocess.Table, imageprocess.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, uploadimage.ImageprocessTable, uploadimage.ImageprocessColumn),
+		)
+		fromV = sqlgraph.Neighbors(ui.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UploadImageClient) Hooks() []Hook {
 	return c.hooks.UploadImage
@@ -938,9 +1095,9 @@ func (c *URLClient) mutate(ctx context.Context, m *URLMutation) (Value, error) {
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		ErrorResult, Stat, Token, UploadImage, Url []ent.Hook
+		ErrorResult, ImageProcess, Stat, Token, UploadImage, Url []ent.Hook
 	}
 	inters struct {
-		ErrorResult, Stat, Token, UploadImage, Url []ent.Interceptor
+		ErrorResult, ImageProcess, Stat, Token, UploadImage, Url []ent.Interceptor
 	}
 )

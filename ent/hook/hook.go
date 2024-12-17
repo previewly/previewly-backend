@@ -20,6 +20,18 @@ func (f ErrorResultFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value,
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ErrorResultMutation", m)
 }
 
+// The ImageProcessFunc type is an adapter to allow the use of ordinary
+// function as ImageProcess mutator.
+type ImageProcessFunc func(context.Context, *ent.ImageProcessMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ImageProcessFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ImageProcessMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ImageProcessMutation", m)
+}
+
 // The StatFunc type is an adapter to allow the use of ordinary
 // function as Stat mutator.
 type StatFunc func(context.Context, *ent.StatMutation) (ent.Value, error)

@@ -23,8 +23,29 @@ type UploadImage struct {
 	// OriginalFilename holds the value of the "original_filename" field.
 	OriginalFilename string `json:"original_filename,omitempty"`
 	// Type holds the value of the "type" field.
-	Type         string `json:"type,omitempty"`
+	Type string `json:"type,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UploadImageQuery when eager-loading is set.
+	Edges        UploadImageEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// UploadImageEdges holds the relations/edges for other nodes in the graph.
+type UploadImageEdges struct {
+	// Imageprocess holds the value of the imageprocess edge.
+	Imageprocess []*ImageProcess `json:"imageprocess,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// ImageprocessOrErr returns the Imageprocess value or an error if the edge
+// was not loaded in eager-loading.
+func (e UploadImageEdges) ImageprocessOrErr() ([]*ImageProcess, error) {
+	if e.loadedTypes[0] {
+		return e.Imageprocess, nil
+	}
+	return nil, &NotLoadedError{edge: "imageprocess"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -92,6 +113,11 @@ func (ui *UploadImage) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (ui *UploadImage) Value(name string) (ent.Value, error) {
 	return ui.selectValues.Get(name)
+}
+
+// QueryImageprocess queries the "imageprocess" edge of the UploadImage entity.
+func (ui *UploadImage) QueryImageprocess() *ImageProcessQuery {
+	return NewUploadImageClient(ui.config).QueryImageprocess(ui)
 }
 
 // Update returns a builder for updating this UploadImage.

@@ -5,6 +5,7 @@ package ent
 import (
 	"time"
 	"wsw/backend/ent/errorresult"
+	"wsw/backend/ent/imageprocess"
 	"wsw/backend/ent/schema"
 	"wsw/backend/ent/stat"
 	"wsw/backend/ent/uploadimage"
@@ -20,6 +21,18 @@ func init() {
 	errorresultDescCreatedAt := errorresultFields[0].Descriptor()
 	// errorresult.DefaultCreatedAt holds the default value on creation for the created_at field.
 	errorresult.DefaultCreatedAt = errorresultDescCreatedAt.Default.(func() time.Time)
+	imageprocessFields := schema.ImageProcess{}.Fields()
+	_ = imageprocessFields
+	// imageprocessDescCreatedAt is the schema descriptor for created_at field.
+	imageprocessDescCreatedAt := imageprocessFields[2].Descriptor()
+	// imageprocess.DefaultCreatedAt holds the default value on creation for the created_at field.
+	imageprocess.DefaultCreatedAt = imageprocessDescCreatedAt.Default.(func() time.Time)
+	// imageprocessDescUpdatedAt is the schema descriptor for updated_at field.
+	imageprocessDescUpdatedAt := imageprocessFields[3].Descriptor()
+	// imageprocess.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	imageprocess.DefaultUpdatedAt = imageprocessDescUpdatedAt.Default.(func() time.Time)
+	// imageprocess.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	imageprocess.UpdateDefaultUpdatedAt = imageprocessDescUpdatedAt.UpdateDefault.(func() time.Time)
 	statFields := schema.Stat{}.Fields()
 	_ = statFields
 	// statDescCreatedAt is the schema descriptor for created_at field.

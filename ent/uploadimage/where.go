@@ -6,6 +6,7 @@ import (
 	"wsw/backend/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // ID filters vertices based on their ID field.
@@ -331,6 +332,29 @@ func TypeEqualFold(v string) predicate.UploadImage {
 // TypeContainsFold applies the ContainsFold predicate on the "type" field.
 func TypeContainsFold(v string) predicate.UploadImage {
 	return predicate.UploadImage(sql.FieldContainsFold(FieldType, v))
+}
+
+// HasImageprocess applies the HasEdge predicate on the "imageprocess" edge.
+func HasImageprocess() predicate.UploadImage {
+	return predicate.UploadImage(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ImageprocessTable, ImageprocessColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasImageprocessWith applies the HasEdge predicate on the "imageprocess" edge with a given conditions (other predicates).
+func HasImageprocessWith(preds ...predicate.ImageProcess) predicate.UploadImage {
+	return predicate.UploadImage(func(s *sql.Selector) {
+		step := newImageprocessStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

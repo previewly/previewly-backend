@@ -9,9 +9,9 @@ import (
 	"wsw/backend/app/config"
 	"wsw/backend/domain/gowitness"
 	"wsw/backend/domain/image/process"
+	"wsw/backend/domain/image/upload"
 	"wsw/backend/domain/path/screenshot/relative"
 	"wsw/backend/domain/token/generator"
-	"wsw/backend/domain/upload"
 	"wsw/backend/domain/url/screenshot"
 	"wsw/backend/ent"
 	"wsw/backend/ent/repository"
@@ -20,7 +20,7 @@ import (
 	"wsw/backend/model/token"
 	"wsw/backend/model/url"
 
-	domainStorage "wsw/backend/domain/upload/storage"
+	domainStorage "wsw/backend/domain/image/upload/storage"
 	uploadModel "wsw/backend/model/upload"
 
 	"github.com/getsentry/sentry-go"

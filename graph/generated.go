@@ -47,10 +47,28 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	ImageProcess struct {
+		Options func(childComplexity int) int
+		Type    func(childComplexity int) int
+	}
+
+	ImageProcessOption struct {
+		Key   func(childComplexity int) int
+		Value func(childComplexity int) int
+	}
+
+	ImageProcesses struct {
+		Error     func(childComplexity int) int
+		ImageID   func(childComplexity int) int
+		Processes func(childComplexity int) int
+		Status    func(childComplexity int) int
+	}
+
 	Mutation struct {
-		AddURL      func(childComplexity int, token string, url string) int
-		CreateToken func(childComplexity int) int
-		Upload      func(childComplexity int, token string, images []*graphql.Upload) int
+		AddURL       func(childComplexity int, token string, url string) int
+		CreateToken  func(childComplexity int) int
+		ProcessImage func(childComplexity int, token string, imageID int, processes []*model.ImageProcessesInput) int
+		Upload       func(childComplexity int, token string, images []*graphql.Upload) int
 	}
 
 	PreviewData struct {
@@ -79,6 +97,7 @@ type MutationResolver interface {
 	CreateToken(ctx context.Context) (string, error)
 	AddURL(ctx context.Context, token string, url string) (*model.PreviewData, error)
 	Upload(ctx context.Context, token string, images []*graphql.Upload) ([]*model.UploadImageStatus, error)
+	ProcessImage(ctx context.Context, token string, imageID int, processes []*model.ImageProcessesInput) (*model.ImageProcesses, error)
 }
 type QueryResolver interface {
 	GetPreviewData(ctx context.Context, token string, url string) (*model.PreviewData, error)
@@ -104,6 +123,62 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
+	case "ImageProcess.options":
+		if e.complexity.ImageProcess.Options == nil {
+			break
+		}
+
+		return e.complexity.ImageProcess.Options(childComplexity), true
+
+	case "ImageProcess.type":
+		if e.complexity.ImageProcess.Type == nil {
+			break
+		}
+
+		return e.complexity.ImageProcess.Type(childComplexity), true
+
+	case "ImageProcessOption.key":
+		if e.complexity.ImageProcessOption.Key == nil {
+			break
+		}
+
+		return e.complexity.ImageProcessOption.Key(childComplexity), true
+
+	case "ImageProcessOption.value":
+		if e.complexity.ImageProcessOption.Value == nil {
+			break
+		}
+
+		return e.complexity.ImageProcessOption.Value(childComplexity), true
+
+	case "ImageProcesses.error":
+		if e.complexity.ImageProcesses.Error == nil {
+			break
+		}
+
+		return e.complexity.ImageProcesses.Error(childComplexity), true
+
+	case "ImageProcesses.imageId":
+		if e.complexity.ImageProcesses.ImageID == nil {
+			break
+		}
+
+		return e.complexity.ImageProcesses.ImageID(childComplexity), true
+
+	case "ImageProcesses.processes":
+		if e.complexity.ImageProcesses.Processes == nil {
+			break
+		}
+
+		return e.complexity.ImageProcesses.Processes(childComplexity), true
+
+	case "ImageProcesses.status":
+		if e.complexity.ImageProcesses.Status == nil {
+			break
+		}
+
+		return e.complexity.ImageProcesses.Status(childComplexity), true
+
 	case "Mutation.addUrl":
 		if e.complexity.Mutation.AddURL == nil {
 			break
@@ -122,6 +197,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateToken(childComplexity), true
+
+	case "Mutation.processImage":
+		if e.complexity.Mutation.ProcessImage == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_processImage_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.ProcessImage(childComplexity, args["token"].(string), args["imageId"].(int), args["processes"].([]*model.ImageProcessesInput)), true
 
 	case "Mutation.upload":
 		if e.complexity.Mutation.Upload == nil {
@@ -236,7 +323,10 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	opCtx := graphql.GetOperationContext(ctx)
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
-	inputUnmarshalMap := graphql.BuildUnmarshalerMap()
+	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputImageProcessOptionInput,
+		ec.unmarshalInputImageProcessesInput,
+	)
 	first := true
 
 	switch opCtx.Operation.Operation {
@@ -408,6 +498,92 @@ func (ec *executionContext) field_Mutation_addUrl_argsURL(
 	}
 
 	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_processImage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	arg0, err := ec.field_Mutation_processImage_argsToken(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["token"] = arg0
+	arg1, err := ec.field_Mutation_processImage_argsImageID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["imageId"] = arg1
+	arg2, err := ec.field_Mutation_processImage_argsProcesses(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["processes"] = arg2
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_processImage_argsToken(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (string, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["token"]
+	if !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
+	if tmp, ok := rawArgs["token"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_processImage_argsImageID(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["imageId"]
+	if !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("imageId"))
+	if tmp, ok := rawArgs["imageId"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_processImage_argsProcesses(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) ([]*model.ImageProcessesInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["processes"]
+	if !ok {
+		var zeroVal []*model.ImageProcessesInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("processes"))
+	if tmp, ok := rawArgs["processes"]; ok {
+		return ec.unmarshalNImageProcessesInput2ᚕᚖwswᚋbackendᚋgraphᚋmodelᚐImageProcessesInputᚄ(ctx, tmp)
+	}
+
+	var zeroVal []*model.ImageProcessesInput
 	return zeroVal, nil
 }
 
@@ -665,6 +841,364 @@ func (ec *executionContext) field___Type_fields_argsIncludeDeprecated(
 
 // region    **************************** field.gotpl *****************************
 
+func (ec *executionContext) _ImageProcess_type(ctx context.Context, field graphql.CollectedField, obj *model.ImageProcess) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImageProcess_type(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.ImageProcessType)
+	fc.Result = res
+	return ec.marshalNImageProcessType2wswᚋbackendᚋgraphᚋmodelᚐImageProcessType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ImageProcess_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImageProcess",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ImageProcessType does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ImageProcess_options(ctx context.Context, field graphql.CollectedField, obj *model.ImageProcess) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImageProcess_options(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Options, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ImageProcessOption)
+	fc.Result = res
+	return ec.marshalNImageProcessOption2ᚕᚖwswᚋbackendᚋgraphᚋmodelᚐImageProcessOptionᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ImageProcess_options(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImageProcess",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "key":
+				return ec.fieldContext_ImageProcessOption_key(ctx, field)
+			case "value":
+				return ec.fieldContext_ImageProcessOption_value(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ImageProcessOption", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ImageProcessOption_key(ctx context.Context, field graphql.CollectedField, obj *model.ImageProcessOption) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImageProcessOption_key(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Key, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ImageProcessOption_key(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImageProcessOption",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ImageProcessOption_value(ctx context.Context, field graphql.CollectedField, obj *model.ImageProcessOption) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImageProcessOption_value(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Value, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ImageProcessOption_value(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImageProcessOption",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ImageProcesses_imageId(ctx context.Context, field graphql.CollectedField, obj *model.ImageProcesses) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImageProcesses_imageId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ImageID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ImageProcesses_imageId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImageProcesses",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ImageProcesses_processes(ctx context.Context, field graphql.CollectedField, obj *model.ImageProcesses) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImageProcesses_processes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Processes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ImageProcess)
+	fc.Result = res
+	return ec.marshalNImageProcess2ᚕᚖwswᚋbackendᚋgraphᚋmodelᚐImageProcessᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ImageProcesses_processes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImageProcesses",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "type":
+				return ec.fieldContext_ImageProcess_type(ctx, field)
+			case "options":
+				return ec.fieldContext_ImageProcess_options(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ImageProcess", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ImageProcesses_status(ctx context.Context, field graphql.CollectedField, obj *model.ImageProcesses) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImageProcesses_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.Status)
+	fc.Result = res
+	return ec.marshalNStatus2wswᚋbackendᚋgraphᚋmodelᚐStatus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ImageProcesses_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImageProcesses",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Status does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ImageProcesses_error(ctx context.Context, field graphql.CollectedField, obj *model.ImageProcesses) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImageProcesses_error(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Error, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ImageProcesses_error(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImageProcesses",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createToken(ctx, field)
 	if err != nil {
@@ -834,6 +1368,68 @@ func (ec *executionContext) fieldContext_Mutation_upload(ctx context.Context, fi
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_upload_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_processImage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_processImage(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().ProcessImage(rctx, fc.Args["token"].(string), fc.Args["imageId"].(int), fc.Args["processes"].([]*model.ImageProcessesInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ImageProcesses)
+	fc.Result = res
+	return ec.marshalOImageProcesses2ᚖwswᚋbackendᚋgraphᚋmodelᚐImageProcesses(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_processImage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "imageId":
+				return ec.fieldContext_ImageProcesses_imageId(ctx, field)
+			case "processes":
+				return ec.fieldContext_ImageProcesses_processes(ctx, field)
+			case "status":
+				return ec.fieldContext_ImageProcesses_status(ctx, field)
+			case "error":
+				return ec.fieldContext_ImageProcesses_error(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ImageProcesses", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_processImage_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -3291,6 +3887,74 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(_ context.Context
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputImageProcessOptionInput(ctx context.Context, obj interface{}) (model.ImageProcessOptionInput, error) {
+	var it model.ImageProcessOptionInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"key", "value"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "key":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("key"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Key = data
+		case "value":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("value"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Value = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputImageProcessesInput(ctx context.Context, obj interface{}) (model.ImageProcessesInput, error) {
+	var it model.ImageProcessesInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"type", "options"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "type":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+			data, err := ec.unmarshalNImageProcessType2wswᚋbackendᚋgraphᚋmodelᚐImageProcessType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Type = data
+		case "options":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
+			data, err := ec.unmarshalNImageProcessOptionInput2ᚕᚖwswᚋbackendᚋgraphᚋmodelᚐImageProcessOptionInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Options = data
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -3298,6 +3962,142 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(_ context.Context
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
+
+var imageProcessImplementors = []string{"ImageProcess"}
+
+func (ec *executionContext) _ImageProcess(ctx context.Context, sel ast.SelectionSet, obj *model.ImageProcess) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, imageProcessImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ImageProcess")
+		case "type":
+			out.Values[i] = ec._ImageProcess_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "options":
+			out.Values[i] = ec._ImageProcess_options(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var imageProcessOptionImplementors = []string{"ImageProcessOption"}
+
+func (ec *executionContext) _ImageProcessOption(ctx context.Context, sel ast.SelectionSet, obj *model.ImageProcessOption) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, imageProcessOptionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ImageProcessOption")
+		case "key":
+			out.Values[i] = ec._ImageProcessOption_key(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "value":
+			out.Values[i] = ec._ImageProcessOption_value(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var imageProcessesImplementors = []string{"ImageProcesses"}
+
+func (ec *executionContext) _ImageProcesses(ctx context.Context, sel ast.SelectionSet, obj *model.ImageProcesses) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, imageProcessesImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ImageProcesses")
+		case "imageId":
+			out.Values[i] = ec._ImageProcesses_imageId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "processes":
+			out.Values[i] = ec._ImageProcesses_processes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "status":
+			out.Values[i] = ec._ImageProcesses_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "error":
+			out.Values[i] = ec._ImageProcesses_error(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
 
 var mutationImplementors = []string{"Mutation"}
 
@@ -3336,6 +4136,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "processImage":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_processImage(ctx, field)
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3897,6 +4701,168 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) marshalNImageProcess2ᚕᚖwswᚋbackendᚋgraphᚋmodelᚐImageProcessᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ImageProcess) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNImageProcess2ᚖwswᚋbackendᚋgraphᚋmodelᚐImageProcess(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNImageProcess2ᚖwswᚋbackendᚋgraphᚋmodelᚐImageProcess(ctx context.Context, sel ast.SelectionSet, v *model.ImageProcess) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ImageProcess(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNImageProcessOption2ᚕᚖwswᚋbackendᚋgraphᚋmodelᚐImageProcessOptionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ImageProcessOption) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNImageProcessOption2ᚖwswᚋbackendᚋgraphᚋmodelᚐImageProcessOption(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNImageProcessOption2ᚖwswᚋbackendᚋgraphᚋmodelᚐImageProcessOption(ctx context.Context, sel ast.SelectionSet, v *model.ImageProcessOption) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ImageProcessOption(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNImageProcessOptionInput2ᚕᚖwswᚋbackendᚋgraphᚋmodelᚐImageProcessOptionInputᚄ(ctx context.Context, v interface{}) ([]*model.ImageProcessOptionInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ImageProcessOptionInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNImageProcessOptionInput2ᚖwswᚋbackendᚋgraphᚋmodelᚐImageProcessOptionInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNImageProcessOptionInput2ᚖwswᚋbackendᚋgraphᚋmodelᚐImageProcessOptionInput(ctx context.Context, v interface{}) (*model.ImageProcessOptionInput, error) {
+	res, err := ec.unmarshalInputImageProcessOptionInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNImageProcessType2wswᚋbackendᚋgraphᚋmodelᚐImageProcessType(ctx context.Context, v interface{}) (model.ImageProcessType, error) {
+	var res model.ImageProcessType
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNImageProcessType2wswᚋbackendᚋgraphᚋmodelᚐImageProcessType(ctx context.Context, sel ast.SelectionSet, v model.ImageProcessType) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalNImageProcessesInput2ᚕᚖwswᚋbackendᚋgraphᚋmodelᚐImageProcessesInputᚄ(ctx context.Context, v interface{}) ([]*model.ImageProcessesInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ImageProcessesInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNImageProcessesInput2ᚖwswᚋbackendᚋgraphᚋmodelᚐImageProcessesInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNImageProcessesInput2ᚖwswᚋbackendᚋgraphᚋmodelᚐImageProcessesInput(ctx context.Context, v interface{}) (*model.ImageProcessesInput, error) {
+	res, err := ec.unmarshalInputImageProcessesInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
 	res, err := graphql.UnmarshalInt(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4321,6 +5287,13 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOImageProcesses2ᚖwswᚋbackendᚋgraphᚋmodelᚐImageProcesses(ctx context.Context, sel ast.SelectionSet, v *model.ImageProcesses) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ImageProcesses(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOPreviewData2ᚖwswᚋbackendᚋgraphᚋmodelᚐPreviewData(ctx context.Context, sel ast.SelectionSet, v *model.PreviewData) graphql.Marshaler {

@@ -2,15 +2,6 @@
 #
 # https://gqlgen.com/getting-started/
 
-type PreviewData {
-  id: Int!
-  url: String!
-  status: Status!
-  image: String!
-  error: String
-  title: String
-}
-
 type Query {
   getPreviewData(token: String!, url: String!): PreviewData
   verifyToken(token: String!): Boolean
@@ -21,6 +12,11 @@ type Mutation {
   addUrl(token: String!, url: String!): PreviewData
 
   upload(token: String!, images: [Upload!]!): [UploadImageStatus!]!
+  processImage(
+    token: String!
+    imageId: Int!
+    processes: [ImageProcessesInput!]!
+  ): ImageProcesses
 }
 
 enum Status {
@@ -28,12 +24,46 @@ enum Status {
   error
   pending
 }
+enum ImageProcessType {
+  resize
+}
 
+type PreviewData {
+  id: Int!
+  url: String!
+  status: Status!
+  image: String!
+  error: String
+  title: String
+}
 type UploadImageStatus {
   id: Int!
   name: String!
   status: Status!
   error: String
+}
+type ImageProcessOption {
+  key: String!
+  value: String
+}
+type ImageProcess {
+  type: ImageProcessType!
+  options: [ImageProcessOption!]!
+}
+type ImageProcesses {
+  imageId: Int!
+  processes: [ImageProcess!]!
+  status: Status!
+  error: String
+}
+
+input ImageProcessOptionInput {
+  key: String!
+  value: String
+}
+input ImageProcessesInput {
+  type: ImageProcessType!
+  options: [ImageProcessOptionInput!]!
 }
 
 scalar Upload

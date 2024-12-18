@@ -5,7 +5,7 @@ import (
 
 	"wsw/backend/graph/model"
 	"wsw/backend/lib/utils"
-	"wsw/backend/model/upload"
+	"wsw/backend/model/image"
 )
 
 type (
@@ -14,11 +14,11 @@ type (
 	}
 
 	resolverImpl struct {
-		imagesModel upload.UploadImage
+		imagesModel image.UploadedImage
 	}
 )
 
-func NewProcessResolver(imagesModel upload.UploadImage) Resolver {
+func NewProcessResolver(imagesModel image.UploadedImage) Resolver {
 	return resolverImpl{imagesModel: imagesModel}
 }
 

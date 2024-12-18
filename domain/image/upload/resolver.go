@@ -7,7 +7,7 @@ import (
 	"wsw/backend/domain/image/upload/storage"
 	"wsw/backend/ent"
 	"wsw/backend/graph/model"
-	"wsw/backend/model/upload"
+	"wsw/backend/model/image"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/xorcare/pointer"
@@ -20,12 +20,12 @@ type (
 		Resolve(context.Context, []*graphql.Upload) ([]*model.UploadImageStatus, error)
 	}
 	resolverImpl struct {
-		model   upload.UploadImage
+		model   image.UploadedImage
 		storage storage.Storage
 	}
 )
 
-func NewUploadResolver(model upload.UploadImage, storage storage.Storage) Resolver {
+func NewUploadResolver(model image.UploadedImage, storage storage.Storage) Resolver {
 	return resolverImpl{model: model, storage: storage}
 }
 

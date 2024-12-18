@@ -21,7 +21,7 @@ import (
 	"wsw/backend/model/url"
 
 	domainStorage "wsw/backend/domain/image/upload/storage"
-	uploadModel "wsw/backend/model/upload"
+	imageModel "wsw/backend/model/image"
 
 	"github.com/getsentry/sentry-go"
 	sentryhttp "github.com/getsentry/sentry-go/http"
@@ -123,10 +123,10 @@ func initDomains(config config.Config) {
 }
 
 func initResolvers() {
-	initService(func(model uploadModel.UploadImage, storage domainStorage.Storage) upload.Resolver {
+	initService(func(model imageModel.UploadedImage, storage domainStorage.Storage) upload.Resolver {
 		return upload.NewUploadResolver(model, storage)
 	})
-	initService(func(model uploadModel.UploadImage) process.Resolver {
+	initService(func(model imageModel.UploadedImage) process.Resolver {
 		return process.NewProcessResolver(model)
 	})
 }
@@ -139,8 +139,8 @@ func initModels() {
 		return url.NewUrl(urlRepository, client, provider)
 	})
 
-	initService(func(uploadRepository repository.UploadImageRepository) uploadModel.UploadImage {
-		return uploadModel.NewModel(uploadRepository)
+	initService(func(uploadRepository repository.UploadImageRepository) imageModel.UploadedImage {
+		return imageModel.NewModel(uploadRepository)
 	})
 }
 

@@ -7,7 +7,6 @@ package graph
 import (
 	"context"
 	"errors"
-	"fmt"
 	"wsw/backend/domain/image/process"
 	"wsw/backend/domain/image/upload"
 	"wsw/backend/graph/convertor"
@@ -105,7 +104,6 @@ func (r *mutationResolver) ProcessImage(ctx context.Context, token string, image
 		return nil, errors.New("invalid token")
 	}
 	return resolver.Resolve(ctx, imageID, processes)
-	panic(fmt.Errorf("not implemented: ProcessImage - processImage"))
 }
 
 // GetPreviewData is the resolver for the getPreviewData field.

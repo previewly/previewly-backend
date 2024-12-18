@@ -8,6 +8,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
+	"wsw/backend/domain/image/process"
 	"wsw/backend/domain/upload"
 	"wsw/backend/graph/convertor"
 	"wsw/backend/graph/model"
@@ -81,6 +83,29 @@ func (r *mutationResolver) Upload(ctx context.Context, token string, images []*g
 
 // ProcessImage is the resolver for the processImage field.
 func (r *mutationResolver) ProcessImage(ctx context.Context, token string, imageID int, processes []*model.ImageProcessesInput) (*model.ImageProcesses, error) {
+	var resolver process.Resolver
+	err := container.Resolve(&resolver)
+	if err != nil {
+		utils.F("Couldnt resolve Image Process Resolver: %v", err)
+		return nil, err
+	}
+	var tokenModelImpl tokenModel.Token
+	var urlModelImpl urlModel.Url
+
+	errTokenModel := container.Resolve(&tokenModelImpl)
+	errURLModel := container.Resolve(&urlModelImpl)
+
+	if errURLModel != nil {
+		return nil, errTokenModel
+	}
+	if errTokenModel != nil {
+		return nil, errTokenModel
+	}
+
+	if !tokenModelImpl.IsTokenExist(token) {
+		return nil, errors.New("invalid token")
+	}
+	return resolver.Resolve(ctx, imageID, processes)
 	panic(fmt.Errorf("not implemented: ProcessImage - processImage"))
 }
 
@@ -90,9 +115,9 @@ func (r *queryResolver) GetPreviewData(ctx context.Context, token string, url st
 	var urlModelImpl urlModel.Url
 
 	errTokenModel := container.Resolve(&tokenModelImpl)
-	errUrlModel := container.Resolve(&urlModelImpl)
+	errURLModel := container.Resolve(&urlModelImpl)
 
-	if errUrlModel != nil {
+	if errURLModel != nil {
 		return nil, errTokenModel
 	}
 	if errTokenModel != nil {
@@ -127,5 +152,7 @@ func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
-type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }
+type (
+	mutationResolver struct{ *Resolver }
+	queryResolver    struct{ *Resolver }
+)

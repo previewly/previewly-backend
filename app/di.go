@@ -8,6 +8,7 @@ import (
 
 	"wsw/backend/app/config"
 	"wsw/backend/domain/gowitness"
+	"wsw/backend/domain/image/process"
 	"wsw/backend/domain/path/screenshot/relative"
 	"wsw/backend/domain/token/generator"
 	"wsw/backend/domain/upload"
@@ -124,6 +125,9 @@ func initDomains(config config.Config) {
 func initResolvers() {
 	initService(func(model uploadModel.UploadImage, storage domainStorage.Storage) upload.Resolver {
 		return upload.NewUploadResolver(model, storage)
+	})
+	initService(func() process.Resolver {
+		return process.NewProcessResolver()
 	})
 }
 

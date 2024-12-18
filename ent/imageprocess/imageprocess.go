@@ -17,14 +17,16 @@ const (
 	FieldID = "id"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
-	// FieldProcess holds the string denoting the process field in the database.
-	FieldProcess = "process"
-	// FieldProcessOptions holds the string denoting the process_options field in the database.
-	FieldProcessOptions = "process_options"
+	// FieldProcesses holds the string denoting the processes field in the database.
+	FieldProcesses = "processes"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldPathPrefix holds the string denoting the path_prefix field in the database.
+	FieldPathPrefix = "path_prefix"
+	// FieldError holds the string denoting the error field in the database.
+	FieldError = "error"
 	// Table holds the table name of the imageprocess in the database.
 	Table = "image_processes"
 )
@@ -33,10 +35,11 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldStatus,
-	FieldProcess,
-	FieldProcessOptions,
+	FieldProcesses,
 	FieldCreatedAt,
 	FieldUpdatedAt,
+	FieldPathPrefix,
+	FieldError,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "image_processes"
@@ -79,16 +82,6 @@ func StatusValidator(s types.StatusEnum) error {
 	}
 }
 
-// ProcessValidator is a validator for the "process" field enum values. It is called by the builders before save.
-func ProcessValidator(pr types.ImageProcess) error {
-	switch pr {
-	case "resize":
-		return nil
-	default:
-		return fmt.Errorf("imageprocess: invalid enum value for process field: %q", pr)
-	}
-}
-
 // OrderOption defines the ordering options for the ImageProcess queries.
 type OrderOption func(*sql.Selector)
 
@@ -102,11 +95,6 @@ func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }
 
-// ByProcess orders the results by the process field.
-func ByProcess(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldProcess, opts...).ToFunc()
-}
-
 // ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
@@ -115,4 +103,14 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByUpdatedAt orders the results by the updated_at field.
 func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByPathPrefix orders the results by the path_prefix field.
+func ByPathPrefix(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPathPrefix, opts...).ToFunc()
+}
+
+// ByError orders the results by the error field.
+func ByError(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldError, opts...).ToFunc()
 }

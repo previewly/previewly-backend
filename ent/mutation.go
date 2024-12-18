@@ -443,19 +443,20 @@ func (m *ErrorResultMutation) ResetEdge(name string) error {
 // ImageProcessMutation represents an operation that mutates the ImageProcess nodes in the graph.
 type ImageProcessMutation struct {
 	config
-	op                    Op
-	typ                   string
-	id                    *int
-	status                *types.StatusEnum
-	process               *types.ImageProcess
-	process_options       *[]types.ImageProcessOptions
-	appendprocess_options []types.ImageProcessOptions
-	created_at            *time.Time
-	updated_at            *time.Time
-	clearedFields         map[string]struct{}
-	done                  bool
-	oldValue              func(context.Context) (*ImageProcess, error)
-	predicates            []predicate.ImageProcess
+	op              Op
+	typ             string
+	id              *int
+	status          *types.StatusEnum
+	processes       *[]types.ImageProcess
+	appendprocesses []types.ImageProcess
+	created_at      *time.Time
+	updated_at      *time.Time
+	path_prefix     *string
+	error           *string
+	clearedFields   map[string]struct{}
+	done            bool
+	oldValue        func(context.Context) (*ImageProcess, error)
+	predicates      []predicate.ImageProcess
 }
 
 var _ ent.Mutation = (*ImageProcessMutation)(nil)
@@ -592,91 +593,55 @@ func (m *ImageProcessMutation) ResetStatus() {
 	m.status = nil
 }
 
-// SetProcess sets the "process" field.
-func (m *ImageProcessMutation) SetProcess(tp types.ImageProcess) {
-	m.process = &tp
+// SetProcesses sets the "processes" field.
+func (m *ImageProcessMutation) SetProcesses(tp []types.ImageProcess) {
+	m.processes = &tp
+	m.appendprocesses = nil
 }
 
-// Process returns the value of the "process" field in the mutation.
-func (m *ImageProcessMutation) Process() (r types.ImageProcess, exists bool) {
-	v := m.process
+// Processes returns the value of the "processes" field in the mutation.
+func (m *ImageProcessMutation) Processes() (r []types.ImageProcess, exists bool) {
+	v := m.processes
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldProcess returns the old "process" field's value of the ImageProcess entity.
+// OldProcesses returns the old "processes" field's value of the ImageProcess entity.
 // If the ImageProcess object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ImageProcessMutation) OldProcess(ctx context.Context) (v types.ImageProcess, err error) {
+func (m *ImageProcessMutation) OldProcesses(ctx context.Context) (v []types.ImageProcess, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldProcess is only allowed on UpdateOne operations")
+		return v, errors.New("OldProcesses is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldProcess requires an ID field in the mutation")
+		return v, errors.New("OldProcesses requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldProcess: %w", err)
+		return v, fmt.Errorf("querying old value for OldProcesses: %w", err)
 	}
-	return oldValue.Process, nil
+	return oldValue.Processes, nil
 }
 
-// ResetProcess resets all changes to the "process" field.
-func (m *ImageProcessMutation) ResetProcess() {
-	m.process = nil
+// AppendProcesses adds tp to the "processes" field.
+func (m *ImageProcessMutation) AppendProcesses(tp []types.ImageProcess) {
+	m.appendprocesses = append(m.appendprocesses, tp...)
 }
 
-// SetProcessOptions sets the "process_options" field.
-func (m *ImageProcessMutation) SetProcessOptions(tpo []types.ImageProcessOptions) {
-	m.process_options = &tpo
-	m.appendprocess_options = nil
-}
-
-// ProcessOptions returns the value of the "process_options" field in the mutation.
-func (m *ImageProcessMutation) ProcessOptions() (r []types.ImageProcessOptions, exists bool) {
-	v := m.process_options
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldProcessOptions returns the old "process_options" field's value of the ImageProcess entity.
-// If the ImageProcess object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ImageProcessMutation) OldProcessOptions(ctx context.Context) (v []types.ImageProcessOptions, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldProcessOptions is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldProcessOptions requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldProcessOptions: %w", err)
-	}
-	return oldValue.ProcessOptions, nil
-}
-
-// AppendProcessOptions adds tpo to the "process_options" field.
-func (m *ImageProcessMutation) AppendProcessOptions(tpo []types.ImageProcessOptions) {
-	m.appendprocess_options = append(m.appendprocess_options, tpo...)
-}
-
-// AppendedProcessOptions returns the list of values that were appended to the "process_options" field in this mutation.
-func (m *ImageProcessMutation) AppendedProcessOptions() ([]types.ImageProcessOptions, bool) {
-	if len(m.appendprocess_options) == 0 {
+// AppendedProcesses returns the list of values that were appended to the "processes" field in this mutation.
+func (m *ImageProcessMutation) AppendedProcesses() ([]types.ImageProcess, bool) {
+	if len(m.appendprocesses) == 0 {
 		return nil, false
 	}
-	return m.appendprocess_options, true
+	return m.appendprocesses, true
 }
 
-// ResetProcessOptions resets all changes to the "process_options" field.
-func (m *ImageProcessMutation) ResetProcessOptions() {
-	m.process_options = nil
-	m.appendprocess_options = nil
+// ResetProcesses resets all changes to the "processes" field.
+func (m *ImageProcessMutation) ResetProcesses() {
+	m.processes = nil
+	m.appendprocesses = nil
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -751,6 +716,104 @@ func (m *ImageProcessMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
+// SetPathPrefix sets the "path_prefix" field.
+func (m *ImageProcessMutation) SetPathPrefix(s string) {
+	m.path_prefix = &s
+}
+
+// PathPrefix returns the value of the "path_prefix" field in the mutation.
+func (m *ImageProcessMutation) PathPrefix() (r string, exists bool) {
+	v := m.path_prefix
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPathPrefix returns the old "path_prefix" field's value of the ImageProcess entity.
+// If the ImageProcess object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ImageProcessMutation) OldPathPrefix(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPathPrefix is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPathPrefix requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPathPrefix: %w", err)
+	}
+	return oldValue.PathPrefix, nil
+}
+
+// ClearPathPrefix clears the value of the "path_prefix" field.
+func (m *ImageProcessMutation) ClearPathPrefix() {
+	m.path_prefix = nil
+	m.clearedFields[imageprocess.FieldPathPrefix] = struct{}{}
+}
+
+// PathPrefixCleared returns if the "path_prefix" field was cleared in this mutation.
+func (m *ImageProcessMutation) PathPrefixCleared() bool {
+	_, ok := m.clearedFields[imageprocess.FieldPathPrefix]
+	return ok
+}
+
+// ResetPathPrefix resets all changes to the "path_prefix" field.
+func (m *ImageProcessMutation) ResetPathPrefix() {
+	m.path_prefix = nil
+	delete(m.clearedFields, imageprocess.FieldPathPrefix)
+}
+
+// SetError sets the "error" field.
+func (m *ImageProcessMutation) SetError(s string) {
+	m.error = &s
+}
+
+// Error returns the value of the "error" field in the mutation.
+func (m *ImageProcessMutation) Error() (r string, exists bool) {
+	v := m.error
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldError returns the old "error" field's value of the ImageProcess entity.
+// If the ImageProcess object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ImageProcessMutation) OldError(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldError is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldError requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldError: %w", err)
+	}
+	return oldValue.Error, nil
+}
+
+// ClearError clears the value of the "error" field.
+func (m *ImageProcessMutation) ClearError() {
+	m.error = nil
+	m.clearedFields[imageprocess.FieldError] = struct{}{}
+}
+
+// ErrorCleared returns if the "error" field was cleared in this mutation.
+func (m *ImageProcessMutation) ErrorCleared() bool {
+	_, ok := m.clearedFields[imageprocess.FieldError]
+	return ok
+}
+
+// ResetError resets all changes to the "error" field.
+func (m *ImageProcessMutation) ResetError() {
+	m.error = nil
+	delete(m.clearedFields, imageprocess.FieldError)
+}
+
 // Where appends a list predicates to the ImageProcessMutation builder.
 func (m *ImageProcessMutation) Where(ps ...predicate.ImageProcess) {
 	m.predicates = append(m.predicates, ps...)
@@ -785,21 +848,24 @@ func (m *ImageProcessMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ImageProcessMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.status != nil {
 		fields = append(fields, imageprocess.FieldStatus)
 	}
-	if m.process != nil {
-		fields = append(fields, imageprocess.FieldProcess)
-	}
-	if m.process_options != nil {
-		fields = append(fields, imageprocess.FieldProcessOptions)
+	if m.processes != nil {
+		fields = append(fields, imageprocess.FieldProcesses)
 	}
 	if m.created_at != nil {
 		fields = append(fields, imageprocess.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, imageprocess.FieldUpdatedAt)
+	}
+	if m.path_prefix != nil {
+		fields = append(fields, imageprocess.FieldPathPrefix)
+	}
+	if m.error != nil {
+		fields = append(fields, imageprocess.FieldError)
 	}
 	return fields
 }
@@ -811,14 +877,16 @@ func (m *ImageProcessMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case imageprocess.FieldStatus:
 		return m.Status()
-	case imageprocess.FieldProcess:
-		return m.Process()
-	case imageprocess.FieldProcessOptions:
-		return m.ProcessOptions()
+	case imageprocess.FieldProcesses:
+		return m.Processes()
 	case imageprocess.FieldCreatedAt:
 		return m.CreatedAt()
 	case imageprocess.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case imageprocess.FieldPathPrefix:
+		return m.PathPrefix()
+	case imageprocess.FieldError:
+		return m.Error()
 	}
 	return nil, false
 }
@@ -830,14 +898,16 @@ func (m *ImageProcessMutation) OldField(ctx context.Context, name string) (ent.V
 	switch name {
 	case imageprocess.FieldStatus:
 		return m.OldStatus(ctx)
-	case imageprocess.FieldProcess:
-		return m.OldProcess(ctx)
-	case imageprocess.FieldProcessOptions:
-		return m.OldProcessOptions(ctx)
+	case imageprocess.FieldProcesses:
+		return m.OldProcesses(ctx)
 	case imageprocess.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case imageprocess.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case imageprocess.FieldPathPrefix:
+		return m.OldPathPrefix(ctx)
+	case imageprocess.FieldError:
+		return m.OldError(ctx)
 	}
 	return nil, fmt.Errorf("unknown ImageProcess field %s", name)
 }
@@ -854,19 +924,12 @@ func (m *ImageProcessMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetStatus(v)
 		return nil
-	case imageprocess.FieldProcess:
-		v, ok := value.(types.ImageProcess)
+	case imageprocess.FieldProcesses:
+		v, ok := value.([]types.ImageProcess)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetProcess(v)
-		return nil
-	case imageprocess.FieldProcessOptions:
-		v, ok := value.([]types.ImageProcessOptions)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetProcessOptions(v)
+		m.SetProcesses(v)
 		return nil
 	case imageprocess.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -881,6 +944,20 @@ func (m *ImageProcessMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
+		return nil
+	case imageprocess.FieldPathPrefix:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPathPrefix(v)
+		return nil
+	case imageprocess.FieldError:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetError(v)
 		return nil
 	}
 	return fmt.Errorf("unknown ImageProcess field %s", name)
@@ -911,7 +988,14 @@ func (m *ImageProcessMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *ImageProcessMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(imageprocess.FieldPathPrefix) {
+		fields = append(fields, imageprocess.FieldPathPrefix)
+	}
+	if m.FieldCleared(imageprocess.FieldError) {
+		fields = append(fields, imageprocess.FieldError)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -924,6 +1008,14 @@ func (m *ImageProcessMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *ImageProcessMutation) ClearField(name string) error {
+	switch name {
+	case imageprocess.FieldPathPrefix:
+		m.ClearPathPrefix()
+		return nil
+	case imageprocess.FieldError:
+		m.ClearError()
+		return nil
+	}
 	return fmt.Errorf("unknown ImageProcess nullable field %s", name)
 }
 
@@ -934,17 +1026,20 @@ func (m *ImageProcessMutation) ResetField(name string) error {
 	case imageprocess.FieldStatus:
 		m.ResetStatus()
 		return nil
-	case imageprocess.FieldProcess:
-		m.ResetProcess()
-		return nil
-	case imageprocess.FieldProcessOptions:
-		m.ResetProcessOptions()
+	case imageprocess.FieldProcesses:
+		m.ResetProcesses()
 		return nil
 	case imageprocess.FieldCreatedAt:
 		m.ResetCreatedAt()
 		return nil
 	case imageprocess.FieldUpdatedAt:
 		m.ResetUpdatedAt()
+		return nil
+	case imageprocess.FieldPathPrefix:
+		m.ResetPathPrefix()
+		return nil
+	case imageprocess.FieldError:
+		m.ResetError()
 		return nil
 	}
 	return fmt.Errorf("unknown ImageProcess field %s", name)

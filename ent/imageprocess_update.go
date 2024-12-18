@@ -44,29 +44,15 @@ func (ipu *ImageProcessUpdate) SetNillableStatus(te *types.StatusEnum) *ImagePro
 	return ipu
 }
 
-// SetProcess sets the "process" field.
-func (ipu *ImageProcessUpdate) SetProcess(tp types.ImageProcess) *ImageProcessUpdate {
-	ipu.mutation.SetProcess(tp)
+// SetProcesses sets the "processes" field.
+func (ipu *ImageProcessUpdate) SetProcesses(tp []types.ImageProcess) *ImageProcessUpdate {
+	ipu.mutation.SetProcesses(tp)
 	return ipu
 }
 
-// SetNillableProcess sets the "process" field if the given value is not nil.
-func (ipu *ImageProcessUpdate) SetNillableProcess(tp *types.ImageProcess) *ImageProcessUpdate {
-	if tp != nil {
-		ipu.SetProcess(*tp)
-	}
-	return ipu
-}
-
-// SetProcessOptions sets the "process_options" field.
-func (ipu *ImageProcessUpdate) SetProcessOptions(tpo []types.ImageProcessOptions) *ImageProcessUpdate {
-	ipu.mutation.SetProcessOptions(tpo)
-	return ipu
-}
-
-// AppendProcessOptions appends tpo to the "process_options" field.
-func (ipu *ImageProcessUpdate) AppendProcessOptions(tpo []types.ImageProcessOptions) *ImageProcessUpdate {
-	ipu.mutation.AppendProcessOptions(tpo)
+// AppendProcesses appends tp to the "processes" field.
+func (ipu *ImageProcessUpdate) AppendProcesses(tp []types.ImageProcess) *ImageProcessUpdate {
+	ipu.mutation.AppendProcesses(tp)
 	return ipu
 }
 
@@ -87,6 +73,46 @@ func (ipu *ImageProcessUpdate) SetNillableCreatedAt(t *time.Time) *ImageProcessU
 // SetUpdatedAt sets the "updated_at" field.
 func (ipu *ImageProcessUpdate) SetUpdatedAt(t time.Time) *ImageProcessUpdate {
 	ipu.mutation.SetUpdatedAt(t)
+	return ipu
+}
+
+// SetPathPrefix sets the "path_prefix" field.
+func (ipu *ImageProcessUpdate) SetPathPrefix(s string) *ImageProcessUpdate {
+	ipu.mutation.SetPathPrefix(s)
+	return ipu
+}
+
+// SetNillablePathPrefix sets the "path_prefix" field if the given value is not nil.
+func (ipu *ImageProcessUpdate) SetNillablePathPrefix(s *string) *ImageProcessUpdate {
+	if s != nil {
+		ipu.SetPathPrefix(*s)
+	}
+	return ipu
+}
+
+// ClearPathPrefix clears the value of the "path_prefix" field.
+func (ipu *ImageProcessUpdate) ClearPathPrefix() *ImageProcessUpdate {
+	ipu.mutation.ClearPathPrefix()
+	return ipu
+}
+
+// SetError sets the "error" field.
+func (ipu *ImageProcessUpdate) SetError(s string) *ImageProcessUpdate {
+	ipu.mutation.SetError(s)
+	return ipu
+}
+
+// SetNillableError sets the "error" field if the given value is not nil.
+func (ipu *ImageProcessUpdate) SetNillableError(s *string) *ImageProcessUpdate {
+	if s != nil {
+		ipu.SetError(*s)
+	}
+	return ipu
+}
+
+// ClearError clears the value of the "error" field.
+func (ipu *ImageProcessUpdate) ClearError() *ImageProcessUpdate {
+	ipu.mutation.ClearError()
 	return ipu
 }
 
@@ -138,11 +164,6 @@ func (ipu *ImageProcessUpdate) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "ImageProcess.status": %w`, err)}
 		}
 	}
-	if v, ok := ipu.mutation.Process(); ok {
-		if err := imageprocess.ProcessValidator(v); err != nil {
-			return &ValidationError{Name: "process", err: fmt.Errorf(`ent: validator failed for field "ImageProcess.process": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -161,15 +182,12 @@ func (ipu *ImageProcessUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := ipu.mutation.Status(); ok {
 		_spec.SetField(imageprocess.FieldStatus, field.TypeEnum, value)
 	}
-	if value, ok := ipu.mutation.Process(); ok {
-		_spec.SetField(imageprocess.FieldProcess, field.TypeEnum, value)
+	if value, ok := ipu.mutation.Processes(); ok {
+		_spec.SetField(imageprocess.FieldProcesses, field.TypeJSON, value)
 	}
-	if value, ok := ipu.mutation.ProcessOptions(); ok {
-		_spec.SetField(imageprocess.FieldProcessOptions, field.TypeJSON, value)
-	}
-	if value, ok := ipu.mutation.AppendedProcessOptions(); ok {
+	if value, ok := ipu.mutation.AppendedProcesses(); ok {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, imageprocess.FieldProcessOptions, value)
+			sqljson.Append(u, imageprocess.FieldProcesses, value)
 		})
 	}
 	if value, ok := ipu.mutation.CreatedAt(); ok {
@@ -177,6 +195,18 @@ func (ipu *ImageProcessUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := ipu.mutation.UpdatedAt(); ok {
 		_spec.SetField(imageprocess.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := ipu.mutation.PathPrefix(); ok {
+		_spec.SetField(imageprocess.FieldPathPrefix, field.TypeString, value)
+	}
+	if ipu.mutation.PathPrefixCleared() {
+		_spec.ClearField(imageprocess.FieldPathPrefix, field.TypeString)
+	}
+	if value, ok := ipu.mutation.Error(); ok {
+		_spec.SetField(imageprocess.FieldError, field.TypeString, value)
+	}
+	if ipu.mutation.ErrorCleared() {
+		_spec.ClearField(imageprocess.FieldError, field.TypeString)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, ipu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -212,29 +242,15 @@ func (ipuo *ImageProcessUpdateOne) SetNillableStatus(te *types.StatusEnum) *Imag
 	return ipuo
 }
 
-// SetProcess sets the "process" field.
-func (ipuo *ImageProcessUpdateOne) SetProcess(tp types.ImageProcess) *ImageProcessUpdateOne {
-	ipuo.mutation.SetProcess(tp)
+// SetProcesses sets the "processes" field.
+func (ipuo *ImageProcessUpdateOne) SetProcesses(tp []types.ImageProcess) *ImageProcessUpdateOne {
+	ipuo.mutation.SetProcesses(tp)
 	return ipuo
 }
 
-// SetNillableProcess sets the "process" field if the given value is not nil.
-func (ipuo *ImageProcessUpdateOne) SetNillableProcess(tp *types.ImageProcess) *ImageProcessUpdateOne {
-	if tp != nil {
-		ipuo.SetProcess(*tp)
-	}
-	return ipuo
-}
-
-// SetProcessOptions sets the "process_options" field.
-func (ipuo *ImageProcessUpdateOne) SetProcessOptions(tpo []types.ImageProcessOptions) *ImageProcessUpdateOne {
-	ipuo.mutation.SetProcessOptions(tpo)
-	return ipuo
-}
-
-// AppendProcessOptions appends tpo to the "process_options" field.
-func (ipuo *ImageProcessUpdateOne) AppendProcessOptions(tpo []types.ImageProcessOptions) *ImageProcessUpdateOne {
-	ipuo.mutation.AppendProcessOptions(tpo)
+// AppendProcesses appends tp to the "processes" field.
+func (ipuo *ImageProcessUpdateOne) AppendProcesses(tp []types.ImageProcess) *ImageProcessUpdateOne {
+	ipuo.mutation.AppendProcesses(tp)
 	return ipuo
 }
 
@@ -255,6 +271,46 @@ func (ipuo *ImageProcessUpdateOne) SetNillableCreatedAt(t *time.Time) *ImageProc
 // SetUpdatedAt sets the "updated_at" field.
 func (ipuo *ImageProcessUpdateOne) SetUpdatedAt(t time.Time) *ImageProcessUpdateOne {
 	ipuo.mutation.SetUpdatedAt(t)
+	return ipuo
+}
+
+// SetPathPrefix sets the "path_prefix" field.
+func (ipuo *ImageProcessUpdateOne) SetPathPrefix(s string) *ImageProcessUpdateOne {
+	ipuo.mutation.SetPathPrefix(s)
+	return ipuo
+}
+
+// SetNillablePathPrefix sets the "path_prefix" field if the given value is not nil.
+func (ipuo *ImageProcessUpdateOne) SetNillablePathPrefix(s *string) *ImageProcessUpdateOne {
+	if s != nil {
+		ipuo.SetPathPrefix(*s)
+	}
+	return ipuo
+}
+
+// ClearPathPrefix clears the value of the "path_prefix" field.
+func (ipuo *ImageProcessUpdateOne) ClearPathPrefix() *ImageProcessUpdateOne {
+	ipuo.mutation.ClearPathPrefix()
+	return ipuo
+}
+
+// SetError sets the "error" field.
+func (ipuo *ImageProcessUpdateOne) SetError(s string) *ImageProcessUpdateOne {
+	ipuo.mutation.SetError(s)
+	return ipuo
+}
+
+// SetNillableError sets the "error" field if the given value is not nil.
+func (ipuo *ImageProcessUpdateOne) SetNillableError(s *string) *ImageProcessUpdateOne {
+	if s != nil {
+		ipuo.SetError(*s)
+	}
+	return ipuo
+}
+
+// ClearError clears the value of the "error" field.
+func (ipuo *ImageProcessUpdateOne) ClearError() *ImageProcessUpdateOne {
+	ipuo.mutation.ClearError()
 	return ipuo
 }
 
@@ -319,11 +375,6 @@ func (ipuo *ImageProcessUpdateOne) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "ImageProcess.status": %w`, err)}
 		}
 	}
-	if v, ok := ipuo.mutation.Process(); ok {
-		if err := imageprocess.ProcessValidator(v); err != nil {
-			return &ValidationError{Name: "process", err: fmt.Errorf(`ent: validator failed for field "ImageProcess.process": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -359,15 +410,12 @@ func (ipuo *ImageProcessUpdateOne) sqlSave(ctx context.Context) (_node *ImagePro
 	if value, ok := ipuo.mutation.Status(); ok {
 		_spec.SetField(imageprocess.FieldStatus, field.TypeEnum, value)
 	}
-	if value, ok := ipuo.mutation.Process(); ok {
-		_spec.SetField(imageprocess.FieldProcess, field.TypeEnum, value)
+	if value, ok := ipuo.mutation.Processes(); ok {
+		_spec.SetField(imageprocess.FieldProcesses, field.TypeJSON, value)
 	}
-	if value, ok := ipuo.mutation.ProcessOptions(); ok {
-		_spec.SetField(imageprocess.FieldProcessOptions, field.TypeJSON, value)
-	}
-	if value, ok := ipuo.mutation.AppendedProcessOptions(); ok {
+	if value, ok := ipuo.mutation.AppendedProcesses(); ok {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, imageprocess.FieldProcessOptions, value)
+			sqljson.Append(u, imageprocess.FieldProcesses, value)
 		})
 	}
 	if value, ok := ipuo.mutation.CreatedAt(); ok {
@@ -375,6 +423,18 @@ func (ipuo *ImageProcessUpdateOne) sqlSave(ctx context.Context) (_node *ImagePro
 	}
 	if value, ok := ipuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(imageprocess.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := ipuo.mutation.PathPrefix(); ok {
+		_spec.SetField(imageprocess.FieldPathPrefix, field.TypeString, value)
+	}
+	if ipuo.mutation.PathPrefixCleared() {
+		_spec.ClearField(imageprocess.FieldPathPrefix, field.TypeString)
+	}
+	if value, ok := ipuo.mutation.Error(); ok {
+		_spec.SetField(imageprocess.FieldError, field.TypeString, value)
+	}
+	if ipuo.mutation.ErrorCleared() {
+		_spec.ClearField(imageprocess.FieldError, field.TypeString)
 	}
 	_node = &ImageProcess{config: ipuo.config}
 	_spec.Assign = _node.assignValues

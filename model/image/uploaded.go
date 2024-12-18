@@ -1,4 +1,4 @@
-package upload
+package image
 
 import (
 	"wsw/backend/ent"
@@ -6,7 +6,7 @@ import (
 )
 
 type (
-	UploadImage interface {
+	UploadedImage interface {
 		Insert(string, string, string, string) (*ent.UploadImage, error)
 		GetByID(int) (*ent.UploadImage, error)
 	}
@@ -25,6 +25,6 @@ func (u uploadImpl) Insert(filename string, desctinationPath string, originalFil
 	return u.repository.Insert(filename, desctinationPath, originalFilename, filetype)
 }
 
-func NewModel(repository repository.UploadImageRepository) UploadImage {
+func NewModel(repository repository.UploadImageRepository) UploadedImage {
 	return uploadImpl{repository: repository}
 }

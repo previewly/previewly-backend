@@ -10,7 +10,7 @@ import (
 	"fmt"
 
 	"wsw/backend/domain/image/process"
-	"wsw/backend/domain/upload"
+	"wsw/backend/domain/image/upload"
 	"wsw/backend/graph/convertor"
 	"wsw/backend/graph/model"
 	"wsw/backend/lib/utils"

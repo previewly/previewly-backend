@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"wsw/backend/domain/upload/storage"
+	"wsw/backend/domain/image/upload/storage"
 	"wsw/backend/ent"
 	"wsw/backend/graph/model"
 	"wsw/backend/model/upload"

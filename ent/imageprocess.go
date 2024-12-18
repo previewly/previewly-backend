@@ -21,14 +21,16 @@ type ImageProcess struct {
 	ID int `json:"id,omitempty"`
 	// Status holds the value of the "status" field.
 	Status types.StatusEnum `json:"status,omitempty"`
-	// Process holds the value of the "process" field.
-	Process types.ImageProcess `json:"process,omitempty"`
-	// ProcessOptions holds the value of the "process_options" field.
-	ProcessOptions []types.ImageProcessOptions `json:"process_options,omitempty"`
+	// Processes holds the value of the "processes" field.
+	Processes []types.ImageProcess `json:"processes,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt                 time.Time `json:"updated_at,omitempty"`
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// PathPrefix holds the value of the "path_prefix" field.
+	PathPrefix string `json:"path_prefix,omitempty"`
+	// Error holds the value of the "error" field.
+	Error                     string `json:"error,omitempty"`
 	upload_image_imageprocess *int
 	selectValues              sql.SelectValues
 }
@@ -38,11 +40,11 @@ func (*ImageProcess) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case imageprocess.FieldProcessOptions:
+		case imageprocess.FieldProcesses:
 			values[i] = new([]byte)
 		case imageprocess.FieldID:
 			values[i] = new(sql.NullInt64)
-		case imageprocess.FieldStatus, imageprocess.FieldProcess:
+		case imageprocess.FieldStatus, imageprocess.FieldPathPrefix, imageprocess.FieldError:
 			values[i] = new(sql.NullString)
 		case imageprocess.FieldCreatedAt, imageprocess.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -75,18 +77,12 @@ func (ip *ImageProcess) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				ip.Status = types.StatusEnum(value.String)
 			}
-		case imageprocess.FieldProcess:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field process", values[i])
-			} else if value.Valid {
-				ip.Process = types.ImageProcess(value.String)
-			}
-		case imageprocess.FieldProcessOptions:
+		case imageprocess.FieldProcesses:
 			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field process_options", values[i])
+				return fmt.Errorf("unexpected type %T for field processes", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &ip.ProcessOptions); err != nil {
-					return fmt.Errorf("unmarshal field process_options: %w", err)
+				if err := json.Unmarshal(*value, &ip.Processes); err != nil {
+					return fmt.Errorf("unmarshal field processes: %w", err)
 				}
 			}
 		case imageprocess.FieldCreatedAt:
@@ -100,6 +96,18 @@ func (ip *ImageProcess) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				ip.UpdatedAt = value.Time
+			}
+		case imageprocess.FieldPathPrefix:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field path_prefix", values[i])
+			} else if value.Valid {
+				ip.PathPrefix = value.String
+			}
+		case imageprocess.FieldError:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field error", values[i])
+			} else if value.Valid {
+				ip.Error = value.String
 			}
 		case imageprocess.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -147,17 +155,20 @@ func (ip *ImageProcess) String() string {
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", ip.Status))
 	builder.WriteString(", ")
-	builder.WriteString("process=")
-	builder.WriteString(fmt.Sprintf("%v", ip.Process))
-	builder.WriteString(", ")
-	builder.WriteString("process_options=")
-	builder.WriteString(fmt.Sprintf("%v", ip.ProcessOptions))
+	builder.WriteString("processes=")
+	builder.WriteString(fmt.Sprintf("%v", ip.Processes))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(ip.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(ip.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("path_prefix=")
+	builder.WriteString(ip.PathPrefix)
+	builder.WriteString(", ")
+	builder.WriteString("error=")
+	builder.WriteString(ip.Error)
 	builder.WriteByte(')')
 	return builder.String()
 }

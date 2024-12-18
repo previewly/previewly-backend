@@ -65,6 +65,16 @@ func UpdatedAt(v time.Time) predicate.ImageProcess {
 	return predicate.ImageProcess(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
+// PathPrefix applies equality check predicate on the "path_prefix" field. It's identical to PathPrefixEQ.
+func PathPrefix(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldEQ(FieldPathPrefix, v))
+}
+
+// Error applies equality check predicate on the "error" field. It's identical to ErrorEQ.
+func Error(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldEQ(FieldError, v))
+}
+
 // StatusEQ applies the EQ predicate on the "status" field.
 func StatusEQ(v types.StatusEnum) predicate.ImageProcess {
 	vc := v
@@ -93,36 +103,6 @@ func StatusNotIn(vs ...types.StatusEnum) predicate.ImageProcess {
 		v[i] = vs[i]
 	}
 	return predicate.ImageProcess(sql.FieldNotIn(FieldStatus, v...))
-}
-
-// ProcessEQ applies the EQ predicate on the "process" field.
-func ProcessEQ(v types.ImageProcess) predicate.ImageProcess {
-	vc := v
-	return predicate.ImageProcess(sql.FieldEQ(FieldProcess, vc))
-}
-
-// ProcessNEQ applies the NEQ predicate on the "process" field.
-func ProcessNEQ(v types.ImageProcess) predicate.ImageProcess {
-	vc := v
-	return predicate.ImageProcess(sql.FieldNEQ(FieldProcess, vc))
-}
-
-// ProcessIn applies the In predicate on the "process" field.
-func ProcessIn(vs ...types.ImageProcess) predicate.ImageProcess {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.ImageProcess(sql.FieldIn(FieldProcess, v...))
-}
-
-// ProcessNotIn applies the NotIn predicate on the "process" field.
-func ProcessNotIn(vs ...types.ImageProcess) predicate.ImageProcess {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.ImageProcess(sql.FieldNotIn(FieldProcess, v...))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -203,6 +183,156 @@ func UpdatedAtLT(v time.Time) predicate.ImageProcess {
 // UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
 func UpdatedAtLTE(v time.Time) predicate.ImageProcess {
 	return predicate.ImageProcess(sql.FieldLTE(FieldUpdatedAt, v))
+}
+
+// PathPrefixEQ applies the EQ predicate on the "path_prefix" field.
+func PathPrefixEQ(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldEQ(FieldPathPrefix, v))
+}
+
+// PathPrefixNEQ applies the NEQ predicate on the "path_prefix" field.
+func PathPrefixNEQ(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldNEQ(FieldPathPrefix, v))
+}
+
+// PathPrefixIn applies the In predicate on the "path_prefix" field.
+func PathPrefixIn(vs ...string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldIn(FieldPathPrefix, vs...))
+}
+
+// PathPrefixNotIn applies the NotIn predicate on the "path_prefix" field.
+func PathPrefixNotIn(vs ...string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldNotIn(FieldPathPrefix, vs...))
+}
+
+// PathPrefixGT applies the GT predicate on the "path_prefix" field.
+func PathPrefixGT(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldGT(FieldPathPrefix, v))
+}
+
+// PathPrefixGTE applies the GTE predicate on the "path_prefix" field.
+func PathPrefixGTE(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldGTE(FieldPathPrefix, v))
+}
+
+// PathPrefixLT applies the LT predicate on the "path_prefix" field.
+func PathPrefixLT(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldLT(FieldPathPrefix, v))
+}
+
+// PathPrefixLTE applies the LTE predicate on the "path_prefix" field.
+func PathPrefixLTE(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldLTE(FieldPathPrefix, v))
+}
+
+// PathPrefixContains applies the Contains predicate on the "path_prefix" field.
+func PathPrefixContains(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldContains(FieldPathPrefix, v))
+}
+
+// PathPrefixHasPrefix applies the HasPrefix predicate on the "path_prefix" field.
+func PathPrefixHasPrefix(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldHasPrefix(FieldPathPrefix, v))
+}
+
+// PathPrefixHasSuffix applies the HasSuffix predicate on the "path_prefix" field.
+func PathPrefixHasSuffix(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldHasSuffix(FieldPathPrefix, v))
+}
+
+// PathPrefixIsNil applies the IsNil predicate on the "path_prefix" field.
+func PathPrefixIsNil() predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldIsNull(FieldPathPrefix))
+}
+
+// PathPrefixNotNil applies the NotNil predicate on the "path_prefix" field.
+func PathPrefixNotNil() predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldNotNull(FieldPathPrefix))
+}
+
+// PathPrefixEqualFold applies the EqualFold predicate on the "path_prefix" field.
+func PathPrefixEqualFold(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldEqualFold(FieldPathPrefix, v))
+}
+
+// PathPrefixContainsFold applies the ContainsFold predicate on the "path_prefix" field.
+func PathPrefixContainsFold(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldContainsFold(FieldPathPrefix, v))
+}
+
+// ErrorEQ applies the EQ predicate on the "error" field.
+func ErrorEQ(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldEQ(FieldError, v))
+}
+
+// ErrorNEQ applies the NEQ predicate on the "error" field.
+func ErrorNEQ(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldNEQ(FieldError, v))
+}
+
+// ErrorIn applies the In predicate on the "error" field.
+func ErrorIn(vs ...string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldIn(FieldError, vs...))
+}
+
+// ErrorNotIn applies the NotIn predicate on the "error" field.
+func ErrorNotIn(vs ...string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldNotIn(FieldError, vs...))
+}
+
+// ErrorGT applies the GT predicate on the "error" field.
+func ErrorGT(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldGT(FieldError, v))
+}
+
+// ErrorGTE applies the GTE predicate on the "error" field.
+func ErrorGTE(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldGTE(FieldError, v))
+}
+
+// ErrorLT applies the LT predicate on the "error" field.
+func ErrorLT(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldLT(FieldError, v))
+}
+
+// ErrorLTE applies the LTE predicate on the "error" field.
+func ErrorLTE(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldLTE(FieldError, v))
+}
+
+// ErrorContains applies the Contains predicate on the "error" field.
+func ErrorContains(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldContains(FieldError, v))
+}
+
+// ErrorHasPrefix applies the HasPrefix predicate on the "error" field.
+func ErrorHasPrefix(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldHasPrefix(FieldError, v))
+}
+
+// ErrorHasSuffix applies the HasSuffix predicate on the "error" field.
+func ErrorHasSuffix(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldHasSuffix(FieldError, v))
+}
+
+// ErrorIsNil applies the IsNil predicate on the "error" field.
+func ErrorIsNil() predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldIsNull(FieldError))
+}
+
+// ErrorNotNil applies the NotNil predicate on the "error" field.
+func ErrorNotNil() predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldNotNull(FieldError))
+}
+
+// ErrorEqualFold applies the EqualFold predicate on the "error" field.
+func ErrorEqualFold(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldEqualFold(FieldError, v))
+}
+
+// ErrorContainsFold applies the ContainsFold predicate on the "error" field.
+func ErrorContainsFold(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldContainsFold(FieldError, v))
 }
 
 // And groups predicates with the AND operator between them.

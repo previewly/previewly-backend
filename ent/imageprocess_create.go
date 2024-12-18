@@ -27,15 +27,9 @@ func (ipc *ImageProcessCreate) SetStatus(te types.StatusEnum) *ImageProcessCreat
 	return ipc
 }
 
-// SetProcess sets the "process" field.
-func (ipc *ImageProcessCreate) SetProcess(tp types.ImageProcess) *ImageProcessCreate {
-	ipc.mutation.SetProcess(tp)
-	return ipc
-}
-
-// SetProcessOptions sets the "process_options" field.
-func (ipc *ImageProcessCreate) SetProcessOptions(tpo []types.ImageProcessOptions) *ImageProcessCreate {
-	ipc.mutation.SetProcessOptions(tpo)
+// SetProcesses sets the "processes" field.
+func (ipc *ImageProcessCreate) SetProcesses(tp []types.ImageProcess) *ImageProcessCreate {
+	ipc.mutation.SetProcesses(tp)
 	return ipc
 }
 
@@ -63,6 +57,34 @@ func (ipc *ImageProcessCreate) SetUpdatedAt(t time.Time) *ImageProcessCreate {
 func (ipc *ImageProcessCreate) SetNillableUpdatedAt(t *time.Time) *ImageProcessCreate {
 	if t != nil {
 		ipc.SetUpdatedAt(*t)
+	}
+	return ipc
+}
+
+// SetPathPrefix sets the "path_prefix" field.
+func (ipc *ImageProcessCreate) SetPathPrefix(s string) *ImageProcessCreate {
+	ipc.mutation.SetPathPrefix(s)
+	return ipc
+}
+
+// SetNillablePathPrefix sets the "path_prefix" field if the given value is not nil.
+func (ipc *ImageProcessCreate) SetNillablePathPrefix(s *string) *ImageProcessCreate {
+	if s != nil {
+		ipc.SetPathPrefix(*s)
+	}
+	return ipc
+}
+
+// SetError sets the "error" field.
+func (ipc *ImageProcessCreate) SetError(s string) *ImageProcessCreate {
+	ipc.mutation.SetError(s)
+	return ipc
+}
+
+// SetNillableError sets the "error" field if the given value is not nil.
+func (ipc *ImageProcessCreate) SetNillableError(s *string) *ImageProcessCreate {
+	if s != nil {
+		ipc.SetError(*s)
 	}
 	return ipc
 }
@@ -122,16 +144,8 @@ func (ipc *ImageProcessCreate) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "ImageProcess.status": %w`, err)}
 		}
 	}
-	if _, ok := ipc.mutation.Process(); !ok {
-		return &ValidationError{Name: "process", err: errors.New(`ent: missing required field "ImageProcess.process"`)}
-	}
-	if v, ok := ipc.mutation.Process(); ok {
-		if err := imageprocess.ProcessValidator(v); err != nil {
-			return &ValidationError{Name: "process", err: fmt.Errorf(`ent: validator failed for field "ImageProcess.process": %w`, err)}
-		}
-	}
-	if _, ok := ipc.mutation.ProcessOptions(); !ok {
-		return &ValidationError{Name: "process_options", err: errors.New(`ent: missing required field "ImageProcess.process_options"`)}
+	if _, ok := ipc.mutation.Processes(); !ok {
+		return &ValidationError{Name: "processes", err: errors.New(`ent: missing required field "ImageProcess.processes"`)}
 	}
 	if _, ok := ipc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ImageProcess.created_at"`)}
@@ -169,13 +183,9 @@ func (ipc *ImageProcessCreate) createSpec() (*ImageProcess, *sqlgraph.CreateSpec
 		_spec.SetField(imageprocess.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
 	}
-	if value, ok := ipc.mutation.Process(); ok {
-		_spec.SetField(imageprocess.FieldProcess, field.TypeEnum, value)
-		_node.Process = value
-	}
-	if value, ok := ipc.mutation.ProcessOptions(); ok {
-		_spec.SetField(imageprocess.FieldProcessOptions, field.TypeJSON, value)
-		_node.ProcessOptions = value
+	if value, ok := ipc.mutation.Processes(); ok {
+		_spec.SetField(imageprocess.FieldProcesses, field.TypeJSON, value)
+		_node.Processes = value
 	}
 	if value, ok := ipc.mutation.CreatedAt(); ok {
 		_spec.SetField(imageprocess.FieldCreatedAt, field.TypeTime, value)
@@ -184,6 +194,14 @@ func (ipc *ImageProcessCreate) createSpec() (*ImageProcess, *sqlgraph.CreateSpec
 	if value, ok := ipc.mutation.UpdatedAt(); ok {
 		_spec.SetField(imageprocess.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if value, ok := ipc.mutation.PathPrefix(); ok {
+		_spec.SetField(imageprocess.FieldPathPrefix, field.TypeString, value)
+		_node.PathPrefix = value
+	}
+	if value, ok := ipc.mutation.Error(); ok {
+		_spec.SetField(imageprocess.FieldError, field.TypeString, value)
+		_node.Error = value
 	}
 	return _node, _spec
 }

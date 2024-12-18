@@ -33,10 +33,11 @@ var (
 	ImageProcessesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"success", "error", "pending"}},
-		{Name: "process", Type: field.TypeEnum, Enums: []string{"resize"}},
-		{Name: "process_options", Type: field.TypeJSON},
+		{Name: "processes", Type: field.TypeJSON},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "path_prefix", Type: field.TypeString, Nullable: true},
+		{Name: "error", Type: field.TypeString, Nullable: true},
 		{Name: "upload_image_imageprocess", Type: field.TypeInt, Nullable: true},
 	}
 	// ImageProcessesTable holds the schema information for the "image_processes" table.
@@ -47,7 +48,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "image_processes_upload_images_imageprocess",
-				Columns:    []*schema.Column{ImageProcessesColumns[6]},
+				Columns:    []*schema.Column{ImageProcessesColumns[7]},
 				RefColumns: []*schema.Column{UploadImagesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

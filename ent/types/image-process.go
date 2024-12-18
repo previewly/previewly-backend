@@ -1,14 +1,14 @@
 package types
 
 type (
-	ImageProcessType    string
-	ImageProcessOptions struct {
+	ImageProcessType   string
+	ImageProcessOption struct {
 		Key   string
 		Value *string
 	}
 	ImageProcess struct {
 		Type    ImageProcessType
-		Options []ImageProcessOptions
+		Options []ImageProcessOption
 	}
 )
 
@@ -22,4 +22,19 @@ func (ImageProcessType) Values() (kinds []string) {
 		kinds = append(kinds, string(s))
 	}
 	return
+}
+
+func NewImageProcessOption(key string, value *string) *ImageProcessOption {
+	return &ImageProcessOption{Key: key, Value: value}
+}
+
+func NewImageProcessType(value string) ImageProcessType {
+	return ImageProcessType(value)
+}
+
+func NewImageProcess(processType ImageProcessType, options []ImageProcessOption) *ImageProcess {
+	return &ImageProcess{
+		Type:    processType,
+		Options: options,
+	}
 }

@@ -8,6 +8,33 @@ import (
 	"strconv"
 )
 
+type ImageProcess struct {
+	Type    ImageProcessType      `json:"type"`
+	Options []*ImageProcessOption `json:"options"`
+}
+
+type ImageProcessOption struct {
+	Key   string  `json:"key"`
+	Value *string `json:"value,omitempty"`
+}
+
+type ImageProcessOptionInput struct {
+	Key   string  `json:"key"`
+	Value *string `json:"value,omitempty"`
+}
+
+type ImageProcesses struct {
+	ImageID   int             `json:"imageId"`
+	Processes []*ImageProcess `json:"processes"`
+	Status    Status          `json:"status"`
+	Error     *string         `json:"error,omitempty"`
+}
+
+type ImageProcessesInput struct {
+	Type    ImageProcessType           `json:"type"`
+	Options []*ImageProcessOptionInput `json:"options"`
+}
+
 type Mutation struct {
 }
 
@@ -28,6 +55,45 @@ type UploadImageStatus struct {
 	Name   string  `json:"name"`
 	Status Status  `json:"status"`
 	Error  *string `json:"error,omitempty"`
+}
+
+type ImageProcessType string
+
+const (
+	ImageProcessTypeResize ImageProcessType = "resize"
+)
+
+var AllImageProcessType = []ImageProcessType{
+	ImageProcessTypeResize,
+}
+
+func (e ImageProcessType) IsValid() bool {
+	switch e {
+	case ImageProcessTypeResize:
+		return true
+	}
+	return false
+}
+
+func (e ImageProcessType) String() string {
+	return string(e)
+}
+
+func (e *ImageProcessType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ImageProcessType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ImageProcessType", str)
+	}
+	return nil
+}
+
+func (e ImageProcessType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
 type Status string

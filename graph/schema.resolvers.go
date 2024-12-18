@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"errors"
+	"fmt"
 	"wsw/backend/domain/upload"
 	"wsw/backend/graph/convertor"
 	"wsw/backend/graph/model"
@@ -76,6 +77,11 @@ func (r *mutationResolver) Upload(ctx context.Context, token string, images []*g
 	}
 
 	return resolver.Resolve(ctx, images)
+}
+
+// ProcessImage is the resolver for the processImage field.
+func (r *mutationResolver) ProcessImage(ctx context.Context, token string, imageID int, processes []*model.ImageProcessesInput) (*model.ImageProcesses, error) {
+	panic(fmt.Errorf("not implemented: ProcessImage - processImage"))
 }
 
 // GetPreviewData is the resolver for the getPreviewData field.

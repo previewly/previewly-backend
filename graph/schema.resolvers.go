@@ -80,7 +80,7 @@ func (r *mutationResolver) Upload(ctx context.Context, token string, images []*g
 }
 
 // ProcessImage is the resolver for the processImage field.
-func (r *mutationResolver) ProcessImage(ctx context.Context, token string, imageID int, processes []*model.ImageProcessesInput) (*model.ImageProcesses, error) {
+func (r *mutationResolver) ProcessImage(ctx context.Context, token string, imageID int, processes []*model.ImageProcessesInput) (*model.ImageProcess, error) {
 	var resolver process.Resolver
 	err := container.Resolve(&resolver)
 	if err != nil {

@@ -50,7 +50,7 @@ func (r resolverImpl) createImageProcess(imageEntity *ent.UploadImage, imageProc
 	if errSaving != nil {
 		return nil, errSaving
 	}
-	return r.gqlConvertor.Convert(processEntity), nil
+	return r.gqlConvertor.Convert(processEntity, runnerResult.ImageName, runnerResult.ImageURL), nil
 }
 
 func (r resolverImpl) validateProcesses(processes []*model.ImageProcessesInput) []types.ImageProcess {

@@ -88,9 +88,7 @@ func initDi(config config.Config, appContext context.Context) {
 
 	initRepositories()
 
-	initService(func() *slog.Logger {
-		return slog.Default()
-	})
+	initService(func() *slog.Logger { return slog.Default() })
 
 	initService(func(urlRepository repository.Url, statRepository repository.Stat, relativePathProvider relative.Provider) gowitness.CreateWriter {
 		return func(url *ent.Url) gowitness.Writer {
@@ -144,7 +142,9 @@ func initModels() {
 	initService(func(uploadRepository repository.UploadImageRepository) imageModel.UploadedImage {
 		return imageModel.NewModel(uploadRepository)
 	})
-	initService(func() imageModel.ImageProcesses { return imageModel.NewImageProcesses() })
+	initService(func(processRepository repository.ImageProcessRepository, imageRepository repository.UploadImageRepository) imageModel.ImageProcesses {
+		return imageModel.NewImageProcesses(processRepository, imageRepository)
+	})
 }
 
 func initRepositories() {
@@ -159,6 +159,9 @@ func initRepositories() {
 	})
 	initService(func(client *ent.Client, ctx context.Context) repository.UploadImageRepository {
 		return repository.NewUploadImageRepository(client, ctx)
+	})
+	initService(func(client *ent.Client, ctx context.Context) repository.ImageProcessRepository {
+		return repository.NewImageProcessRepository(client, ctx)
 	})
 }
 

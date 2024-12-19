@@ -4,12 +4,14 @@ import (
 	"context"
 
 	"wsw/backend/ent"
+	"wsw/backend/ent/types"
 	entImage "wsw/backend/ent/uploadimage"
 )
 
 type (
 	UploadImageRepository interface {
 		Insert(string, string, string, string) (*ent.UploadImage, error)
+		CreateProcess(*ent.UploadImage, []types.ImageProcess) (*ent.ImageProcess, error)
 		GetByID(int) (*ent.UploadImage, error)
 	}
 	uploadrepositoryImpl struct {
@@ -17,6 +19,25 @@ type (
 		ctx    context.Context
 	}
 )
+
+func (u uploadrepositoryImpl) CreateProcess(imageEntity *ent.UploadImage, imageProcesses []types.ImageProcess) (*ent.ImageProcess, error) {
+	process, err := u.client.ImageProcess.Create().
+		SetStatus(types.Pending).
+		SetProcesses(imageProcesses).
+		Save(u.ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	_, errUpdated := u.client.UploadImage.
+		UpdateOne(imageEntity).
+		AddImageprocess(process).
+		Save(u.ctx)
+	if errUpdated != nil {
+		return nil, errUpdated
+	}
+	return process, nil
+}
 
 // GetByID implements UploadImageRepository.
 func (u uploadrepositoryImpl) GetByID(imageID int) (*ent.UploadImage, error) {

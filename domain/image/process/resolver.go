@@ -38,7 +38,7 @@ func (r resolverImpl) Resolve(ctx context.Context, imageID int, processes []*mod
 	return r.createImageProcess(ctx, imageEntity, imageProcesses)
 }
 
-func (r resolverImpl) createImageProcess(ctx context.Context, imageEntity *ent.UploadImage, imageProcesses []*types.ImageProcess) (*model.ImageProcesses, error) {
+func (r resolverImpl) createImageProcess(ctx context.Context, imageEntity *ent.UploadImage, imageProcesses []types.ImageProcess) (*model.ImageProcesses, error) {
 	processEntity, err := r.processesModel.Create(imageEntity, imageProcesses)
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func (r resolverImpl) createImageProcess(ctx context.Context, imageEntity *ent.U
 	return r.gqlConvertor.Convert(processEntity), nil
 }
 
-func (r resolverImpl) validateProcesses(processes []*model.ImageProcessesInput) []*types.ImageProcess {
+func (r resolverImpl) validateProcesses(processes []*model.ImageProcessesInput) []types.ImageProcess {
 	validedProcesses := make([]*types.ImageProcess, 0, len(processes))
 	for _, process := range processes {
 		validProcess := r.createValidProcess(process)
@@ -63,7 +63,13 @@ func (r resolverImpl) validateProcesses(processes []*model.ImageProcessesInput) 
 		}
 
 	}
-	return utils.FilterNil(validedProcesses)
+	validedProcesses = utils.FilterNil(validedProcesses)
+
+	result := make([]types.ImageProcess, 0, len(validedProcesses))
+	for _, process := range validedProcesses {
+		result = append(result, *process)
+	}
+	return result
 }
 
 func (r resolverImpl) createValidProcess(input *model.ImageProcessesInput) *types.ImageProcess {

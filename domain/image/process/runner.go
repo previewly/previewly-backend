@@ -1,16 +1,20 @@
 package process
 
-import "wsw/backend/ent"
+import (
+	"wsw/backend/ent"
+	"wsw/backend/ent/types"
+)
 
 type (
 	ProcessRunner interface {
-		Start(*ent.ImageProcess) (*ent.ImageProcess, error)
+		Start(*ent.UploadImage, []types.ImageProcess) (types.StatusEnum, error)
 	}
 	processRunnerimpl struct{}
 )
 
-func (p processRunnerimpl) Start(processEntity *ent.ImageProcess) (*ent.ImageProcess, error) {
-	panic("unimplemented")
+// Start implements ProcessRunner.
+func (p processRunnerimpl) Start(*ent.UploadImage, []types.ImageProcess) (types.StatusEnum, error) {
+	return types.Success, nil
 }
 
 func NewProcessRunner() ProcessRunner { return processRunnerimpl{} }

@@ -19,11 +19,12 @@ type (
 		imagesModel    image.UploadedImage
 		processesModel image.ImageProcesses
 		gqlConvertor   Convertor
+		runner         ProcessRunner
 	}
 )
 
-func NewProcessResolver(imagesModel image.UploadedImage, processesModel image.ImageProcesses, gqlConvertor Convertor) Resolver {
-	return resolverImpl{imagesModel: imagesModel, processesModel: processesModel, gqlConvertor: gqlConvertor}
+func NewProcessResolver(imagesModel image.UploadedImage, processesModel image.ImageProcesses, gqlConvertor Convertor, runner ProcessRunner) Resolver {
+	return resolverImpl{imagesModel: imagesModel, processesModel: processesModel, gqlConvertor: gqlConvertor, runner: runner}
 }
 
 // Resolve implements Resolver.
@@ -38,21 +39,19 @@ func (r resolverImpl) Resolve(ctx context.Context, imageID int, processes []*mod
 }
 
 func (r resolverImpl) createImageProcess(ctx context.Context, imageEntity *ent.UploadImage, imageProcesses []*types.ImageProcess) (*model.ImageProcesses, error) {
-	processEntity := r.createProcessEntity(imageEntity, imageProcesses)
-
-	processEntity, err := r.saveProcessEntity(ctx, processEntity)
+	processEntity, err := r.processesModel.Create(imageEntity, imageProcesses)
 	if err != nil {
 		return nil, err
 	}
+	processEntity, errStart := r.runner.Start(processEntity)
+	if errStart != nil {
+		return nil, errStart
+	}
+	processEntity, errSaving := r.processesModel.Save(ctx, processEntity)
+	if errSaving != nil {
+		return nil, errSaving
+	}
 	return r.gqlConvertor.Convert(processEntity), nil
-}
-
-func (r resolverImpl) saveProcessEntity(ctx context.Context, processEntity ent.ImageProcess) (ent.ImageProcess, error) {
-	panic("unimplemented")
-}
-
-func (r resolverImpl) createProcessEntity(imageEntity *ent.UploadImage, imageProcesses []*types.ImageProcess) ent.ImageProcess {
-	panic("unimplemented")
 }
 
 func (r resolverImpl) validateProcesses(processes []*model.ImageProcessesInput) []*types.ImageProcess {

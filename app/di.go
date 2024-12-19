@@ -121,14 +121,15 @@ func initDomains(config config.Config) {
 		return domainStorage.NewUploadStorage(config.App.UploadPath, filenameProvider)
 	})
 	initService(func() process.Convertor { return process.NewConvertor() })
+	initService(func() process.ProcessRunner { return process.NewProcessRunner() })
 }
 
 func initResolvers() {
 	initService(func(model imageModel.UploadedImage, storage domainStorage.Storage) upload.Resolver {
 		return upload.NewUploadResolver(model, storage)
 	})
-	initService(func(model imageModel.UploadedImage, processesModel imageModel.ImageProcesses, gqlConvertor process.Convertor) process.Resolver {
-		return process.NewProcessResolver(model, processesModel, gqlConvertor)
+	initService(func(model imageModel.UploadedImage, processesModel imageModel.ImageProcesses, gqlConvertor process.Convertor, runner process.ProcessRunner) process.Resolver {
+		return process.NewProcessResolver(model, processesModel, gqlConvertor, runner)
 	})
 }
 

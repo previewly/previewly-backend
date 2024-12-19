@@ -44,9 +44,9 @@ func (r resolverImpl) createImageProcess(imageEntity *ent.UploadImage, imageProc
 		return nil, err
 	}
 
-	status, errRunner := r.runner.Start(imageEntity, imageProcesses)
+	runnerResult := r.runner.Start(imageEntity, imageProcesses)
 
-	processEntity, errSaving := r.processesModel.Update(processEntity, status, errRunner)
+	processEntity, errSaving := r.processesModel.Update(processEntity, runnerResult.PrefixPath, runnerResult.Status, runnerResult.Error)
 	if errSaving != nil {
 		return nil, errSaving
 	}

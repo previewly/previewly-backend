@@ -18,11 +18,12 @@ type (
 	resolverImpl struct {
 		imagesModel    image.UploadedImage
 		processesModel image.ImageProcesses
+		gqlConvertor   Convertor
 	}
 )
 
-func NewProcessResolver(imagesModel image.UploadedImage, processesModel image.ImageProcesses) Resolver {
-	return resolverImpl{imagesModel: imagesModel, processesModel: processesModel}
+func NewProcessResolver(imagesModel image.UploadedImage, processesModel image.ImageProcesses, gqlConvertor Convertor) Resolver {
+	return resolverImpl{imagesModel: imagesModel, processesModel: processesModel, gqlConvertor: gqlConvertor}
 }
 
 // Resolve implements Resolver.
@@ -37,6 +38,20 @@ func (r resolverImpl) Resolve(ctx context.Context, imageID int, processes []*mod
 }
 
 func (r resolverImpl) createImageProcess(ctx context.Context, imageEntity *ent.UploadImage, imageProcesses []*types.ImageProcess) (*model.ImageProcesses, error) {
+	processEntity := r.createProcessEntity(imageEntity, imageProcesses)
+
+	processEntity, err := r.saveProcessEntity(ctx, processEntity)
+	if err != nil {
+		return nil, err
+	}
+	return r.gqlConvertor.Convert(processEntity), nil
+}
+
+func (r resolverImpl) saveProcessEntity(ctx context.Context, processEntity ent.ImageProcess) (ent.ImageProcess, error) {
+	panic("unimplemented")
+}
+
+func (r resolverImpl) createProcessEntity(imageEntity *ent.UploadImage, imageProcesses []*types.ImageProcess) ent.ImageProcess {
 	panic("unimplemented")
 }
 

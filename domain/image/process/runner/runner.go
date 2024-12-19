@@ -1,4 +1,4 @@
-package process
+package runner
 
 import (
 	"wsw/backend/ent"

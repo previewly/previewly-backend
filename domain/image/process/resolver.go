@@ -12,7 +12,7 @@ import (
 
 type (
 	Resolver interface {
-		Resolve(context.Context, int, []*model.ImageProcessesInput) (*model.ImageProcesses, error)
+		Resolve(context.Context, int, []*model.ImageProcessesInput) (*model.ImageProcess, error)
 	}
 
 	resolverImpl struct {
@@ -28,7 +28,7 @@ func NewProcessResolver(imagesModel image.UploadedImage, processesModel image.Im
 }
 
 // Resolve implements Resolver.
-func (r resolverImpl) Resolve(ctx context.Context, imageID int, processes []*model.ImageProcessesInput) (*model.ImageProcesses, error) {
+func (r resolverImpl) Resolve(ctx context.Context, imageID int, processes []*model.ImageProcessesInput) (*model.ImageProcess, error) {
 	imageEntity, err := r.imagesModel.GetByID(imageID)
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func (r resolverImpl) Resolve(ctx context.Context, imageID int, processes []*mod
 	return r.createImageProcess(imageEntity, imageProcesses)
 }
 
-func (r resolverImpl) createImageProcess(imageEntity *ent.UploadImage, imageProcesses []types.ImageProcess) (*model.ImageProcesses, error) {
+func (r resolverImpl) createImageProcess(imageEntity *ent.UploadImage, imageProcesses []types.ImageProcess) (*model.ImageProcess, error) {
 	processEntity, err := r.processesModel.Create(imageEntity, imageProcesses)
 	if err != nil {
 		return nil, err

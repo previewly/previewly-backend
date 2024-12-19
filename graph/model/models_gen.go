@@ -9,8 +9,10 @@ import (
 )
 
 type ImageProcess struct {
-	Type    ImageProcessType      `json:"type"`
-	Options []*ImageProcessOption `json:"options"`
+	ImageID   int                `json:"imageId"`
+	Processes []*OneImageProcess `json:"processes"`
+	Status    Status             `json:"status"`
+	Error     *string            `json:"error,omitempty"`
 }
 
 type ImageProcessOption struct {
@@ -23,19 +25,17 @@ type ImageProcessOptionInput struct {
 	Value *string `json:"value,omitempty"`
 }
 
-type ImageProcesses struct {
-	ImageID   int             `json:"imageId"`
-	Processes []*ImageProcess `json:"processes"`
-	Status    Status          `json:"status"`
-	Error     *string         `json:"error,omitempty"`
-}
-
 type ImageProcessesInput struct {
 	Type    ImageProcessType           `json:"type"`
 	Options []*ImageProcessOptionInput `json:"options"`
 }
 
 type Mutation struct {
+}
+
+type OneImageProcess struct {
+	Type    ImageProcessType      `json:"type"`
+	Options []*ImageProcessOption `json:"options"`
 }
 
 type PreviewData struct {

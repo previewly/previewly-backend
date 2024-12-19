@@ -126,8 +126,8 @@ func initResolvers() {
 	initService(func(model imageModel.UploadedImage, storage domainStorage.Storage) upload.Resolver {
 		return upload.NewUploadResolver(model, storage)
 	})
-	initService(func(model imageModel.UploadedImage) process.Resolver {
-		return process.NewProcessResolver(model)
+	initService(func(model imageModel.UploadedImage, processesModel imageModel.ImageProcesses) process.Resolver {
+		return process.NewProcessResolver(model, processesModel)
 	})
 }
 
@@ -142,6 +142,7 @@ func initModels() {
 	initService(func(uploadRepository repository.UploadImageRepository) imageModel.UploadedImage {
 		return imageModel.NewModel(uploadRepository)
 	})
+	initService(func() imageModel.ImageProcesses { return imageModel.NewImageProcesses() })
 }
 
 func initRepositories() {

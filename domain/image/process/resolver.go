@@ -3,6 +3,7 @@ package process
 import (
 	"context"
 
+	"wsw/backend/ent"
 	"wsw/backend/ent/types"
 	"wsw/backend/graph/model"
 	"wsw/backend/lib/utils"
@@ -15,12 +16,13 @@ type (
 	}
 
 	resolverImpl struct {
-		imagesModel image.UploadedImage
+		imagesModel    image.UploadedImage
+		processesModel image.ImageProcesses
 	}
 )
 
-func NewProcessResolver(imagesModel image.UploadedImage) Resolver {
-	return resolverImpl{imagesModel: imagesModel}
+func NewProcessResolver(imagesModel image.UploadedImage, processesModel image.ImageProcesses) Resolver {
+	return resolverImpl{imagesModel: imagesModel, processesModel: processesModel}
 }
 
 // Resolve implements Resolver.
@@ -31,8 +33,10 @@ func (r resolverImpl) Resolve(ctx context.Context, imageID int, processes []*mod
 	}
 
 	imageProcesses := r.validateProcesses(processes)
+	return r.createImageProcess(ctx, imageEntity, imageProcesses)
+}
 
-	utils.D(imageEntity, imageProcesses)
+func (r resolverImpl) createImageProcess(ctx context.Context, imageEntity *ent.UploadImage, imageProcesses []*types.ImageProcess) (*model.ImageProcesses, error) {
 	panic("unimplemented")
 }
 

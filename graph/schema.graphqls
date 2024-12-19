@@ -50,8 +50,13 @@ type OneImageProcess {
   type: ImageProcessType!
   options: [ImageProcessOption!]!
 }
+type ImageData {
+  name: String!
+  url: String!
+}
 type ImageProcess {
   imageId: Int!
+  image: ImageData
   processes: [OneImageProcess!]!
   status: Status!
   error: String

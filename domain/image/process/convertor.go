@@ -8,7 +8,7 @@ import (
 
 type (
 	Convertor interface {
-		Convert(*ent.ImageProcess) *model.ImageProcess
+		Convert(*ent.ImageProcess, *string, *string) *model.ImageProcess
 	}
 	convertorImpl struct{}
 )
@@ -17,13 +17,24 @@ func NewConvertor() Convertor {
 	return convertorImpl{}
 }
 
-func (c convertorImpl) Convert(processEntity *ent.ImageProcess) *model.ImageProcess {
+func (c convertorImpl) Convert(processEntity *ent.ImageProcess, imageName *string, imageURL *string) *model.ImageProcess {
 	return &model.ImageProcess{
 		ImageID:   processEntity.ID,
+		Image:     c.convertImageData(imageName, imageURL),
 		Processes: c.convertToGQLProcesses(processEntity.Processes),
 		Error:     &processEntity.Error,
 		Status:    model.Status(processEntity.Status),
 	}
+}
+
+func (c convertorImpl) convertImageData(imageName *string, imageURL *string) *model.ImageData {
+	if imageURL != nil {
+		return &model.ImageData{
+			Name: *imageName,
+			URL:  *imageURL,
+		}
+	}
+	return nil
 }
 
 func (c convertorImpl) convertToGQLProcesses(processes []types.ImageProcess) []*model.OneImageProcess {

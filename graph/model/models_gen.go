@@ -8,8 +8,14 @@ import (
 	"strconv"
 )
 
+type ImageData struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
+}
+
 type ImageProcess struct {
 	ImageID   int                `json:"imageId"`
+	Image     *ImageData         `json:"image,omitempty"`
 	Processes []*OneImageProcess `json:"processes"`
 	Status    Status             `json:"status"`
 	Error     *string            `json:"error,omitempty"`

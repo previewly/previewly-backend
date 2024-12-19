@@ -20,7 +20,10 @@ import (
 	"wsw/backend/model/token"
 	"wsw/backend/model/url"
 
+	domainImagePathProvider "wsw/backend/domain/image/path"
+	domainRunner "wsw/backend/domain/image/process/runner"
 	domainStorage "wsw/backend/domain/image/upload/storage"
+
 	imageModel "wsw/backend/model/image"
 
 	"github.com/getsentry/sentry-go"
@@ -114,19 +117,24 @@ func initDi(config config.Config, appContext context.Context) {
 }
 
 func initDomains(config config.Config) {
-	initService(func() domainStorage.FilenameProvider { return domainStorage.NewFilenameProvider() })
-	initService(func(filenameProvider domainStorage.FilenameProvider) domainStorage.Storage {
-		return domainStorage.NewUploadStorage(config.App.UploadPath, filenameProvider)
+	initService(func() domainStorage.FilenameGenerator { return domainStorage.NewFilenameProvider() })
+	initService(func() domainImagePathProvider.PathProvider {
+		return domainImagePathProvider.NewPathProvider(config.App.UploadPath)
+	})
+	initService(func(filenameGenerator domainStorage.FilenameGenerator, pathProvider domainImagePathProvider.PathProvider) domainStorage.Storage {
+		return domainStorage.NewUploadStorage(filenameGenerator, pathProvider)
 	})
 	initService(func() process.Convertor { return process.NewConvertor() })
-	initService(func() process.ProcessRunner { return process.NewProcessRunner() })
+	initService(func(pathProvider domainImagePathProvider.PathProvider) domainRunner.ProcessRunner {
+		return domainRunner.NewProcessRunner(pathProvider)
+	})
 }
 
 func initResolvers() {
 	initService(func(model imageModel.UploadedImage, storage domainStorage.Storage) upload.Resolver {
 		return upload.NewUploadResolver(model, storage)
 	})
-	initService(func(model imageModel.UploadedImage, processesModel imageModel.ImageProcesses, gqlConvertor process.Convertor, runner process.ProcessRunner) process.Resolver {
+	initService(func(model imageModel.UploadedImage, processesModel imageModel.ImageProcesses, gqlConvertor process.Convertor, runner domainRunner.ProcessRunner) process.Resolver {
 		return process.NewProcessResolver(model, processesModel, gqlConvertor, runner)
 	})
 }

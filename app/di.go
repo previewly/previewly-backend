@@ -115,8 +115,8 @@ func initDi(config config.Config, appContext context.Context) {
 }
 
 func initDomains(config config.Config) {
-	initService(func() domainStorage.FilenameProvider { return domainStorage.NewFilenameProvider() })
-	initService(func(filenameProvider domainStorage.FilenameProvider) domainStorage.Storage {
+	initService(func() domainStorage.FilenameGenerator { return domainStorage.NewFilenameProvider() })
+	initService(func(filenameProvider domainStorage.FilenameGenerator) domainStorage.Storage {
 		return domainStorage.NewUploadStorage(config.App.UploadPath, filenameProvider)
 	})
 	initService(func() process.Convertor { return process.NewConvertor() })

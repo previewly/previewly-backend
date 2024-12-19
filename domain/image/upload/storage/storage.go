@@ -17,8 +17,8 @@ type (
 		Save(string, *string, io.ReadSeeker) (*StorageFile, error)
 	}
 	storageImpl struct {
-		destPath        string
-		newNameProvider FilenameProvider
+		destPath      string
+		nameGenerator FilenameGenerator
 	}
 )
 
@@ -50,8 +50,8 @@ func (s storageImpl) Save(filename string, prefix *string, file io.ReadSeeker) (
 }
 
 func (s storageImpl) createStorageFile(filename string, prefix *string) *StorageFile {
-	newFilename := s.newNameProvider.GenerateFilename(filename)
-	newFilePlace := s.newNameProvider.GenerateFilepath(prefix)
+	newFilename := s.nameGenerator.GenerateFilename(filename)
+	newFilePlace := s.nameGenerator.GenerateFilepath(prefix)
 	fullPath := strings.Join([]string{
 		strings.TrimSuffix(s.destPath, "/"),
 		strings.TrimSuffix(newFilePlace, "/"),
@@ -65,9 +65,9 @@ func (s storageImpl) createStorageFile(filename string, prefix *string) *Storage
 	}
 }
 
-func NewUploadStorage(destPath string, filenameProvider FilenameProvider) Storage {
+func NewUploadStorage(destPath string, filenameProvider FilenameGenerator) Storage {
 	return storageImpl{
-		destPath:        destPath,
-		newNameProvider: filenameProvider,
+		destPath:      destPath,
+		nameGenerator: filenameProvider,
 	}
 }

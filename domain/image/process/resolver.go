@@ -35,19 +35,18 @@ func (r resolverImpl) Resolve(ctx context.Context, imageID int, processes []*mod
 	}
 
 	imageProcesses := r.validateProcesses(processes)
-	return r.createImageProcess(ctx, imageEntity, imageProcesses)
+	return r.createImageProcess(imageEntity, imageProcesses)
 }
 
-func (r resolverImpl) createImageProcess(ctx context.Context, imageEntity *ent.UploadImage, imageProcesses []types.ImageProcess) (*model.ImageProcesses, error) {
+func (r resolverImpl) createImageProcess(imageEntity *ent.UploadImage, imageProcesses []types.ImageProcess) (*model.ImageProcesses, error) {
 	processEntity, err := r.processesModel.Create(imageEntity, imageProcesses)
 	if err != nil {
 		return nil, err
 	}
-	processEntity, errStart := r.runner.Start(processEntity)
-	if errStart != nil {
-		return nil, errStart
-	}
-	processEntity, errSaving := r.processesModel.Save(ctx, processEntity)
+
+	status, errRunner := r.runner.Start(imageEntity, imageProcesses)
+
+	processEntity, errSaving := r.processesModel.Update(processEntity, status, errRunner)
 	if errSaving != nil {
 		return nil, errSaving
 	}

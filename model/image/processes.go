@@ -11,7 +11,7 @@ import (
 type (
 	ImageProcesses interface {
 		Create(*ent.UploadImage, []types.ImageProcess) (*ent.ImageProcess, error)
-		Update(*ent.ImageProcess, types.StatusEnum, error) (*ent.ImageProcess, error)
+		Update(*ent.ImageProcess, *string, types.StatusEnum, error) (*ent.ImageProcess, error)
 	}
 	imageProcessesImpl struct {
 		processRepository repository.ImageProcessRepository
@@ -19,14 +19,14 @@ type (
 	}
 )
 
-func (i imageProcessesImpl) Update(processEntity *ent.ImageProcess, status types.StatusEnum, err error) (*ent.ImageProcess, error) {
+func (i imageProcessesImpl) Update(processEntity *ent.ImageProcess, prefix *string, status types.StatusEnum, err error) (*ent.ImageProcess, error) {
 	var errorMessage *string
 	if err != nil {
 		errorMessage = pointer.String(err.Error())
 	} else {
 		errorMessage = nil
 	}
-	return i.processRepository.Update(processEntity, status, errorMessage)
+	return i.processRepository.Update(processEntity, prefix, status, errorMessage)
 }
 
 func NewImageProcesses(processRepository repository.ImageProcessRepository, imageRepository repository.UploadImageRepository) ImageProcesses {

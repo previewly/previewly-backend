@@ -8,7 +8,7 @@ import (
 
 type (
 	Convertor interface {
-		Convert(ent.ImageProcess) *model.ImageProcesses
+		Convert(*ent.ImageProcess) *model.ImageProcesses
 	}
 	convertorImpl struct{}
 )
@@ -17,7 +17,7 @@ func NewConvertor() Convertor {
 	return convertorImpl{}
 }
 
-func (c convertorImpl) Convert(processEntity ent.ImageProcess) *model.ImageProcesses {
+func (c convertorImpl) Convert(processEntity *ent.ImageProcess) *model.ImageProcesses {
 	return &model.ImageProcesses{
 		ImageID:   processEntity.ID,
 		Processes: c.convertToGQLProcesses(processEntity.Processes),

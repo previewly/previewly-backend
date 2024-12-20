@@ -7,4 +7,12 @@ FROM ghcr.io/go-rod/rod:v0.116.2
 WORKDIR /app/
 COPY --from=GO /app/previewly-backend /app/previewly-backend
 
+RUN apt-get update && \
+  apt-get install --no-install-recommends -y libvips && \
+  apt-get remove -y automake curl build-essential && \
+  apt-get autoremove -y && \
+  apt-get autoclean && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 EXPOSE 8000

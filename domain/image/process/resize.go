@@ -1,6 +1,8 @@
 package process
 
 import (
+	"errors"
+
 	"wsw/backend/domain/image/path"
 	"wsw/backend/ent/types"
 
@@ -10,14 +12,10 @@ import (
 type (
 	resizeProcessFactoryImpl struct{}
 	resizeProcessImpl        struct {
-		options []types.ImageProcessOption
+		width  *int
+		height *int
 	}
 )
-
-// Create implements ProcessFactory.
-func (r resizeProcessFactoryImpl) Create(options []types.ImageProcessOption) (Process, error) {
-	panic("unimplemented")
-}
 
 // Run implements Process.
 func (r resizeProcessImpl) Run(imagePath path.PathData) (*path.PathData, error) {
@@ -29,4 +27,15 @@ func (r resizeProcessImpl) Run(imagePath path.PathData) (*path.PathData, error) 
 		FullPath:  "Sss",
 		Directory: "sxsdsdsd",
 	}, nil
+}
+
+// Create implements ProcessFactory.
+func (r resizeProcessFactoryImpl) Create(options []types.ImageProcessOption) (Process, error) {
+	width := GetIntOption(options, "width")
+	height := GetIntOption(options, "height")
+
+	if width != nil || height != nil {
+		return resizeProcessImpl{width: width, height: height}, nil
+	}
+	return nil, errors.New("width or height should be provided")
 }

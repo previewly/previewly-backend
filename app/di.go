@@ -9,6 +9,7 @@ import (
 	"wsw/backend/app/config"
 	"wsw/backend/domain/gowitness"
 	"wsw/backend/domain/image/process"
+	domainRunner "wsw/backend/domain/image/process"
 	"wsw/backend/domain/image/upload"
 	"wsw/backend/domain/path/screenshot/relative"
 	"wsw/backend/domain/token/generator"
@@ -21,7 +22,6 @@ import (
 	"wsw/backend/model/url"
 
 	domainImagePathProvider "wsw/backend/domain/image/path"
-	domainRunner "wsw/backend/domain/image/process/runner"
 	domainStorage "wsw/backend/domain/image/upload/storage"
 
 	imageModel "wsw/backend/model/image"
@@ -125,7 +125,10 @@ func initDomains(config config.Config) {
 		return domainStorage.NewUploadStorage(filenameGenerator, pathProvider)
 	})
 	initService(func() process.Convertor { return process.NewConvertor() })
-	initService(func() domainRunner.ProcessRunner { return domainRunner.NewProcessRunner() })
+	initService(func() domainRunner.ProcessFactory { return domainRunner.NewProcessFactory() })
+	initService(func(pathProvider domainImagePathProvider.PathProvider, processFactory domainRunner.ProcessFactory) domainRunner.ProcessRunner {
+		return domainRunner.NewProcessRunner(pathProvider, processFactory)
+	})
 }
 
 func initResolvers() {

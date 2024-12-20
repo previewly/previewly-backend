@@ -10,7 +10,7 @@ import (
 
 type (
 	ImageProcessRepository interface {
-		Update(*ent.ImageProcess, *string, types.StatusEnum, *string) (*ent.ImageProcess, error)
+		Update(*ent.ImageProcess, string, types.StatusEnum, *string) (*ent.ImageProcess, error)
 	}
 	imageProcessRepositoryImpl struct {
 		client *ent.Client
@@ -18,9 +18,9 @@ type (
 	}
 )
 
-func (i imageProcessRepositoryImpl) Update(processEntity *ent.ImageProcess, prefix *string, status types.StatusEnum, err *string) (*ent.ImageProcess, error) {
+func (i imageProcessRepositoryImpl) Update(processEntity *ent.ImageProcess, prefix string, status types.StatusEnum, err *string) (*ent.ImageProcess, error) {
 	return i.client.ImageProcess.UpdateOne(processEntity).
-		SetPathPrefix(*prefix).
+		SetPathPrefix(prefix).
 		SetStatus(status).
 		SetError(utils.ToString(err)).
 		Save(i.ctx)

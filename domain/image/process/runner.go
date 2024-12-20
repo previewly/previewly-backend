@@ -10,7 +10,7 @@ import (
 
 type (
 	RunnerResult struct {
-		PrefixPath *string
+		PrefixPath string
 		ImageName  *string
 		ImageURL   *string
 		Status     types.StatusEnum
@@ -51,9 +51,9 @@ func (p processRunnerimpl) Start(image *ent.UploadImage, processes []types.Image
 }
 
 func (p processRunnerimpl) createError(err error) RunnerResult {
-	return RunnerResult{PrefixPath: nil, Status: types.Error, Error: err, ImageName: nil, ImageURL: nil}
+	return RunnerResult{PrefixPath: "", Status: types.Error, Error: err, ImageName: nil, ImageURL: nil}
 }
 
 func (p processRunnerimpl) createSuccessResult(prefix string, imageName *string, imageURL *string) RunnerResult {
-	return RunnerResult{PrefixPath: &prefix, Status: types.Success, Error: nil, ImageName: imageName, ImageURL: imageURL}
+	return RunnerResult{PrefixPath: prefix, Status: types.Success, Error: nil, ImageName: imageName, ImageURL: imageURL}
 }

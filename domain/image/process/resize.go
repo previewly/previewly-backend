@@ -8,13 +8,15 @@ import (
 )
 
 type (
-	resizeProcessImpl struct {
+	resizeProcessFactoryImpl struct{}
+	resizeProcessImpl        struct {
 		options []types.ImageProcessOption
 	}
 )
 
-func NewResizeProcess(options []types.ImageProcessOption) Process {
-	return resizeProcessImpl{options: options}
+// Create implements ProcessFactory.
+func (r resizeProcessFactoryImpl) Create(options []types.ImageProcessOption) (Process, error) {
+	panic("unimplemented")
 }
 
 // Run implements Process.

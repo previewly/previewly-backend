@@ -125,9 +125,8 @@ func initDomains(config config.Config) {
 		return domainStorage.NewUploadStorage(filenameGenerator, pathProvider)
 	})
 	initService(func() process.Convertor { return process.NewConvertor() })
-	initService(func() domainRunner.ProcessFactory { return domainRunner.NewProcessFactory() })
-	initService(func(pathProvider domainImagePathProvider.PathProvider, processFactory domainRunner.ProcessFactory) domainRunner.ProcessRunner {
-		return domainRunner.NewProcessRunner(pathProvider, processFactory)
+	initService(func(pathProvider domainImagePathProvider.PathProvider) domainRunner.ProcessRunner {
+		return domainRunner.NewProcessRunner(pathProvider)
 	})
 }
 

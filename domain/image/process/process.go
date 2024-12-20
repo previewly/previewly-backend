@@ -12,16 +12,13 @@ type (
 		Run(path.PathData) (*path.PathData, error)
 	}
 	ProcessFactory interface {
-		Create(types.ImageProcessType, []types.ImageProcessOption) (Process, error)
+		Create([]types.ImageProcessOption) (Process, error)
 	}
-	processFactoryImpl struct{}
 )
 
-func NewProcessFactory() ProcessFactory { return processFactoryImpl{} }
-
-func (p processFactoryImpl) Create(processType types.ImageProcessType, options []types.ImageProcessOption) (Process, error) {
+func GetProcessFactory(processType types.ImageProcessType) (ProcessFactory, error) {
 	if processType == types.Resize {
-		return NewResizeProcess(options), nil
+		return resizeProcessFactoryImpl{}, nil
 	}
-	return nil, errors.New("unsupported process type")
+	return nil, errors.New("process type not found")
 }

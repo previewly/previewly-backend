@@ -20,13 +20,12 @@ type (
 		Start(*ent.UploadImage, []types.ImageProcess) RunnerResult
 	}
 	processRunnerimpl struct {
-		pathProvider   path.PathProvider
-		processFactory ProcessFactory
+		pathProvider path.PathProvider
 	}
 )
 
-func NewProcessRunner(pathProvider path.PathProvider, processFactory ProcessFactory) ProcessRunner {
-	return processRunnerimpl{pathProvider: pathProvider, processFactory: processFactory}
+func NewProcessRunner(pathProvider path.PathProvider) ProcessRunner {
+	return processRunnerimpl{pathProvider: pathProvider}
 }
 
 // Start implements ProcessRunner.
@@ -34,7 +33,11 @@ func (p processRunnerimpl) Start(image *ent.UploadImage, processes []types.Image
 	var imagePath *path.PathData
 	imagePath = p.pathProvider.Provide(image.DestinationPath, image.Filename)
 	for _, processInput := range processes {
-		process, err := p.processFactory.Create(processInput.Type, processInput.Options)
+		processFactory, err := GetProcessFactory(processInput.Type)
+		if err != nil {
+			return p.createError(err)
+		}
+		process, err := processFactory.Create(processInput.Options)
 		if err != nil {
 			return p.createError(err)
 		}

@@ -54,8 +54,8 @@ type ComplexityRoot struct {
 
 	ImageProcess struct {
 		Error     func(childComplexity int) int
+		ID        func(childComplexity int) int
 		Image     func(childComplexity int) int
-		ImageID   func(childComplexity int) int
 		Processes func(childComplexity int) int
 		Status    func(childComplexity int) int
 	}
@@ -150,19 +150,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ImageProcess.Error(childComplexity), true
 
+	case "ImageProcess.id":
+		if e.complexity.ImageProcess.ID == nil {
+			break
+		}
+
+		return e.complexity.ImageProcess.ID(childComplexity), true
+
 	case "ImageProcess.image":
 		if e.complexity.ImageProcess.Image == nil {
 			break
 		}
 
 		return e.complexity.ImageProcess.Image(childComplexity), true
-
-	case "ImageProcess.imageId":
-		if e.complexity.ImageProcess.ImageID == nil {
-			break
-		}
-
-		return e.complexity.ImageProcess.ImageID(childComplexity), true
 
 	case "ImageProcess.processes":
 		if e.complexity.ImageProcess.Processes == nil {
@@ -956,8 +956,8 @@ func (ec *executionContext) fieldContext_ImageData_url(_ context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _ImageProcess_imageId(ctx context.Context, field graphql.CollectedField, obj *model.ImageProcess) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ImageProcess_imageId(ctx, field)
+func (ec *executionContext) _ImageProcess_id(ctx context.Context, field graphql.CollectedField, obj *model.ImageProcess) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImageProcess_id(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -970,7 +970,7 @@ func (ec *executionContext) _ImageProcess_imageId(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ImageID, nil
+		return obj.ID, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -987,7 +987,7 @@ func (ec *executionContext) _ImageProcess_imageId(ctx context.Context, field gra
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ImageProcess_imageId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ImageProcess_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ImageProcess",
 		Field:      field,
@@ -1478,8 +1478,8 @@ func (ec *executionContext) fieldContext_Mutation_processImage(ctx context.Conte
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "imageId":
-				return ec.fieldContext_ImageProcess_imageId(ctx, field)
+			case "id":
+				return ec.fieldContext_ImageProcess_id(ctx, field)
 			case "image":
 				return ec.fieldContext_ImageProcess_image(ctx, field)
 			case "processes":
@@ -4182,8 +4182,8 @@ func (ec *executionContext) _ImageProcess(ctx context.Context, sel ast.Selection
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ImageProcess")
-		case "imageId":
-			out.Values[i] = ec._ImageProcess_imageId(ctx, field, obj)
+		case "id":
+			out.Values[i] = ec._ImageProcess_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

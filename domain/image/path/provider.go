@@ -8,19 +8,19 @@ type (
 		FullPath  string
 	}
 	PathProvider interface {
-		Provide(directory string, filename string) PathData
+		Provide(directory string, filename string) *PathData
 	}
 	pathProviderImpl struct {
 		baseDirectory string
 	}
 )
 
-func (p pathProviderImpl) Provide(directory string, filename string) PathData {
+func (p pathProviderImpl) Provide(directory string, filename string) *PathData {
 	absoluteDirectory := strings.Join([]string{
 		strings.TrimSuffix(p.baseDirectory, "/"),
 		strings.TrimSuffix(directory, "/"),
 	}, "/")
-	return PathData{
+	return &PathData{
 		Directory: absoluteDirectory,
 		FullPath:  strings.Join([]string{absoluteDirectory, filename}, "/"),
 	}

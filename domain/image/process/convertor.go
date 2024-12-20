@@ -19,7 +19,7 @@ func NewConvertor() Convertor {
 
 func (c convertorImpl) Convert(processEntity *ent.ImageProcess, imageName *string, imageURL *string) *model.ImageProcess {
 	return &model.ImageProcess{
-		ImageID:   processEntity.ID,
+		ID:        processEntity.ID,
 		Image:     c.convertImageData(imageName, imageURL),
 		Processes: c.convertToGQLProcesses(processEntity.Processes),
 		Error:     &processEntity.Error,

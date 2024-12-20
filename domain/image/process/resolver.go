@@ -3,7 +3,6 @@ package process
 import (
 	"context"
 
-	"wsw/backend/domain/image/process/runner"
 	"wsw/backend/ent"
 	"wsw/backend/ent/types"
 	"wsw/backend/graph/model"
@@ -20,11 +19,11 @@ type (
 		imagesModel    image.UploadedImage
 		processesModel image.ImageProcesses
 		gqlConvertor   Convertor
-		runner         runner.ProcessRunner
+		runner         ProcessRunner
 	}
 )
 
-func NewProcessResolver(imagesModel image.UploadedImage, processesModel image.ImageProcesses, gqlConvertor Convertor, runner runner.ProcessRunner) Resolver {
+func NewProcessResolver(imagesModel image.UploadedImage, processesModel image.ImageProcesses, gqlConvertor Convertor, runner ProcessRunner) Resolver {
 	return resolverImpl{imagesModel: imagesModel, processesModel: processesModel, gqlConvertor: gqlConvertor, runner: runner}
 }
 

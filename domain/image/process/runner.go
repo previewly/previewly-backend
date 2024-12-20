@@ -42,7 +42,7 @@ func (p processRunnerimpl) Start(image *ent.UploadImage, processes []types.Image
 		if err != nil {
 			return p.createError(err)
 		}
-		imagePath = &updatedImagePath
+		imagePath = updatedImagePath
 	}
 	return p.createSuccessResult("", pointer.String(image.Filename), nil)
 }

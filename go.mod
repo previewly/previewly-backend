@@ -10,6 +10,7 @@ require (
 	github.com/golobby/container/v3 v3.3.2
 	github.com/google/uuid v1.6.0
 	github.com/gookit/goutil v0.6.18
+	github.com/h2non/bimg v1.1.9
 	github.com/lib/pq v1.10.9
 	github.com/rollbar/rollbar-go v1.4.5
 	github.com/rs/cors v1.11.1

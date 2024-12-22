@@ -2,6 +2,7 @@ package process
 
 import (
 	"wsw/backend/domain/image/path"
+	"wsw/backend/domain/image/url"
 	"wsw/backend/ent"
 	"wsw/backend/ent/types"
 
@@ -22,11 +23,12 @@ type (
 	processRunnerimpl struct {
 		pathProvider  path.PathProvider
 		pathGenerator path.FilenameGenerator
+		urlProvider   url.Provider
 	}
 )
 
-func NewProcessRunner(pathProvider path.PathProvider, pathGenerator path.FilenameGenerator) ProcessRunner {
-	return processRunnerimpl{pathProvider: pathProvider, pathGenerator: pathGenerator}
+func NewProcessRunner(pathProvider path.PathProvider, pathGenerator path.FilenameGenerator, urlProvider url.Provider) ProcessRunner {
+	return processRunnerimpl{pathProvider: pathProvider, pathGenerator: pathGenerator, urlProvider: urlProvider}
 }
 
 // Start implements ProcessRunner.
@@ -53,7 +55,8 @@ func (p processRunnerimpl) Start(image *ent.UploadImage, processes []types.Image
 		}
 		imagePath = toPath
 	}
-	return p.createSuccessResult("", pointer.String(image.Filename), nil)
+	url := p.urlProvider.Provide(&imagePath.RelativeFullPath)
+	return p.createSuccessResult("", pointer.String(image.Filename), &url)
 }
 
 func (p processRunnerimpl) createError(err error) RunnerResult {

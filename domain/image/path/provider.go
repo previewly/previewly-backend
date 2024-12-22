@@ -4,8 +4,10 @@ import "strings"
 
 type (
 	PathData struct {
-		Directory string
-		FullPath  string
+		RelativeDirectory string
+		RelativeFullPath  string
+		Directory         string
+		FullPath          string
 	}
 	PathProvider interface {
 		Provide(directory string, filename string) *PathData
@@ -21,8 +23,10 @@ func (p pathProviderImpl) Provide(directory string, filename string) *PathData {
 		strings.TrimSuffix(directory, "/"),
 	}, "/")
 	return &PathData{
-		Directory: absoluteDirectory,
-		FullPath:  strings.Join([]string{absoluteDirectory, filename}, "/"),
+		RelativeDirectory: directory,
+		RelativeFullPath:  strings.Join([]string{strings.TrimSuffix(directory, "/"), filename}, "/"),
+		Directory:         absoluteDirectory,
+		FullPath:          strings.Join([]string{absoluteDirectory, filename}, "/"),
 	}
 }
 

@@ -2,12 +2,12 @@ package process
 
 import (
 	"errors"
+	"os"
 	"strconv"
 	"strings"
 
 	"wsw/backend/domain/image/path"
 	"wsw/backend/ent/types"
-	"wsw/backend/lib/utils"
 
 	"github.com/h2non/bimg"
 )
@@ -22,13 +22,46 @@ type (
 
 // Run implements Process.
 func (r resizeProcessImpl) Run(from path.PathData, to path.PathData) error {
-	_, err := bimg.Read(from.FullPath)
+	buffer, err := bimg.Read(from.FullPath)
 	if err != nil {
 		return err
 	}
-	utils.D(to)
 
-	return nil
+	size, err := bimg.NewImage(buffer).Size()
+	if err != nil {
+		return err
+	}
+	ratio := float64(size.Width) / float64(size.Height)
+
+	resizeWidth := r.getResizeWidth(ratio)
+	resizeHeight := r.getResizeHeight(ratio)
+
+	newImage, err := bimg.NewImage(buffer).Resize(resizeWidth, resizeHeight)
+	if err != nil {
+		return err
+	}
+
+	// Create the uploads folder if it doesn't already exist
+	errMkdir := os.MkdirAll(to.Directory, os.ModePerm)
+	if errMkdir != nil {
+		return errMkdir
+	}
+
+	return bimg.Write(to.FullPath, newImage)
+}
+
+func (r resizeProcessImpl) getResizeHeight(ratio float64) int {
+	if r.height != nil {
+		return *r.height
+	}
+	return int(ratio * float64(*r.width))
+}
+
+func (r resizeProcessImpl) getResizeWidth(ratio float64) int {
+	if r.width != nil {
+		return *r.width
+	}
+	return int(ratio * float64(*r.height))
 }
 
 func (r resizeProcessImpl) GeneratePathPrefix() string {

@@ -42,7 +42,10 @@ func (p processRunnerimpl) Start(image *ent.UploadImage, processes []types.Image
 		if err != nil {
 			return p.createError(err)
 		}
-		toPath := p.pathProvider.Provide(process.GeneratePathPrefix(), image.Filename)
+
+		prefix := process.GeneratePathPrefix()
+		newPath := p.pathGenerator.GenerateFilepath(&prefix)
+		toPath := p.pathProvider.Provide(newPath, image.Filename)
 		processError := process.Run(*imagePath, *toPath)
 
 		if processError != nil {

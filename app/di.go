@@ -21,7 +21,7 @@ import (
 	"wsw/backend/model/token"
 	"wsw/backend/model/url"
 
-	domainImagePathProvider "wsw/backend/domain/image/path"
+	domainImagePath "wsw/backend/domain/image/path"
 	domainStorage "wsw/backend/domain/image/upload/storage"
 
 	imageModel "wsw/backend/model/image"
@@ -117,15 +117,15 @@ func initDi(config config.Config, appContext context.Context) {
 }
 
 func initDomains(config config.Config) {
-	initService(func() domainStorage.FilenameGenerator { return domainStorage.NewFilenameProvider() })
-	initService(func() domainImagePathProvider.PathProvider {
-		return domainImagePathProvider.NewPathProvider(config.App.UploadPath)
+	initService(func() domainImagePath.FilenameGenerator { return domainImagePath.NewFilenameProvider() })
+	initService(func() domainImagePath.PathProvider {
+		return domainImagePath.NewPathProvider(config.App.UploadPath)
 	})
-	initService(func(filenameGenerator domainStorage.FilenameGenerator, pathProvider domainImagePathProvider.PathProvider) domainStorage.Storage {
+	initService(func(filenameGenerator domainImagePath.FilenameGenerator, pathProvider domainImagePath.PathProvider) domainStorage.Storage {
 		return domainStorage.NewUploadStorage(filenameGenerator, pathProvider)
 	})
 	initService(func() process.Convertor { return process.NewConvertor() })
-	initService(func(pathProvider domainImagePathProvider.PathProvider) domainRunner.ProcessRunner {
+	initService(func(pathProvider domainImagePath.PathProvider) domainRunner.ProcessRunner {
 		return domainRunner.NewProcessRunner(pathProvider)
 	})
 }

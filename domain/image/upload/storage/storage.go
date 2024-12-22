@@ -18,12 +18,12 @@ type (
 		Save(string, *string, io.ReadSeeker) (*StorageFile, error)
 	}
 	storageImpl struct {
-		nameGenerator FilenameGenerator
+		nameGenerator path.FilenameGenerator
 		pathProvider  path.PathProvider
 	}
 )
 
-func NewUploadStorage(filenameGenerator FilenameGenerator, pathProvider path.PathProvider) Storage {
+func NewUploadStorage(filenameGenerator path.FilenameGenerator, pathProvider path.PathProvider) Storage {
 	return storageImpl{
 		nameGenerator: filenameGenerator,
 		pathProvider:  pathProvider,

@@ -9,7 +9,6 @@ import (
 	"wsw/backend/app/config"
 	"wsw/backend/domain/gowitness"
 	"wsw/backend/domain/image/process"
-	domainRunner "wsw/backend/domain/image/process"
 	"wsw/backend/domain/image/upload"
 	"wsw/backend/domain/path/screenshot/relative"
 	"wsw/backend/domain/token/generator"
@@ -22,7 +21,9 @@ import (
 	"wsw/backend/model/url"
 
 	domainImagePath "wsw/backend/domain/image/path"
+	domainRunner "wsw/backend/domain/image/process"
 	domainStorage "wsw/backend/domain/image/upload/storage"
+	domainImageUrl "wsw/backend/domain/image/url"
 
 	imageModel "wsw/backend/model/image"
 
@@ -84,8 +85,8 @@ func initDi(config config.Config, appContext context.Context) {
 
 	initService(func() generator.TokenGenerator { return generator.NewTokenGenerator() })
 	initService(func() screenshot.Loader { return screenshot.NewLoader(config.App.AssetsBaseURL) })
-	initService(func(loader screenshot.Loader) screenshot.Provider {
-		return screenshot.NewProvider(config.Gowitness, loader)
+	initService(func(loader screenshot.Loader) domainImageUrl.Provider {
+		return domainImageUrl.NewProvider(config.Gowitness, loader)
 	})
 	initService(func() relative.Provider { return relative.NewProvider() })
 
@@ -143,7 +144,7 @@ func initModels() {
 	initService(func(generator generator.TokenGenerator, tokenRepository repository.Token) token.Token {
 		return token.NewModel(generator, tokenRepository)
 	})
-	initService(func(urlRepository repository.Url, client gowitness.Client, provider screenshot.Provider) url.Url {
+	initService(func(urlRepository repository.Url, client gowitness.Client, provider domainImageUrl.Provider) url.Url {
 		return url.NewUrl(urlRepository, client, provider)
 	})
 

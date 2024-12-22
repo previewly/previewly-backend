@@ -12,7 +12,6 @@ import (
 	"wsw/backend/domain/image/upload"
 	"wsw/backend/domain/path/screenshot/relative"
 	"wsw/backend/domain/token/generator"
-	"wsw/backend/domain/url/screenshot"
 	"wsw/backend/ent"
 	"wsw/backend/ent/repository"
 	log "wsw/backend/lib/log"
@@ -84,9 +83,8 @@ func initDi(config config.Config, appContext context.Context) {
 	})
 
 	initService(func() generator.TokenGenerator { return generator.NewTokenGenerator() })
-	initService(func() screenshot.Loader { return screenshot.NewLoader(config.App.AssetsBaseURL) })
-	initService(func(loader screenshot.Loader) domainImageUrl.Provider {
-		return domainImageUrl.NewProvider(config.Gowitness, loader)
+	initService(func() domainImageUrl.Provider {
+		return domainImageUrl.NewProvider(config.Gowitness.ScreenshotBaseUrl, config.App.AssetsBaseURL)
 	})
 	initService(func() relative.Provider { return relative.NewProvider() })
 

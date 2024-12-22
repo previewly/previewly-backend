@@ -1,17 +1,12 @@
 package url
 
-import (
-	"wsw/backend/app/config"
-	"wsw/backend/domain/url/screenshot"
-)
-
 type (
 	Provider interface {
 		Provide(filename *string) string
 	}
 	providerImpl struct {
-		baseURL string
-		loader  screenshot.Loader
+		baseURL   string
+		assetsURL string
 	}
 )
 
@@ -20,12 +15,9 @@ func (p providerImpl) Provide(filename *string) string {
 	if filename != nil {
 		return p.baseURL + *filename
 	}
-	return p.loader.Provide()
+	return p.assetsURL + "loader-200px-200px.gif"
 }
 
-func NewProvider(config config.Gowitness, loader screenshot.Loader) Provider {
-	return providerImpl{
-		baseURL: config.ScreenshotBaseUrl,
-		loader:  loader,
-	}
+func NewProvider(baseURL string, assetsURL string) Provider {
+	return providerImpl{baseURL: baseURL, assetsURL: assetsURL}
 }

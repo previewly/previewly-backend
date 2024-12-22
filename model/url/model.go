@@ -4,8 +4,8 @@ import (
 	netUrl "net/url"
 
 	"wsw/backend/domain/gowitness"
+	"wsw/backend/domain/image/url"
 	"wsw/backend/domain/preview"
-	"wsw/backend/domain/url/screenshot"
 	"wsw/backend/ent"
 	"wsw/backend/ent/repository"
 	"wsw/backend/ent/types"
@@ -19,7 +19,7 @@ type (
 	urlImpl struct {
 		client                gowitness.Client
 		urlRepository         repository.Url
-		screenshotURLProvider screenshot.Provider
+		screenshotURLProvider url.Provider
 	}
 )
 
@@ -39,12 +39,12 @@ func (u urlImpl) AddURL(url string) (*preview.PreviewData, error) {
 	if err != nil {
 		return nil, err
 	}
-	urlEntity, err, isNew := u.getOrCreateUrlEntity(url)
+	urlEntity, err, isNew := u.getOrCreateURLEntity(url)
 	if err != nil {
 		return nil, err
 	}
 
-	updatedEntity, err := u.updateUrlData(urlEntity, isNew)
+	updatedEntity, err := u.updateURLData(urlEntity, isNew)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (u urlImpl) AddURL(url string) (*preview.PreviewData, error) {
 	return u.createPreviewData(updatedEntity)
 }
 
-func NewUrl(urlRepository repository.Url, client gowitness.Client, provider screenshot.Provider) Url {
+func NewUrl(urlRepository repository.Url, client gowitness.Client, provider url.Provider) Url {
 	return urlImpl{
 		urlRepository:         urlRepository,
 		client:                client,
@@ -60,7 +60,7 @@ func NewUrl(urlRepository repository.Url, client gowitness.Client, provider scre
 	}
 }
 
-func (u urlImpl) updateUrlData(urlEntity *ent.Url, isNew bool) (*ent.Url, error) {
+func (u urlImpl) updateURLData(urlEntity *ent.Url, isNew bool) (*ent.Url, error) {
 	if isNew {
 		go func(url *ent.Url) {
 			u.client.UpdateUrl(url)
@@ -69,11 +69,11 @@ func (u urlImpl) updateUrlData(urlEntity *ent.Url, isNew bool) (*ent.Url, error)
 	return urlEntity, nil
 }
 
-func (u urlImpl) getOrCreateUrlEntity(url string) (*ent.Url, error, bool) {
+func (u urlImpl) getOrCreateURLEntity(url string) (*ent.Url, error, bool) {
 	entity := u.urlRepository.TryGet(url)
 	if entity == nil {
-		entity, err := u.urlRepository.Insert(url)
-		return entity, err, true
+		newEntity, err := u.urlRepository.Insert(url)
+		return newEntity, err, true
 	}
 	return entity, nil, false
 }

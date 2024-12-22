@@ -2,9 +2,12 @@ package process
 
 import (
 	"errors"
+	"strconv"
+	"strings"
 
 	"wsw/backend/domain/image/path"
 	"wsw/backend/ent/types"
+	"wsw/backend/lib/utils"
 
 	"github.com/h2non/bimg"
 )
@@ -18,15 +21,28 @@ type (
 )
 
 // Run implements Process.
-func (r resizeProcessImpl) Run(imagePath path.PathData) (*path.PathData, error) {
-	_, err := bimg.Read(imagePath.FullPath)
+func (r resizeProcessImpl) Run(from path.PathData, to path.PathData) error {
+	_, err := bimg.Read(from.FullPath)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return &path.PathData{
-		FullPath:  "Sss",
-		Directory: "sxsdsdsd",
-	}, nil
+	utils.D(to)
+
+	return nil
+}
+
+func (r resizeProcessImpl) GeneratePathPrefix() string {
+	var sb strings.Builder
+	sb.WriteString("resize/")
+	if r.width != nil {
+		sb.WriteString(strconv.Itoa(*r.width))
+		sb.WriteString("/")
+	}
+	if r.height != nil {
+		sb.WriteString(strconv.Itoa(*r.height))
+		sb.WriteString("/")
+	}
+	return sb.String()
 }
 
 // Create implements ProcessFactory.

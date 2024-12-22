@@ -9,7 +9,8 @@ import (
 
 type (
 	Process interface {
-		Run(path.PathData) (*path.PathData, error)
+		Run(path.PathData, path.PathData) error
+		GeneratePathPrefix() string
 	}
 	ProcessFactory interface {
 		Create([]types.ImageProcessOption) (Process, error)

@@ -2,6 +2,7 @@ package url
 
 import (
 	netUrl "net/url"
+	"strings"
 
 	"wsw/backend/domain/gowitness"
 	"wsw/backend/domain/image/url"
@@ -98,15 +99,27 @@ func (u urlImpl) createPreviewData(url *ent.Url) (*preview.PreviewData, error) {
 	if lastStat != nil {
 		title = lastStat.Title
 	}
-
+	imagePath := u.getImagePath(url.RelativePath)
 	return &preview.PreviewData{
 		ID:     url.ID,
 		URL:    url.URL,
-		Image:  u.screenshotURLProvider.Provide(url.RelativePath),
+		Image:  u.screenshotURLProvider.Provide(imagePath),
 		Status: u.getPreviewDataStatus(url.Status),
 		Error:  errorMessage,
 		Title:  title,
 	}, nil
+}
+
+func (u urlImpl) getImagePath(path *string) *string {
+	if path != nil {
+		var sb strings.Builder
+		sb.WriteString("screenshot/")
+		sb.WriteString(*path)
+		result := sb.String()
+		return &result
+	} else {
+		return nil
+	}
 }
 
 func (u urlImpl) getLastError(entity *ent.Url) (*ent.ErrorResult, error) {

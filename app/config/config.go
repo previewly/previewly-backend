@@ -83,7 +83,7 @@ func NewConfig() Config {
 	flag.StringVar(&postgresPassword, "postgres-password", "wsw", "Database user password")
 
 	flag.StringVar(&screenShotPath, "screenshot-path", baseDataPath+"screenshots", "Screenshot path")
-	flag.StringVar(&screenshotBaseURL, "screenshot-base-url", "http://localhost:8000/screenshot/", "Base url for screenshot")
+	flag.StringVar(&screenshotBaseURL, "screenshot-base-url", "http://localhost:8000/", "Base url for screenshot")
 
 	flag.Parse()
 

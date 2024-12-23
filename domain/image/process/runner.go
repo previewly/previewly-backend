@@ -1,6 +1,8 @@
 package process
 
 import (
+	"strings"
+
 	"wsw/backend/domain/image/path"
 	"wsw/backend/domain/image/url"
 	"wsw/backend/ent"
@@ -55,8 +57,16 @@ func (p processRunnerimpl) Start(image *ent.UploadImage, processes []types.Image
 		}
 		imagePath = toPath
 	}
-	url := p.urlProvider.Provide(&imagePath.RelativeFullPath)
+	url := p.urlProvider.Provide(p.getImagePathForURL(imagePath.RelativeFullPath))
 	return p.createSuccessResult("", pointer.String(image.Filename), &url)
+}
+
+func (p processRunnerimpl) getImagePathForURL(path string) *string {
+	var sb strings.Builder
+	sb.WriteString("upload/")
+	sb.WriteString(path)
+	result := sb.String()
+	return &result
 }
 
 func (p processRunnerimpl) createError(err error) RunnerResult {

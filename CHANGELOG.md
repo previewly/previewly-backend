@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.4](https://github.com/previewly/previewly-backend/compare/v1.12.3...v1.12.4) (2024-12-24)
+
+
+### Bug Fixes
+
+* fix panic to image process ([5c064ea](https://github.com/previewly/previewly-backend/commit/5c064ea62f26107dc0518108bd04ccbe1de141cb))
+
 ## [1.12.3](https://github.com/previewly/previewly-backend/compare/v1.12.2...v1.12.3) (2024-12-24)
 
 

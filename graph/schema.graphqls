@@ -55,7 +55,6 @@ type ImageData {
   url: String!
 }
 type ImageProcess {
-  id: Int!
   image: ImageData
   processes: [OneImageProcess!]!
   status: Status!

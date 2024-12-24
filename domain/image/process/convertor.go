@@ -1,14 +1,15 @@
 package process
 
 import (
-	"wsw/backend/ent"
 	"wsw/backend/ent/types"
 	"wsw/backend/graph/model"
+
+	"github.com/xorcare/pointer"
 )
 
 type (
 	Convertor interface {
-		Convert(*ent.ImageProcess, *string, *string) *model.ImageProcess
+		Convert(RunnerResult) *model.ImageProcess
 	}
 	convertorImpl struct{}
 )
@@ -17,20 +18,24 @@ func NewConvertor() Convertor {
 	return convertorImpl{}
 }
 
-func (c convertorImpl) Convert(processEntity *ent.ImageProcess, imageName *string, imageURL *string) *model.ImageProcess {
+func (c convertorImpl) Convert(result RunnerResult) *model.ImageProcess {
+	var errorMessage *string
+	if result.Error != nil {
+		errorMessage = pointer.String(result.Error.Error())
+	}
+
 	return &model.ImageProcess{
-		ID:        processEntity.ID,
-		Image:     c.convertImageData(imageName, imageURL),
-		Processes: c.convertToGQLProcesses(processEntity.Processes),
-		Error:     &processEntity.Error,
-		Status:    model.Status(processEntity.Status),
+		Image:     c.convertImageData(result.Input.ImageName, result.ImageURL),
+		Processes: c.convertToGQLProcesses(result.Input.Processes),
+		Error:     errorMessage,
+		Status:    model.Status(result.Status),
 	}
 }
 
-func (c convertorImpl) convertImageData(imageName *string, imageURL *string) *model.ImageData {
+func (c convertorImpl) convertImageData(imageName string, imageURL *string) *model.ImageData {
 	if imageURL != nil {
 		return &model.ImageData{
-			Name: *imageName,
+			Name: imageName,
 			URL:  *imageURL,
 		}
 	}

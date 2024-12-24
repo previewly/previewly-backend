@@ -487,6 +487,22 @@ func (c *ImageProcessClient) GetX(ctx context.Context, id int) *ImageProcess {
 	return obj
 }
 
+// QueryUploadimage queries the uploadimage edge of a ImageProcess.
+func (c *ImageProcessClient) QueryUploadimage(ip *ImageProcess) *UploadImageQuery {
+	query := (&UploadImageClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ip.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(imageprocess.Table, imageprocess.FieldID, id),
+			sqlgraph.To(uploadimage.Table, uploadimage.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, imageprocess.UploadimageTable, imageprocess.UploadimageColumn),
+		)
+		fromV = sqlgraph.Neighbors(ip.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *ImageProcessClient) Hooks() []Hook {
 	return c.hooks.ImageProcess

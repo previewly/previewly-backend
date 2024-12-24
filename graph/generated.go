@@ -54,7 +54,6 @@ type ComplexityRoot struct {
 
 	ImageProcess struct {
 		Error     func(childComplexity int) int
-		ID        func(childComplexity int) int
 		Image     func(childComplexity int) int
 		Processes func(childComplexity int) int
 		Status    func(childComplexity int) int
@@ -149,13 +148,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ImageProcess.Error(childComplexity), true
-
-	case "ImageProcess.id":
-		if e.complexity.ImageProcess.ID == nil {
-			break
-		}
-
-		return e.complexity.ImageProcess.ID(childComplexity), true
 
 	case "ImageProcess.image":
 		if e.complexity.ImageProcess.Image == nil {
@@ -956,50 +948,6 @@ func (ec *executionContext) fieldContext_ImageData_url(_ context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _ImageProcess_id(ctx context.Context, field graphql.CollectedField, obj *model.ImageProcess) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ImageProcess_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ImageProcess_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ImageProcess",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _ImageProcess_image(ctx context.Context, field graphql.CollectedField, obj *model.ImageProcess) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ImageProcess_image(ctx, field)
 	if err != nil {
@@ -1478,8 +1426,6 @@ func (ec *executionContext) fieldContext_Mutation_processImage(ctx context.Conte
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_ImageProcess_id(ctx, field)
 			case "image":
 				return ec.fieldContext_ImageProcess_image(ctx, field)
 			case "processes":
@@ -4182,11 +4128,6 @@ func (ec *executionContext) _ImageProcess(ctx context.Context, sel ast.Selection
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ImageProcess")
-		case "id":
-			out.Values[i] = ec._ImageProcess_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "image":
 			out.Values[i] = ec._ImageProcess_image(ctx, field, obj)
 		case "processes":

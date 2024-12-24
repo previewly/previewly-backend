@@ -9,6 +9,7 @@ import (
 	"time"
 	"wsw/backend/ent/imageprocess"
 	"wsw/backend/ent/types"
+	"wsw/backend/ent/uploadimage"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -21,6 +22,8 @@ type ImageProcess struct {
 	ID int `json:"id,omitempty"`
 	// Status holds the value of the "status" field.
 	Status types.StatusEnum `json:"status,omitempty"`
+	// ProcessHash holds the value of the "process_hash" field.
+	ProcessHash string `json:"process_hash,omitempty"`
 	// Processes holds the value of the "processes" field.
 	Processes []types.ImageProcess `json:"processes,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -30,9 +33,32 @@ type ImageProcess struct {
 	// PathPrefix holds the value of the "path_prefix" field.
 	PathPrefix string `json:"path_prefix,omitempty"`
 	// Error holds the value of the "error" field.
-	Error                     string `json:"error,omitempty"`
+	Error string `json:"error,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the ImageProcessQuery when eager-loading is set.
+	Edges                     ImageProcessEdges `json:"edges"`
 	upload_image_imageprocess *int
 	selectValues              sql.SelectValues
+}
+
+// ImageProcessEdges holds the relations/edges for other nodes in the graph.
+type ImageProcessEdges struct {
+	// Uploadimage holds the value of the uploadimage edge.
+	Uploadimage *UploadImage `json:"uploadimage,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// UploadimageOrErr returns the Uploadimage value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ImageProcessEdges) UploadimageOrErr() (*UploadImage, error) {
+	if e.Uploadimage != nil {
+		return e.Uploadimage, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: uploadimage.Label}
+	}
+	return nil, &NotLoadedError{edge: "uploadimage"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -44,7 +70,7 @@ func (*ImageProcess) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case imageprocess.FieldID:
 			values[i] = new(sql.NullInt64)
-		case imageprocess.FieldStatus, imageprocess.FieldPathPrefix, imageprocess.FieldError:
+		case imageprocess.FieldStatus, imageprocess.FieldProcessHash, imageprocess.FieldPathPrefix, imageprocess.FieldError:
 			values[i] = new(sql.NullString)
 		case imageprocess.FieldCreatedAt, imageprocess.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -76,6 +102,12 @@ func (ip *ImageProcess) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
 				ip.Status = types.StatusEnum(value.String)
+			}
+		case imageprocess.FieldProcessHash:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field process_hash", values[i])
+			} else if value.Valid {
+				ip.ProcessHash = value.String
 			}
 		case imageprocess.FieldProcesses:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -129,6 +161,11 @@ func (ip *ImageProcess) Value(name string) (ent.Value, error) {
 	return ip.selectValues.Get(name)
 }
 
+// QueryUploadimage queries the "uploadimage" edge of the ImageProcess entity.
+func (ip *ImageProcess) QueryUploadimage() *UploadImageQuery {
+	return NewImageProcessClient(ip.config).QueryUploadimage(ip)
+}
+
 // Update returns a builder for updating this ImageProcess.
 // Note that you need to call ImageProcess.Unwrap() before calling this method if this ImageProcess
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -154,6 +191,9 @@ func (ip *ImageProcess) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", ip.ID))
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", ip.Status))
+	builder.WriteString(", ")
+	builder.WriteString("process_hash=")
+	builder.WriteString(ip.ProcessHash)
 	builder.WriteString(", ")
 	builder.WriteString("processes=")
 	builder.WriteString(fmt.Sprintf("%v", ip.Processes))

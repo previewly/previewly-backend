@@ -11,7 +11,7 @@ import (
 type (
 	UploadImageRepository interface {
 		Insert(string, string, string, string) (*ent.UploadImage, error)
-		CreateProcess(*ent.UploadImage, []types.ImageProcess) (*ent.ImageProcess, error)
+		CreateProcess(entity *ent.UploadImage, processes []types.ImageProcess, hash string) (*ent.ImageProcess, error)
 		GetByID(int) (*ent.UploadImage, error)
 	}
 	uploadrepositoryImpl struct {
@@ -20,9 +20,10 @@ type (
 	}
 )
 
-func (u uploadrepositoryImpl) CreateProcess(imageEntity *ent.UploadImage, imageProcesses []types.ImageProcess) (*ent.ImageProcess, error) {
+func (u uploadrepositoryImpl) CreateProcess(imageEntity *ent.UploadImage, imageProcesses []types.ImageProcess, hash string) (*ent.ImageProcess, error) {
 	process, err := u.client.ImageProcess.Create().
 		SetStatus(types.Pending).
+		SetProcessHash(hash).
 		SetProcesses(imageProcesses).
 		Save(u.ctx)
 	if err != nil {

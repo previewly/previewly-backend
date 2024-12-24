@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.2](https://github.com/previewly/previewly-backend/compare/v1.12.1...v1.12.2) (2024-12-24)
+
+
+### Bug Fixes
+
+* fix docker image build ([8b637d1](https://github.com/previewly/previewly-backend/commit/8b637d1811674451533da8bd7663d65cfd9e3090))
+
 ## [1.12.1](https://github.com/previewly/previewly-backend/compare/v1.12.0...v1.12.1) (2024-12-24)
 
 

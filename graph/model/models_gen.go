@@ -14,7 +14,6 @@ type ImageData struct {
 }
 
 type ImageProcess struct {
-	ID        int                `json:"id"`
 	Image     *ImageData         `json:"image,omitempty"`
 	Processes []*OneImageProcess `json:"processes"`
 	Status    Status             `json:"status"`

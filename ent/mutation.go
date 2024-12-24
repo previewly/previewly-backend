@@ -443,20 +443,23 @@ func (m *ErrorResultMutation) ResetEdge(name string) error {
 // ImageProcessMutation represents an operation that mutates the ImageProcess nodes in the graph.
 type ImageProcessMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *int
-	status          *types.StatusEnum
-	processes       *[]types.ImageProcess
-	appendprocesses []types.ImageProcess
-	created_at      *time.Time
-	updated_at      *time.Time
-	path_prefix     *string
-	error           *string
-	clearedFields   map[string]struct{}
-	done            bool
-	oldValue        func(context.Context) (*ImageProcess, error)
-	predicates      []predicate.ImageProcess
+	op                 Op
+	typ                string
+	id                 *int
+	status             *types.StatusEnum
+	process_hash       *string
+	processes          *[]types.ImageProcess
+	appendprocesses    []types.ImageProcess
+	created_at         *time.Time
+	updated_at         *time.Time
+	path_prefix        *string
+	error              *string
+	clearedFields      map[string]struct{}
+	uploadimage        *int
+	cleareduploadimage bool
+	done               bool
+	oldValue           func(context.Context) (*ImageProcess, error)
+	predicates         []predicate.ImageProcess
 }
 
 var _ ent.Mutation = (*ImageProcessMutation)(nil)
@@ -591,6 +594,42 @@ func (m *ImageProcessMutation) OldStatus(ctx context.Context) (v types.StatusEnu
 // ResetStatus resets all changes to the "status" field.
 func (m *ImageProcessMutation) ResetStatus() {
 	m.status = nil
+}
+
+// SetProcessHash sets the "process_hash" field.
+func (m *ImageProcessMutation) SetProcessHash(s string) {
+	m.process_hash = &s
+}
+
+// ProcessHash returns the value of the "process_hash" field in the mutation.
+func (m *ImageProcessMutation) ProcessHash() (r string, exists bool) {
+	v := m.process_hash
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProcessHash returns the old "process_hash" field's value of the ImageProcess entity.
+// If the ImageProcess object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ImageProcessMutation) OldProcessHash(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldProcessHash is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldProcessHash requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProcessHash: %w", err)
+	}
+	return oldValue.ProcessHash, nil
+}
+
+// ResetProcessHash resets all changes to the "process_hash" field.
+func (m *ImageProcessMutation) ResetProcessHash() {
+	m.process_hash = nil
 }
 
 // SetProcesses sets the "processes" field.
@@ -814,6 +853,45 @@ func (m *ImageProcessMutation) ResetError() {
 	delete(m.clearedFields, imageprocess.FieldError)
 }
 
+// SetUploadimageID sets the "uploadimage" edge to the UploadImage entity by id.
+func (m *ImageProcessMutation) SetUploadimageID(id int) {
+	m.uploadimage = &id
+}
+
+// ClearUploadimage clears the "uploadimage" edge to the UploadImage entity.
+func (m *ImageProcessMutation) ClearUploadimage() {
+	m.cleareduploadimage = true
+}
+
+// UploadimageCleared reports if the "uploadimage" edge to the UploadImage entity was cleared.
+func (m *ImageProcessMutation) UploadimageCleared() bool {
+	return m.cleareduploadimage
+}
+
+// UploadimageID returns the "uploadimage" edge ID in the mutation.
+func (m *ImageProcessMutation) UploadimageID() (id int, exists bool) {
+	if m.uploadimage != nil {
+		return *m.uploadimage, true
+	}
+	return
+}
+
+// UploadimageIDs returns the "uploadimage" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UploadimageID instead. It exists only for internal usage by the builders.
+func (m *ImageProcessMutation) UploadimageIDs() (ids []int) {
+	if id := m.uploadimage; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUploadimage resets all changes to the "uploadimage" edge.
+func (m *ImageProcessMutation) ResetUploadimage() {
+	m.uploadimage = nil
+	m.cleareduploadimage = false
+}
+
 // Where appends a list predicates to the ImageProcessMutation builder.
 func (m *ImageProcessMutation) Where(ps ...predicate.ImageProcess) {
 	m.predicates = append(m.predicates, ps...)
@@ -848,9 +926,12 @@ func (m *ImageProcessMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ImageProcessMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.status != nil {
 		fields = append(fields, imageprocess.FieldStatus)
+	}
+	if m.process_hash != nil {
+		fields = append(fields, imageprocess.FieldProcessHash)
 	}
 	if m.processes != nil {
 		fields = append(fields, imageprocess.FieldProcesses)
@@ -877,6 +958,8 @@ func (m *ImageProcessMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case imageprocess.FieldStatus:
 		return m.Status()
+	case imageprocess.FieldProcessHash:
+		return m.ProcessHash()
 	case imageprocess.FieldProcesses:
 		return m.Processes()
 	case imageprocess.FieldCreatedAt:
@@ -898,6 +981,8 @@ func (m *ImageProcessMutation) OldField(ctx context.Context, name string) (ent.V
 	switch name {
 	case imageprocess.FieldStatus:
 		return m.OldStatus(ctx)
+	case imageprocess.FieldProcessHash:
+		return m.OldProcessHash(ctx)
 	case imageprocess.FieldProcesses:
 		return m.OldProcesses(ctx)
 	case imageprocess.FieldCreatedAt:
@@ -923,6 +1008,13 @@ func (m *ImageProcessMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStatus(v)
+		return nil
+	case imageprocess.FieldProcessHash:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetProcessHash(v)
 		return nil
 	case imageprocess.FieldProcesses:
 		v, ok := value.([]types.ImageProcess)
@@ -1026,6 +1118,9 @@ func (m *ImageProcessMutation) ResetField(name string) error {
 	case imageprocess.FieldStatus:
 		m.ResetStatus()
 		return nil
+	case imageprocess.FieldProcessHash:
+		m.ResetProcessHash()
+		return nil
 	case imageprocess.FieldProcesses:
 		m.ResetProcesses()
 		return nil
@@ -1047,19 +1142,28 @@ func (m *ImageProcessMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ImageProcessMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.uploadimage != nil {
+		edges = append(edges, imageprocess.EdgeUploadimage)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *ImageProcessMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case imageprocess.EdgeUploadimage:
+		if id := m.uploadimage; id != nil {
+			return []ent.Value{*id}
+		}
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ImageProcessMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
 	return edges
 }
 
@@ -1071,25 +1175,42 @@ func (m *ImageProcessMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ImageProcessMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.cleareduploadimage {
+		edges = append(edges, imageprocess.EdgeUploadimage)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *ImageProcessMutation) EdgeCleared(name string) bool {
+	switch name {
+	case imageprocess.EdgeUploadimage:
+		return m.cleareduploadimage
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *ImageProcessMutation) ClearEdge(name string) error {
+	switch name {
+	case imageprocess.EdgeUploadimage:
+		m.ClearUploadimage()
+		return nil
+	}
 	return fmt.Errorf("unknown ImageProcess unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *ImageProcessMutation) ResetEdge(name string) error {
+	switch name {
+	case imageprocess.EdgeUploadimage:
+		m.ResetUploadimage()
+		return nil
+	}
 	return fmt.Errorf("unknown ImageProcess edge %s", name)
 }
 

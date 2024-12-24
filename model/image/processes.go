@@ -10,8 +10,9 @@ import (
 
 type (
 	ImageProcesses interface {
-		Create(*ent.UploadImage, []types.ImageProcess) (*ent.ImageProcess, error)
-		Update(*ent.ImageProcess, string, types.StatusEnum, error) (*ent.ImageProcess, error)
+		Create(entity *ent.UploadImage, processes []types.ImageProcess, hash string) (*ent.ImageProcess, error)
+		Update(*ent.ImageProcess, string, types.StatusEnum, string) (*ent.ImageProcess, error)
+		TryGetByHash(imageID int, processesHash string) (*ent.ImageProcess, error)
 	}
 	imageProcessesImpl struct {
 		processRepository repository.ImageProcessRepository
@@ -19,20 +20,22 @@ type (
 	}
 )
 
-func (i imageProcessesImpl) Update(processEntity *ent.ImageProcess, prefix string, status types.StatusEnum, err error) (*ent.ImageProcess, error) {
-	var errorMessage *string
-	if err != nil {
-		errorMessage = pointer.String(err.Error())
-	} else {
-		errorMessage = nil
+func (i imageProcessesImpl) TryGetByHash(imageID int, processesHash string) (*ent.ImageProcess, error) {
+	entity, err := i.processRepository.GetByHash(imageID, processesHash)
+	if ent.IsNotFound(err) {
+		return nil, nil
 	}
-	return i.processRepository.Update(processEntity, prefix, status, errorMessage)
+	return entity, err
+}
+
+func (i imageProcessesImpl) Update(processEntity *ent.ImageProcess, prefix string, status types.StatusEnum, err string) (*ent.ImageProcess, error) {
+	return i.processRepository.Update(processEntity, prefix, status, pointer.String(err))
 }
 
 func NewImageProcesses(processRepository repository.ImageProcessRepository, imageRepository repository.UploadImageRepository) ImageProcesses {
 	return imageProcessesImpl{processRepository: processRepository, imageRepository: imageRepository}
 }
 
-func (i imageProcessesImpl) Create(imageEntity *ent.UploadImage, imageProcesses []types.ImageProcess) (*ent.ImageProcess, error) {
-	return i.imageRepository.CreateProcess(imageEntity, imageProcesses)
+func (i imageProcessesImpl) Create(entity *ent.UploadImage, processes []types.ImageProcess, hash string) (*ent.ImageProcess, error) {
+	return i.imageRepository.CreateProcess(entity, processes, hash)
 }

@@ -8,6 +8,7 @@ import (
 	"math"
 	"wsw/backend/ent/imageprocess"
 	"wsw/backend/ent/predicate"
+	"wsw/backend/ent/uploadimage"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -18,11 +19,12 @@ import (
 // ImageProcessQuery is the builder for querying ImageProcess entities.
 type ImageProcessQuery struct {
 	config
-	ctx        *QueryContext
-	order      []imageprocess.OrderOption
-	inters     []Interceptor
-	predicates []predicate.ImageProcess
-	withFKs    bool
+	ctx             *QueryContext
+	order           []imageprocess.OrderOption
+	inters          []Interceptor
+	predicates      []predicate.ImageProcess
+	withUploadimage *UploadImageQuery
+	withFKs         bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -57,6 +59,28 @@ func (ipq *ImageProcessQuery) Unique(unique bool) *ImageProcessQuery {
 func (ipq *ImageProcessQuery) Order(o ...imageprocess.OrderOption) *ImageProcessQuery {
 	ipq.order = append(ipq.order, o...)
 	return ipq
+}
+
+// QueryUploadimage chains the current query on the "uploadimage" edge.
+func (ipq *ImageProcessQuery) QueryUploadimage() *UploadImageQuery {
+	query := (&UploadImageClient{config: ipq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := ipq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := ipq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(imageprocess.Table, imageprocess.FieldID, selector),
+			sqlgraph.To(uploadimage.Table, uploadimage.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, imageprocess.UploadimageTable, imageprocess.UploadimageColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(ipq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first ImageProcess entity from the query.
@@ -246,15 +270,27 @@ func (ipq *ImageProcessQuery) Clone() *ImageProcessQuery {
 		return nil
 	}
 	return &ImageProcessQuery{
-		config:     ipq.config,
-		ctx:        ipq.ctx.Clone(),
-		order:      append([]imageprocess.OrderOption{}, ipq.order...),
-		inters:     append([]Interceptor{}, ipq.inters...),
-		predicates: append([]predicate.ImageProcess{}, ipq.predicates...),
+		config:          ipq.config,
+		ctx:             ipq.ctx.Clone(),
+		order:           append([]imageprocess.OrderOption{}, ipq.order...),
+		inters:          append([]Interceptor{}, ipq.inters...),
+		predicates:      append([]predicate.ImageProcess{}, ipq.predicates...),
+		withUploadimage: ipq.withUploadimage.Clone(),
 		// clone intermediate query.
 		sql:  ipq.sql.Clone(),
 		path: ipq.path,
 	}
+}
+
+// WithUploadimage tells the query-builder to eager-load the nodes that are connected to
+// the "uploadimage" edge. The optional arguments are used to configure the query builder of the edge.
+func (ipq *ImageProcessQuery) WithUploadimage(opts ...func(*UploadImageQuery)) *ImageProcessQuery {
+	query := (&UploadImageClient{config: ipq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	ipq.withUploadimage = query
+	return ipq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -333,10 +369,16 @@ func (ipq *ImageProcessQuery) prepareQuery(ctx context.Context) error {
 
 func (ipq *ImageProcessQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*ImageProcess, error) {
 	var (
-		nodes   = []*ImageProcess{}
-		withFKs = ipq.withFKs
-		_spec   = ipq.querySpec()
+		nodes       = []*ImageProcess{}
+		withFKs     = ipq.withFKs
+		_spec       = ipq.querySpec()
+		loadedTypes = [1]bool{
+			ipq.withUploadimage != nil,
+		}
 	)
+	if ipq.withUploadimage != nil {
+		withFKs = true
+	}
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, imageprocess.ForeignKeys...)
 	}
@@ -346,6 +388,7 @@ func (ipq *ImageProcessQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &ImageProcess{config: ipq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -357,7 +400,46 @@ func (ipq *ImageProcessQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := ipq.withUploadimage; query != nil {
+		if err := ipq.loadUploadimage(ctx, query, nodes, nil,
+			func(n *ImageProcess, e *UploadImage) { n.Edges.Uploadimage = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (ipq *ImageProcessQuery) loadUploadimage(ctx context.Context, query *UploadImageQuery, nodes []*ImageProcess, init func(*ImageProcess), assign func(*ImageProcess, *UploadImage)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*ImageProcess)
+	for i := range nodes {
+		if nodes[i].upload_image_imageprocess == nil {
+			continue
+		}
+		fk := *nodes[i].upload_image_imageprocess
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(uploadimage.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "upload_image_imageprocess" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
 }
 
 func (ipq *ImageProcessQuery) sqlCount(ctx context.Context) (int, error) {

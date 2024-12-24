@@ -8,6 +8,7 @@ import (
 	"wsw/backend/ent/types"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // ID filters vertices based on their ID field.
@@ -53,6 +54,11 @@ func IDLT(id int) predicate.ImageProcess {
 // IDLTE applies the LTE predicate on the ID field.
 func IDLTE(id int) predicate.ImageProcess {
 	return predicate.ImageProcess(sql.FieldLTE(FieldID, id))
+}
+
+// ProcessHash applies equality check predicate on the "process_hash" field. It's identical to ProcessHashEQ.
+func ProcessHash(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldEQ(FieldProcessHash, v))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
@@ -103,6 +109,71 @@ func StatusNotIn(vs ...types.StatusEnum) predicate.ImageProcess {
 		v[i] = vs[i]
 	}
 	return predicate.ImageProcess(sql.FieldNotIn(FieldStatus, v...))
+}
+
+// ProcessHashEQ applies the EQ predicate on the "process_hash" field.
+func ProcessHashEQ(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldEQ(FieldProcessHash, v))
+}
+
+// ProcessHashNEQ applies the NEQ predicate on the "process_hash" field.
+func ProcessHashNEQ(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldNEQ(FieldProcessHash, v))
+}
+
+// ProcessHashIn applies the In predicate on the "process_hash" field.
+func ProcessHashIn(vs ...string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldIn(FieldProcessHash, vs...))
+}
+
+// ProcessHashNotIn applies the NotIn predicate on the "process_hash" field.
+func ProcessHashNotIn(vs ...string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldNotIn(FieldProcessHash, vs...))
+}
+
+// ProcessHashGT applies the GT predicate on the "process_hash" field.
+func ProcessHashGT(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldGT(FieldProcessHash, v))
+}
+
+// ProcessHashGTE applies the GTE predicate on the "process_hash" field.
+func ProcessHashGTE(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldGTE(FieldProcessHash, v))
+}
+
+// ProcessHashLT applies the LT predicate on the "process_hash" field.
+func ProcessHashLT(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldLT(FieldProcessHash, v))
+}
+
+// ProcessHashLTE applies the LTE predicate on the "process_hash" field.
+func ProcessHashLTE(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldLTE(FieldProcessHash, v))
+}
+
+// ProcessHashContains applies the Contains predicate on the "process_hash" field.
+func ProcessHashContains(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldContains(FieldProcessHash, v))
+}
+
+// ProcessHashHasPrefix applies the HasPrefix predicate on the "process_hash" field.
+func ProcessHashHasPrefix(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldHasPrefix(FieldProcessHash, v))
+}
+
+// ProcessHashHasSuffix applies the HasSuffix predicate on the "process_hash" field.
+func ProcessHashHasSuffix(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldHasSuffix(FieldProcessHash, v))
+}
+
+// ProcessHashEqualFold applies the EqualFold predicate on the "process_hash" field.
+func ProcessHashEqualFold(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldEqualFold(FieldProcessHash, v))
+}
+
+// ProcessHashContainsFold applies the ContainsFold predicate on the "process_hash" field.
+func ProcessHashContainsFold(v string) predicate.ImageProcess {
+	return predicate.ImageProcess(sql.FieldContainsFold(FieldProcessHash, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -333,6 +404,29 @@ func ErrorEqualFold(v string) predicate.ImageProcess {
 // ErrorContainsFold applies the ContainsFold predicate on the "error" field.
 func ErrorContainsFold(v string) predicate.ImageProcess {
 	return predicate.ImageProcess(sql.FieldContainsFold(FieldError, v))
+}
+
+// HasUploadimage applies the HasEdge predicate on the "uploadimage" edge.
+func HasUploadimage() predicate.ImageProcess {
+	return predicate.ImageProcess(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, UploadimageTable, UploadimageColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUploadimageWith applies the HasEdge predicate on the "uploadimage" edge with a given conditions (other predicates).
+func HasUploadimageWith(preds ...predicate.UploadImage) predicate.ImageProcess {
+	return predicate.ImageProcess(func(s *sql.Selector) {
+		step := newUploadimageStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

@@ -33,6 +33,7 @@ var (
 	ImageProcessesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"success", "error", "pending"}},
+		{Name: "process_hash", Type: field.TypeString},
 		{Name: "processes", Type: field.TypeJSON},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
@@ -48,9 +49,16 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "image_processes_upload_images_imageprocess",
-				Columns:    []*schema.Column{ImageProcessesColumns[7]},
+				Columns:    []*schema.Column{ImageProcessesColumns[8]},
 				RefColumns: []*schema.Column{UploadImagesColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "imageprocess_process_hash_upload_image_imageprocess",
+				Unique:  true,
+				Columns: []*schema.Column{ImageProcessesColumns[2], ImageProcessesColumns[8]},
 			},
 		},
 	}

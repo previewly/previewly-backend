@@ -16,6 +16,7 @@ import (
 	"wsw/backend/ent/repository"
 	log "wsw/backend/lib/log"
 	"wsw/backend/lib/utils"
+	"wsw/backend/model/image"
 	"wsw/backend/model/token"
 	"wsw/backend/model/url"
 
@@ -124,17 +125,22 @@ func initDomains(config config.Config) {
 		return domainStorage.NewUploadStorage(filenameGenerator, pathProvider)
 	})
 	initService(func() process.Convertor { return process.NewConvertor() })
-	initService(func(pathProvider domainImagePath.PathProvider, pathGenerator domainImagePath.FilenameGenerator, urlProvider domainImageUrl.Provider) domainRunner.ProcessRunner {
-		return domainRunner.NewProcessRunner(pathProvider, pathGenerator, urlProvider)
-	})
+	initService(
+		func(pathProvider domainImagePath.PathProvider,
+			pathGenerator domainImagePath.FilenameGenerator,
+			urlProvider domainImageUrl.Provider,
+			processesModel image.ImageProcesses,
+		) domainRunner.ProcessRunner {
+			return domainRunner.NewProcessRunner(pathProvider, pathGenerator, urlProvider, processesModel)
+		})
 }
 
 func initResolvers() {
 	initService(func(model imageModel.UploadedImage, storage domainStorage.Storage) upload.Resolver {
 		return upload.NewUploadResolver(model, storage)
 	})
-	initService(func(model imageModel.UploadedImage, processesModel imageModel.ImageProcesses, gqlConvertor process.Convertor, runner domainRunner.ProcessRunner) process.Resolver {
-		return process.NewProcessResolver(model, processesModel, gqlConvertor, runner)
+	initService(func(model imageModel.UploadedImage, gqlConvertor process.Convertor, runner domainRunner.ProcessRunner) process.Resolver {
+		return process.NewProcessResolver(model, gqlConvertor, runner)
 	})
 }
 

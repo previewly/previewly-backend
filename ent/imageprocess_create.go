@@ -9,6 +9,7 @@ import (
 	"time"
 	"wsw/backend/ent/imageprocess"
 	"wsw/backend/ent/types"
+	"wsw/backend/ent/uploadimage"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -24,6 +25,12 @@ type ImageProcessCreate struct {
 // SetStatus sets the "status" field.
 func (ipc *ImageProcessCreate) SetStatus(te types.StatusEnum) *ImageProcessCreate {
 	ipc.mutation.SetStatus(te)
+	return ipc
+}
+
+// SetProcessHash sets the "process_hash" field.
+func (ipc *ImageProcessCreate) SetProcessHash(s string) *ImageProcessCreate {
+	ipc.mutation.SetProcessHash(s)
 	return ipc
 }
 
@@ -89,6 +96,25 @@ func (ipc *ImageProcessCreate) SetNillableError(s *string) *ImageProcessCreate {
 	return ipc
 }
 
+// SetUploadimageID sets the "uploadimage" edge to the UploadImage entity by ID.
+func (ipc *ImageProcessCreate) SetUploadimageID(id int) *ImageProcessCreate {
+	ipc.mutation.SetUploadimageID(id)
+	return ipc
+}
+
+// SetNillableUploadimageID sets the "uploadimage" edge to the UploadImage entity by ID if the given value is not nil.
+func (ipc *ImageProcessCreate) SetNillableUploadimageID(id *int) *ImageProcessCreate {
+	if id != nil {
+		ipc = ipc.SetUploadimageID(*id)
+	}
+	return ipc
+}
+
+// SetUploadimage sets the "uploadimage" edge to the UploadImage entity.
+func (ipc *ImageProcessCreate) SetUploadimage(u *UploadImage) *ImageProcessCreate {
+	return ipc.SetUploadimageID(u.ID)
+}
+
 // Mutation returns the ImageProcessMutation object of the builder.
 func (ipc *ImageProcessCreate) Mutation() *ImageProcessMutation {
 	return ipc.mutation
@@ -144,6 +170,9 @@ func (ipc *ImageProcessCreate) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "ImageProcess.status": %w`, err)}
 		}
 	}
+	if _, ok := ipc.mutation.ProcessHash(); !ok {
+		return &ValidationError{Name: "process_hash", err: errors.New(`ent: missing required field "ImageProcess.process_hash"`)}
+	}
 	if _, ok := ipc.mutation.Processes(); !ok {
 		return &ValidationError{Name: "processes", err: errors.New(`ent: missing required field "ImageProcess.processes"`)}
 	}
@@ -183,6 +212,10 @@ func (ipc *ImageProcessCreate) createSpec() (*ImageProcess, *sqlgraph.CreateSpec
 		_spec.SetField(imageprocess.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
 	}
+	if value, ok := ipc.mutation.ProcessHash(); ok {
+		_spec.SetField(imageprocess.FieldProcessHash, field.TypeString, value)
+		_node.ProcessHash = value
+	}
 	if value, ok := ipc.mutation.Processes(); ok {
 		_spec.SetField(imageprocess.FieldProcesses, field.TypeJSON, value)
 		_node.Processes = value
@@ -202,6 +235,23 @@ func (ipc *ImageProcessCreate) createSpec() (*ImageProcess, *sqlgraph.CreateSpec
 	if value, ok := ipc.mutation.Error(); ok {
 		_spec.SetField(imageprocess.FieldError, field.TypeString, value)
 		_node.Error = value
+	}
+	if nodes := ipc.mutation.UploadimageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   imageprocess.UploadimageTable,
+			Columns: []string{imageprocess.UploadimageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(uploadimage.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.upload_image_imageprocess = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

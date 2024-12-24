@@ -8,6 +8,7 @@ import (
 	"wsw/backend/ent/types"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -17,6 +18,8 @@ const (
 	FieldID = "id"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
+	// FieldProcessHash holds the string denoting the process_hash field in the database.
+	FieldProcessHash = "process_hash"
 	// FieldProcesses holds the string denoting the processes field in the database.
 	FieldProcesses = "processes"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -27,14 +30,24 @@ const (
 	FieldPathPrefix = "path_prefix"
 	// FieldError holds the string denoting the error field in the database.
 	FieldError = "error"
+	// EdgeUploadimage holds the string denoting the uploadimage edge name in mutations.
+	EdgeUploadimage = "uploadimage"
 	// Table holds the table name of the imageprocess in the database.
 	Table = "image_processes"
+	// UploadimageTable is the table that holds the uploadimage relation/edge.
+	UploadimageTable = "image_processes"
+	// UploadimageInverseTable is the table name for the UploadImage entity.
+	// It exists in this package in order to avoid circular dependency with the "uploadimage" package.
+	UploadimageInverseTable = "upload_images"
+	// UploadimageColumn is the table column denoting the uploadimage relation/edge.
+	UploadimageColumn = "upload_image_imageprocess"
 )
 
 // Columns holds all SQL columns for imageprocess fields.
 var Columns = []string{
 	FieldID,
 	FieldStatus,
+	FieldProcessHash,
 	FieldProcesses,
 	FieldCreatedAt,
 	FieldUpdatedAt,
@@ -95,6 +108,11 @@ func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }
 
+// ByProcessHash orders the results by the process_hash field.
+func ByProcessHash(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldProcessHash, opts...).ToFunc()
+}
+
 // ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
@@ -113,4 +131,18 @@ func ByPathPrefix(opts ...sql.OrderTermOption) OrderOption {
 // ByError orders the results by the error field.
 func ByError(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldError, opts...).ToFunc()
+}
+
+// ByUploadimageField orders the results by uploadimage field.
+func ByUploadimageField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUploadimageStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newUploadimageStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UploadimageInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, UploadimageTable, UploadimageColumn),
+	)
 }

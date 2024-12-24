@@ -113,7 +113,7 @@ func (u urlImpl) createPreviewData(url *ent.Url) (*preview.PreviewData, error) {
 func (u urlImpl) getImagePath(path *string) *string {
 	if path != nil {
 		var sb strings.Builder
-		sb.WriteString("screenshot/")
+		sb.WriteString("screenshots/")
 		sb.WriteString(*path)
 		result := sb.String()
 		return &result

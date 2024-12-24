@@ -1,5 +1,38 @@
 # Changelog
 
+## [1.12.0](https://github.com/previewly/previewly-backend/compare/v1.11.2...v1.12.0) (2024-12-24)
+
+
+### Features
+
+* add all image process resolver steps ([f1e431b](https://github.com/previewly/previewly-backend/commit/f1e431b9b4480490b5daed9cc12b608794a0413f))
+* add convertor to image process GQL type ([79262a9](https://github.com/previewly/previewly-backend/commit/79262a953d8f75cd3021f2b56ba56c8aaf8d0b1b))
+* add image process entity ([9557856](https://github.com/previewly/previewly-backend/commit/95578560a75c964cce92efb1f70a1ab24d65aa4a))
+* add image process options for entity ([f5d991c](https://github.com/previewly/previewly-backend/commit/f5d991c398dc67544f9414748ff2182b9ed415a2))
+* add libvips to docker image ([00f87e4](https://github.com/previewly/previewly-backend/commit/00f87e46ca5c2e7619adf933a57c2e05637bdec9))
+* add mutation for adding image processes ([2a3fa28](https://github.com/previewly/previewly-backend/commit/2a3fa2863b09bc5ed77061a00cad38cb6631a314))
+* create resize process for images ([d8fc0fd](https://github.com/previewly/previewly-backend/commit/d8fc0fd4ed7d14bd659c59d4424edfe00f524103))
+* createimage processes model ([e7ab8a5](https://github.com/previewly/previewly-backend/commit/e7ab8a5250f3ba6c5768d8e2a175cc87ae55a720))
+* creating image process entities ([7ef15a1](https://github.com/previewly/previewly-backend/commit/7ef15a1636027e92ef01b9194fb58228fe740c6a))
+* expose image data on image process mutation ([b1a4d36](https://github.com/previewly/previewly-backend/commit/b1a4d368ff65977f20df4b89927b55c57e71e76d))
+* generate image url ([12fe653](https://github.com/previewly/previewly-backend/commit/12fe65383f4783125a9023421c4f7b516029e1c1))
+* get image by id ([a7e4c87](https://github.com/previewly/previewly-backend/commit/a7e4c87a220140365fd8f3506284e3cd6224b7ce))
+* init resolver for image processes mutation ([e5542eb](https://github.com/previewly/previewly-backend/commit/e5542eb43a11c1c38719d220c38338466f431f7d))
+* resize image ([e836b7a](https://github.com/previewly/previewly-backend/commit/e836b7a54ba11410dca2e5e1122e3cad7ebec150))
+* save image process prefix ([35f8141](https://github.com/previewly/previewly-backend/commit/35f8141e2de365b77a50da17c4ba6e4e9e0c28e8))
+* save process status ([9393935](https://github.com/previewly/previewly-backend/commit/939393510c3cc94aeec3fab8b426811cd9b52954))
+* validation of image processes ([e033768](https://github.com/previewly/previewly-backend/commit/e0337683ec1ea4b33a8907f6f6e1b1658c062152))
+
+
+### Bug Fixes
+
+* fix a table definition of image process entity ([7ee3400](https://github.com/previewly/previewly-backend/commit/7ee340066bafa6690e8f77a163373be5a877b4ba))
+* fix image urls ([70e6d26](https://github.com/previewly/previewly-backend/commit/70e6d26e51902c940d1da6a5eb3dacfa2986a2fe))
+* fix saving of image process prifix value ([fe9a166](https://github.com/previewly/previewly-backend/commit/fe9a1661cf2ddd752708cd10c9efddfdbe8bd6e7))
+* image processes does not create again on same options ([366e25c](https://github.com/previewly/previewly-backend/commit/366e25c7ad02c0b389e913b3680ac8bcb2854a28))
+* resize process factory check options on new object creations ([a81854d](https://github.com/previewly/previewly-backend/commit/a81854d288ae08398b88258dbe2ded60a7e65c62))
+* update paths for process ([6c5008b](https://github.com/previewly/previewly-backend/commit/6c5008b1e2b026c5da8805eaead11ad11df7b3fe))
+
 ## [1.11.2](https://github.com/previewly/previewly-backend/compare/v1.11.1...v1.11.2) (2024-12-14)
 
 

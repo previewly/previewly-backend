@@ -73,22 +73,20 @@ func (p processRunnerimpl) Start(image *ent.UploadImage, processes []types.Image
 }
 
 func (p processRunnerimpl) doProcess(image *ent.UploadImage, processes []types.ImageProcess, processList []Process) (*ent.ImageProcess, error) {
-	utils.D(image, processes, processList)
 	hash := p.getProcessesHash(processList)
-	utils.D(hash)
 	processEntity, err := p.createProcessEntity(image, processes, hash)
 	if err != nil {
 		return nil, err
 	}
-	utils.D(processEntity)
 	imagePath, err := p.runProcesses(image, processList)
-	utils.D(imagePath, err)
 	if err != nil {
 		processEntity.Status = types.Error
 		processEntity.Error = err.Error()
+
+	} else {
+		processEntity.PathPrefix = imagePath.RelativeDirectory
+		processEntity.Status = types.Success
 	}
-	processEntity.PathPrefix = imagePath.RelativeDirectory
-	processEntity.Status = types.Success
 	return processEntity, nil
 }
 

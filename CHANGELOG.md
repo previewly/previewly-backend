@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.6](https://github.com/previewly/previewly-backend/compare/v1.12.5...v1.12.6) (2024-12-29)
+
+
+### Bug Fixes
+
+* fix uploaded image url ([7ccae44](https://github.com/previewly/previewly-backend/commit/7ccae44831428d919c878264bdfa148dba1d7503))
+
 ## [1.12.5](https://github.com/previewly/previewly-backend/compare/v1.12.4...v1.12.5) (2024-12-24)
 
 

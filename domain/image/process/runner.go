@@ -169,7 +169,7 @@ func (p processRunnerimpl) getMd5Hash(text string) string {
 
 func (p processRunnerimpl) getImagePathForURL(path string, name string) *string {
 	var sb strings.Builder
-	sb.WriteString("upload/")
+	sb.WriteString("uploads/")
 	sb.WriteString(path)
 	sb.WriteString(name)
 	result := sb.String()

@@ -36,10 +36,12 @@ type PreviewData {
   error: String
   title: String
 }
+
 type UploadImageStatus {
   id: Int!
   name: String!
   status: Status!
+  extra: String
   error: String
 }
 type ImageProcessOption {

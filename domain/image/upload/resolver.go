@@ -80,6 +80,7 @@ func (r resolverImpl) createImageStatus(name string, imageError error, imageEnti
 			Name:   name,
 			Error:  pointer.String(imageError.Error()),
 			Status: model.StatusError,
+			Extra:  imageEntity.ExtraValue,
 		}
 	} else {
 		return &model.UploadImageStatus{

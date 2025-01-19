@@ -15,7 +15,6 @@ import (
 	tokenModel "wsw/backend/model/token"
 	urlModel "wsw/backend/model/url"
 
-	"github.com/99designs/gqlgen/graphql"
 	container "github.com/golobby/container/v3"
 )
 
@@ -59,7 +58,7 @@ func (r *mutationResolver) AddURL(ctx context.Context, token string, url string)
 }
 
 // Upload is the resolver for the upload field.
-func (r *mutationResolver) Upload(ctx context.Context, token string, images []*graphql.Upload) ([]*model.UploadImageStatus, error) {
+func (r *mutationResolver) Upload(ctx context.Context, token string, images []*model.UploadInput) ([]*model.UploadImageStatus, error) {
 	var resolver upload.Resolver
 	err := container.Resolve(&resolver)
 	if err != nil {

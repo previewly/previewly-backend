@@ -17,7 +17,7 @@ const MaxImageSize = 5 * 1024 * 1024
 
 type (
 	Resolver interface {
-		Resolve(context.Context, []*graphql.Upload) ([]*model.UploadImageStatus, error)
+		Resolve(context.Context, []*model.UploadInput) ([]*model.UploadImageStatus, error)
 	}
 	resolverImpl struct {
 		model   image.UploadedImage
@@ -30,18 +30,18 @@ func NewUploadResolver(model image.UploadedImage, storage storage.Storage) Resol
 }
 
 // Resolve implements Resolver.
-func (r resolverImpl) Resolve(cxt context.Context, images []*graphql.Upload) ([]*model.UploadImageStatus, error) {
+func (r resolverImpl) Resolve(cxt context.Context, images []*model.UploadInput) ([]*model.UploadImageStatus, error) {
 	fileResults := make([]*model.UploadImageStatus, len(images))
 	for i, image := range images {
 		if image == nil {
 			return nil, errors.New("image is nil")
 		}
 
-		imageError := r.validateImage(image)
-		storageFile, imageError := r.saveToStorage(image, imageError)
-		imageEntity, imageError := r.saveToDatabase(image, storageFile.NewFilePlace, storageFile.NewFilename, imageError)
+		imageError := r.validateImage(&image.Image)
+		storageFile, imageError := r.saveToStorage(&image.Image, imageError)
+		imageEntity, imageError := r.saveToDatabase(&image.Image, storageFile.NewFilePlace, storageFile.NewFilename, imageError, image.Extra)
 
-		fileResults[i] = r.createImageStatus(image.Filename, imageError, imageEntity)
+		fileResults[i] = r.createImageStatus(image.Image.Filename, imageError, imageEntity)
 	}
 	return fileResults, nil
 }
@@ -53,12 +53,12 @@ func (r resolverImpl) saveToStorage(image *graphql.Upload, imageError error) (*s
 	return r.storage.Save(image.Filename, pointer.String("o/"), image.File)
 }
 
-func (r resolverImpl) saveToDatabase(image *graphql.Upload, destinationPath string, newFilename string, imageError error) (*ent.UploadImage, error) {
+func (r resolverImpl) saveToDatabase(image *graphql.Upload, destinationPath string, newFilename string, imageError error, extraValue *string) (*ent.UploadImage, error) {
 	if imageError != nil {
 		return nil, imageError
 	}
 
-	return r.model.Insert(newFilename, destinationPath, image.Filename, image.ContentType, nil)
+	return r.model.Insert(newFilename, destinationPath, image.Filename, image.ContentType, extraValue)
 }
 
 func (r resolverImpl) validateImage(image *graphql.Upload) error {

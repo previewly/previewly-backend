@@ -68,7 +68,7 @@ type ComplexityRoot struct {
 		AddURL       func(childComplexity int, token string, url string) int
 		CreateToken  func(childComplexity int) int
 		ProcessImage func(childComplexity int, token string, imageID int, processes []*model.ImageProcessesInput) int
-		Upload       func(childComplexity int, token string, images []*graphql.Upload) int
+		Upload       func(childComplexity int, token string, images []*model.UploadInput) int
 	}
 
 	OneImageProcess struct {
@@ -102,7 +102,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateToken(ctx context.Context) (string, error)
 	AddURL(ctx context.Context, token string, url string) (*model.PreviewData, error)
-	Upload(ctx context.Context, token string, images []*graphql.Upload) ([]*model.UploadImageStatus, error)
+	Upload(ctx context.Context, token string, images []*model.UploadInput) ([]*model.UploadImageStatus, error)
 	ProcessImage(ctx context.Context, token string, imageID int, processes []*model.ImageProcessesInput) (*model.ImageProcess, error)
 }
 type QueryResolver interface {
@@ -226,7 +226,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.Upload(childComplexity, args["token"].(string), args["images"].([]*graphql.Upload)), true
+		return e.complexity.Mutation.Upload(childComplexity, args["token"].(string), args["images"].([]*model.UploadInput)), true
 
 	case "OneImageProcess.options":
 		if e.complexity.OneImageProcess.Options == nil {
@@ -353,6 +353,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputImageProcessOptionInput,
 		ec.unmarshalInputImageProcessesInput,
+		ec.unmarshalInputUploadInput,
 	)
 	first := true
 
@@ -630,18 +631,18 @@ func (ec *executionContext) field_Mutation_upload_argsToken(
 func (ec *executionContext) field_Mutation_upload_argsImages(
 	ctx context.Context,
 	rawArgs map[string]any,
-) ([]*graphql.Upload, error) {
+) ([]*model.UploadInput, error) {
 	if _, ok := rawArgs["images"]; !ok {
-		var zeroVal []*graphql.Upload
+		var zeroVal []*model.UploadInput
 		return zeroVal, nil
 	}
 
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("images"))
 	if tmp, ok := rawArgs["images"]; ok {
-		return ec.unmarshalNUpload2ᚕᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUploadᚄ(ctx, tmp)
+		return ec.unmarshalNUploadInput2ᚕᚖwswᚋbackendᚋgraphᚋmodelᚐUploadInputᚄ(ctx, tmp)
 	}
 
-	var zeroVal []*graphql.Upload
+	var zeroVal []*model.UploadInput
 	return zeroVal, nil
 }
 
@@ -1295,7 +1296,7 @@ func (ec *executionContext) _Mutation_upload(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Upload(rctx, fc.Args["token"].(string), fc.Args["images"].([]*graphql.Upload))
+		return ec.resolvers.Mutation().Upload(rctx, fc.Args["token"].(string), fc.Args["images"].([]*model.UploadInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4064,6 +4065,47 @@ func (ec *executionContext) unmarshalInputImageProcessesInput(ctx context.Contex
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUploadInput(ctx context.Context, obj any) (model.UploadInput, error) {
+	var it model.UploadInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "extra", "image"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "extra":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("extra"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Extra = data
+		case "image":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("image"))
+			data, err := ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Image = data
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -5055,51 +5097,13 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) unmarshalNUpload2ᚕᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUploadᚄ(ctx context.Context, v any) ([]*graphql.Upload, error) {
-	var vSlice []any
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]*graphql.Upload, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalNUpload2ᚕᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUploadᚄ(ctx context.Context, sel ast.SelectionSet, v []*graphql.Upload) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	for i := range v {
-		ret[i] = ec.marshalNUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, sel, v[i])
-	}
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
-func (ec *executionContext) unmarshalNUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v any) (*graphql.Upload, error) {
+func (ec *executionContext) unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v any) (graphql.Upload, error) {
 	res, err := graphql.UnmarshalUpload(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, sel ast.SelectionSet, v *graphql.Upload) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	res := graphql.MarshalUpload(*v)
+func (ec *executionContext) marshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, sel ast.SelectionSet, v graphql.Upload) graphql.Marshaler {
+	res := graphql.MarshalUpload(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -5160,6 +5164,28 @@ func (ec *executionContext) marshalNUploadImageStatus2ᚖwswᚋbackendᚋgraph�
 		return graphql.Null
 	}
 	return ec._UploadImageStatus(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUploadInput2ᚕᚖwswᚋbackendᚋgraphᚋmodelᚐUploadInputᚄ(ctx context.Context, v any) ([]*model.UploadInput, error) {
+	var vSlice []any
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.UploadInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNUploadInput2ᚖwswᚋbackendᚋgraphᚋmodelᚐUploadInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNUploadInput2ᚖwswᚋbackendᚋgraphᚋmodelᚐUploadInput(ctx context.Context, v any) (*model.UploadInput, error) {
+	res, err := ec.unmarshalInputUploadInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

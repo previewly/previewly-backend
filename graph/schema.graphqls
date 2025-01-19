@@ -11,7 +11,7 @@ type Mutation {
   createToken: String!
   addUrl(token: String!, url: String!): PreviewData
 
-  upload(token: String!, images: [Upload!]!): [UploadImageStatus!]!
+  upload(token: String!, images: [UploadInput!]!): [UploadImageStatus!]!
   processImage(
     token: String!
     imageId: Int!
@@ -61,6 +61,12 @@ type ImageProcess {
   processes: [OneImageProcess!]!
   status: Status!
   error: String
+}
+
+input UploadInput {
+  name: String
+  extra: String
+  image: Upload!
 }
 
 input ImageProcessOptionInput {

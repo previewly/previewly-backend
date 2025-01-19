@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+
+	"github.com/99designs/gqlgen/graphql"
 )
 
 type ImageData struct {
@@ -61,6 +63,12 @@ type UploadImageStatus struct {
 	Status Status  `json:"status"`
 	Extra  *string `json:"extra,omitempty"`
 	Error  *string `json:"error,omitempty"`
+}
+
+type UploadInput struct {
+	Name  *string        `json:"name,omitempty"`
+	Extra *string        `json:"extra,omitempty"`
+	Image graphql.Upload `json:"image"`
 }
 
 type ImageProcessType string

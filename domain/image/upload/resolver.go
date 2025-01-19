@@ -88,6 +88,7 @@ func (r resolverImpl) createImageStatus(name string, imageError error, imageEnti
 			Name:   name,
 			Error:  nil,
 			Status: model.StatusSuccess,
+			Extra:  imageEntity.ExtraValue,
 		}
 	}
 }

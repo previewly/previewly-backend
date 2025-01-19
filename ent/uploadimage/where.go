@@ -74,6 +74,11 @@ func Type(v string) predicate.UploadImage {
 	return predicate.UploadImage(sql.FieldEQ(FieldType, v))
 }
 
+// ExtraValue applies equality check predicate on the "extra_value" field. It's identical to ExtraValueEQ.
+func ExtraValue(v string) predicate.UploadImage {
+	return predicate.UploadImage(sql.FieldEQ(FieldExtraValue, v))
+}
+
 // FilenameEQ applies the EQ predicate on the "filename" field.
 func FilenameEQ(v string) predicate.UploadImage {
 	return predicate.UploadImage(sql.FieldEQ(FieldFilename, v))
@@ -332,6 +337,81 @@ func TypeEqualFold(v string) predicate.UploadImage {
 // TypeContainsFold applies the ContainsFold predicate on the "type" field.
 func TypeContainsFold(v string) predicate.UploadImage {
 	return predicate.UploadImage(sql.FieldContainsFold(FieldType, v))
+}
+
+// ExtraValueEQ applies the EQ predicate on the "extra_value" field.
+func ExtraValueEQ(v string) predicate.UploadImage {
+	return predicate.UploadImage(sql.FieldEQ(FieldExtraValue, v))
+}
+
+// ExtraValueNEQ applies the NEQ predicate on the "extra_value" field.
+func ExtraValueNEQ(v string) predicate.UploadImage {
+	return predicate.UploadImage(sql.FieldNEQ(FieldExtraValue, v))
+}
+
+// ExtraValueIn applies the In predicate on the "extra_value" field.
+func ExtraValueIn(vs ...string) predicate.UploadImage {
+	return predicate.UploadImage(sql.FieldIn(FieldExtraValue, vs...))
+}
+
+// ExtraValueNotIn applies the NotIn predicate on the "extra_value" field.
+func ExtraValueNotIn(vs ...string) predicate.UploadImage {
+	return predicate.UploadImage(sql.FieldNotIn(FieldExtraValue, vs...))
+}
+
+// ExtraValueGT applies the GT predicate on the "extra_value" field.
+func ExtraValueGT(v string) predicate.UploadImage {
+	return predicate.UploadImage(sql.FieldGT(FieldExtraValue, v))
+}
+
+// ExtraValueGTE applies the GTE predicate on the "extra_value" field.
+func ExtraValueGTE(v string) predicate.UploadImage {
+	return predicate.UploadImage(sql.FieldGTE(FieldExtraValue, v))
+}
+
+// ExtraValueLT applies the LT predicate on the "extra_value" field.
+func ExtraValueLT(v string) predicate.UploadImage {
+	return predicate.UploadImage(sql.FieldLT(FieldExtraValue, v))
+}
+
+// ExtraValueLTE applies the LTE predicate on the "extra_value" field.
+func ExtraValueLTE(v string) predicate.UploadImage {
+	return predicate.UploadImage(sql.FieldLTE(FieldExtraValue, v))
+}
+
+// ExtraValueContains applies the Contains predicate on the "extra_value" field.
+func ExtraValueContains(v string) predicate.UploadImage {
+	return predicate.UploadImage(sql.FieldContains(FieldExtraValue, v))
+}
+
+// ExtraValueHasPrefix applies the HasPrefix predicate on the "extra_value" field.
+func ExtraValueHasPrefix(v string) predicate.UploadImage {
+	return predicate.UploadImage(sql.FieldHasPrefix(FieldExtraValue, v))
+}
+
+// ExtraValueHasSuffix applies the HasSuffix predicate on the "extra_value" field.
+func ExtraValueHasSuffix(v string) predicate.UploadImage {
+	return predicate.UploadImage(sql.FieldHasSuffix(FieldExtraValue, v))
+}
+
+// ExtraValueIsNil applies the IsNil predicate on the "extra_value" field.
+func ExtraValueIsNil() predicate.UploadImage {
+	return predicate.UploadImage(sql.FieldIsNull(FieldExtraValue))
+}
+
+// ExtraValueNotNil applies the NotNil predicate on the "extra_value" field.
+func ExtraValueNotNil() predicate.UploadImage {
+	return predicate.UploadImage(sql.FieldNotNull(FieldExtraValue))
+}
+
+// ExtraValueEqualFold applies the EqualFold predicate on the "extra_value" field.
+func ExtraValueEqualFold(v string) predicate.UploadImage {
+	return predicate.UploadImage(sql.FieldEqualFold(FieldExtraValue, v))
+}
+
+// ExtraValueContainsFold applies the ContainsFold predicate on the "extra_value" field.
+func ExtraValueContainsFold(v string) predicate.UploadImage {
+	return predicate.UploadImage(sql.FieldContainsFold(FieldExtraValue, v))
 }
 
 // HasImageprocess applies the HasEdge predicate on the "imageprocess" edge.

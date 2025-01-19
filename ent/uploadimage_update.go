@@ -105,6 +105,9 @@ func (uiu *UploadImageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if uiu.mutation.ExtraValueCleared() {
+		_spec.ClearField(uploadimage.FieldExtraValue, field.TypeString)
+	}
 	if uiu.mutation.ImageprocessCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -276,6 +279,9 @@ func (uiuo *UploadImageUpdateOne) sqlSave(ctx context.Context) (_node *UploadIma
 				ps[i](selector)
 			}
 		}
+	}
+	if uiuo.mutation.ExtraValueCleared() {
+		_spec.ClearField(uploadimage.FieldExtraValue, field.TypeString)
 	}
 	if uiuo.mutation.ImageprocessCleared() {
 		edge := &sqlgraph.EdgeSpec{

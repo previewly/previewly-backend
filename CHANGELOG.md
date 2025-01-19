@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.13.0](https://github.com/previewly/previewly-backend/compare/v1.12.6...v1.13.0) (2025-01-19)
+
+
+### Features
+
+* add extra field to uploaded image ([a938054](https://github.com/previewly/previewly-backend/commit/a9380549653c9b666ab6227fef74b42b43f61b9b))
+* add extra to GQL ([78778a8](https://github.com/previewly/previewly-backend/commit/78778a854bdfbd99c49bfab00ce419c340fd3f83))
+* expose extra value on upload image ([b103d4b](https://github.com/previewly/previewly-backend/commit/b103d4bde76c55d880fa752f59ed393fc08e177f))
+* saving extra values to repository ([a99db7e](https://github.com/previewly/previewly-backend/commit/a99db7ee8f91d02b290221c5bf6e8ef8d9c226fe))
+
+
+### Bug Fixes
+
+* fix expose extra value ([4af178f](https://github.com/previewly/previewly-backend/commit/4af178f3a416d5921b08616f09f2e27ebb95fca3))
+
 ## [1.12.6](https://github.com/previewly/previewly-backend/compare/v1.12.5...v1.12.6) (2024-12-29)
 
 

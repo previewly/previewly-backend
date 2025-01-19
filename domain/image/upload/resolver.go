@@ -58,7 +58,7 @@ func (r resolverImpl) saveToDatabase(image *graphql.Upload, destinationPath stri
 		return nil, imageError
 	}
 
-	return r.model.Insert(newFilename, destinationPath, image.Filename, image.ContentType)
+	return r.model.Insert(newFilename, destinationPath, image.Filename, image.ContentType, nil)
 }
 
 func (r resolverImpl) validateImage(image *graphql.Upload) error {

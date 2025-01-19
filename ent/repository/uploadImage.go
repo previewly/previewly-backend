@@ -10,7 +10,7 @@ import (
 
 type (
 	UploadImageRepository interface {
-		Insert(string, string, string, string) (*ent.UploadImage, error)
+		Insert(filename string, destinationPath string, originalFilename string, filetype string, extraValue *string) (*ent.UploadImage, error)
 		CreateProcess(entity *ent.UploadImage, processes []types.ImageProcess, hash string) (*ent.ImageProcess, error)
 		GetByID(int) (*ent.UploadImage, error)
 	}
@@ -46,13 +46,17 @@ func (u uploadrepositoryImpl) GetByID(imageID int) (*ent.UploadImage, error) {
 }
 
 // Inser implements UploadImageRepository.
-func (u uploadrepositoryImpl) Insert(filename string, destinationPath string, originalFilename string, filetype string) (*ent.UploadImage, error) {
-	imageEntity, err := u.client.UploadImage.Create().
+func (u uploadrepositoryImpl) Insert(filename string, destinationPath string, originalFilename string, filetype string, extraValue *string) (*ent.UploadImage, error) {
+	entity := u.client.UploadImage.Create().
 		SetFilename(filename).
 		SetOriginalFilename(originalFilename).
 		SetDestinationPath(destinationPath).
-		SetType(filetype).
-		Save(u.ctx)
+		SetType(filetype)
+
+	if extraValue != nil {
+		entity = entity.SetExtraValue(*extraValue)
+	}
+	imageEntity, err := entity.Save(u.ctx)
 	if err != nil {
 		return nil, err
 	}

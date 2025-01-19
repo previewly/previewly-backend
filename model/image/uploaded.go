@@ -7,7 +7,7 @@ import (
 
 type (
 	UploadedImage interface {
-		Insert(string, string, string, string) (*ent.UploadImage, error)
+		Insert(filename string, desctinationPath string, originalFilename string, filetype string, extraValue *string) (*ent.UploadImage, error)
 		GetByID(int) (*ent.UploadImage, error)
 	}
 	uploadImpl struct {
@@ -21,8 +21,8 @@ func (u uploadImpl) GetByID(imageID int) (*ent.UploadImage, error) {
 }
 
 // Insert implements UploadImage.
-func (u uploadImpl) Insert(filename string, desctinationPath string, originalFilename string, filetype string) (*ent.UploadImage, error) {
-	return u.repository.Insert(filename, desctinationPath, originalFilename, filetype)
+func (u uploadImpl) Insert(filename string, desctinationPath string, originalFilename string, filetype string, extraValue *string) (*ent.UploadImage, error) {
+	return u.repository.Insert(filename, desctinationPath, originalFilename, filetype, extraValue)
 }
 
 func NewModel(repository repository.UploadImageRepository) UploadedImage {

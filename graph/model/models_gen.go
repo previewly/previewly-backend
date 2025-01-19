@@ -59,6 +59,7 @@ type UploadImageStatus struct {
 	ID     int     `json:"id"`
 	Name   string  `json:"name"`
 	Status Status  `json:"status"`
+	Extra  *string `json:"extra,omitempty"`
 	Error  *string `json:"error,omitempty"`
 }
 

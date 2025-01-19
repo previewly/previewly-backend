@@ -92,6 +92,7 @@ type ComplexityRoot struct {
 
 	UploadImageStatus struct {
 		Error  func(childComplexity int) int
+		Extra  func(childComplexity int) int
 		ID     func(childComplexity int) int
 		Name   func(childComplexity int) int
 		Status func(childComplexity int) int
@@ -313,6 +314,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UploadImageStatus.Error(childComplexity), true
+
+	case "UploadImageStatus.extra":
+		if e.complexity.UploadImageStatus.Extra == nil {
+			break
+		}
+
+		return e.complexity.UploadImageStatus.Extra(childComplexity), true
 
 	case "UploadImageStatus.id":
 		if e.complexity.UploadImageStatus.ID == nil {
@@ -1318,6 +1326,8 @@ func (ec *executionContext) fieldContext_Mutation_upload(ctx context.Context, fi
 				return ec.fieldContext_UploadImageStatus_name(ctx, field)
 			case "status":
 				return ec.fieldContext_UploadImageStatus_status(ctx, field)
+			case "extra":
+				return ec.fieldContext_UploadImageStatus_extra(ctx, field)
 			case "error":
 				return ec.fieldContext_UploadImageStatus_error(ctx, field)
 			}
@@ -2126,6 +2136,47 @@ func (ec *executionContext) fieldContext_UploadImageStatus_status(_ context.Cont
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Status does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UploadImageStatus_extra(ctx context.Context, field graphql.CollectedField, obj *model.UploadImageStatus) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UploadImageStatus_extra(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Extra, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UploadImageStatus_extra(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UploadImageStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4434,6 +4485,8 @@ func (ec *executionContext) _UploadImageStatus(ctx context.Context, sel ast.Sele
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "extra":
+			out.Values[i] = ec._UploadImageStatus_extra(ctx, field, obj)
 		case "error":
 			out.Values[i] = ec._UploadImageStatus_error(ctx, field, obj)
 		default:

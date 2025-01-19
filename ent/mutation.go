@@ -1952,6 +1952,7 @@ type UploadImageMutation struct {
 	destination_path    *string
 	original_filename   *string
 	_type               *string
+	extra_value         *string
 	clearedFields       map[string]struct{}
 	imageprocess        map[int]struct{}
 	removedimageprocess map[int]struct{}
@@ -2203,6 +2204,55 @@ func (m *UploadImageMutation) ResetType() {
 	m._type = nil
 }
 
+// SetExtraValue sets the "extra_value" field.
+func (m *UploadImageMutation) SetExtraValue(s string) {
+	m.extra_value = &s
+}
+
+// ExtraValue returns the value of the "extra_value" field in the mutation.
+func (m *UploadImageMutation) ExtraValue() (r string, exists bool) {
+	v := m.extra_value
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExtraValue returns the old "extra_value" field's value of the UploadImage entity.
+// If the UploadImage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UploadImageMutation) OldExtraValue(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExtraValue is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExtraValue requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExtraValue: %w", err)
+	}
+	return oldValue.ExtraValue, nil
+}
+
+// ClearExtraValue clears the value of the "extra_value" field.
+func (m *UploadImageMutation) ClearExtraValue() {
+	m.extra_value = nil
+	m.clearedFields[uploadimage.FieldExtraValue] = struct{}{}
+}
+
+// ExtraValueCleared returns if the "extra_value" field was cleared in this mutation.
+func (m *UploadImageMutation) ExtraValueCleared() bool {
+	_, ok := m.clearedFields[uploadimage.FieldExtraValue]
+	return ok
+}
+
+// ResetExtraValue resets all changes to the "extra_value" field.
+func (m *UploadImageMutation) ResetExtraValue() {
+	m.extra_value = nil
+	delete(m.clearedFields, uploadimage.FieldExtraValue)
+}
+
 // AddImageprocesIDs adds the "imageprocess" edge to the ImageProcess entity by ids.
 func (m *UploadImageMutation) AddImageprocesIDs(ids ...int) {
 	if m.imageprocess == nil {
@@ -2291,7 +2341,7 @@ func (m *UploadImageMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UploadImageMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.filename != nil {
 		fields = append(fields, uploadimage.FieldFilename)
 	}
@@ -2303,6 +2353,9 @@ func (m *UploadImageMutation) Fields() []string {
 	}
 	if m._type != nil {
 		fields = append(fields, uploadimage.FieldType)
+	}
+	if m.extra_value != nil {
+		fields = append(fields, uploadimage.FieldExtraValue)
 	}
 	return fields
 }
@@ -2320,6 +2373,8 @@ func (m *UploadImageMutation) Field(name string) (ent.Value, bool) {
 		return m.OriginalFilename()
 	case uploadimage.FieldType:
 		return m.GetType()
+	case uploadimage.FieldExtraValue:
+		return m.ExtraValue()
 	}
 	return nil, false
 }
@@ -2337,6 +2392,8 @@ func (m *UploadImageMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldOriginalFilename(ctx)
 	case uploadimage.FieldType:
 		return m.OldType(ctx)
+	case uploadimage.FieldExtraValue:
+		return m.OldExtraValue(ctx)
 	}
 	return nil, fmt.Errorf("unknown UploadImage field %s", name)
 }
@@ -2374,6 +2431,13 @@ func (m *UploadImageMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetType(v)
 		return nil
+	case uploadimage.FieldExtraValue:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExtraValue(v)
+		return nil
 	}
 	return fmt.Errorf("unknown UploadImage field %s", name)
 }
@@ -2403,7 +2467,11 @@ func (m *UploadImageMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *UploadImageMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(uploadimage.FieldExtraValue) {
+		fields = append(fields, uploadimage.FieldExtraValue)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -2416,6 +2484,11 @@ func (m *UploadImageMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *UploadImageMutation) ClearField(name string) error {
+	switch name {
+	case uploadimage.FieldExtraValue:
+		m.ClearExtraValue()
+		return nil
+	}
 	return fmt.Errorf("unknown UploadImage nullable field %s", name)
 }
 
@@ -2434,6 +2507,9 @@ func (m *UploadImageMutation) ResetField(name string) error {
 		return nil
 	case uploadimage.FieldType:
 		m.ResetType()
+		return nil
+	case uploadimage.FieldExtraValue:
+		m.ResetExtraValue()
 		return nil
 	}
 	return fmt.Errorf("unknown UploadImage field %s", name)

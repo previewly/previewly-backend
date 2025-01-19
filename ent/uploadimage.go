@@ -24,6 +24,8 @@ type UploadImage struct {
 	OriginalFilename string `json:"original_filename,omitempty"`
 	// Type holds the value of the "type" field.
 	Type string `json:"type,omitempty"`
+	// ExtraValue holds the value of the "extra_value" field.
+	ExtraValue *string `json:"extra_value,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UploadImageQuery when eager-loading is set.
 	Edges        UploadImageEdges `json:"edges"`
@@ -55,7 +57,7 @@ func (*UploadImage) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case uploadimage.FieldID:
 			values[i] = new(sql.NullInt64)
-		case uploadimage.FieldFilename, uploadimage.FieldDestinationPath, uploadimage.FieldOriginalFilename, uploadimage.FieldType:
+		case uploadimage.FieldFilename, uploadimage.FieldDestinationPath, uploadimage.FieldOriginalFilename, uploadimage.FieldType, uploadimage.FieldExtraValue:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -101,6 +103,13 @@ func (ui *UploadImage) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
 			} else if value.Valid {
 				ui.Type = value.String
+			}
+		case uploadimage.FieldExtraValue:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field extra_value", values[i])
+			} else if value.Valid {
+				ui.ExtraValue = new(string)
+				*ui.ExtraValue = value.String
 			}
 		default:
 			ui.selectValues.Set(columns[i], values[i])
@@ -154,6 +163,11 @@ func (ui *UploadImage) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("type=")
 	builder.WriteString(ui.Type)
+	builder.WriteString(", ")
+	if v := ui.ExtraValue; v != nil {
+		builder.WriteString("extra_value=")
+		builder.WriteString(*v)
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

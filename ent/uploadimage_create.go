@@ -44,6 +44,20 @@ func (uic *UploadImageCreate) SetType(s string) *UploadImageCreate {
 	return uic
 }
 
+// SetExtraValue sets the "extra_value" field.
+func (uic *UploadImageCreate) SetExtraValue(s string) *UploadImageCreate {
+	uic.mutation.SetExtraValue(s)
+	return uic
+}
+
+// SetNillableExtraValue sets the "extra_value" field if the given value is not nil.
+func (uic *UploadImageCreate) SetNillableExtraValue(s *string) *UploadImageCreate {
+	if s != nil {
+		uic.SetExtraValue(*s)
+	}
+	return uic
+}
+
 // AddImageprocesIDs adds the "imageprocess" edge to the ImageProcess entity by IDs.
 func (uic *UploadImageCreate) AddImageprocesIDs(ids ...int) *UploadImageCreate {
 	uic.mutation.AddImageprocesIDs(ids...)
@@ -166,6 +180,10 @@ func (uic *UploadImageCreate) createSpec() (*UploadImage, *sqlgraph.CreateSpec) 
 	if value, ok := uic.mutation.GetType(); ok {
 		_spec.SetField(uploadimage.FieldType, field.TypeString, value)
 		_node.Type = value
+	}
+	if value, ok := uic.mutation.ExtraValue(); ok {
+		_spec.SetField(uploadimage.FieldExtraValue, field.TypeString, value)
+		_node.ExtraValue = &value
 	}
 	if nodes := uic.mutation.ImageprocessIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

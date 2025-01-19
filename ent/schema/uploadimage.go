@@ -18,6 +18,7 @@ func (UploadImage) Fields() []ent.Field {
 		field.String("destination_path").NotEmpty().Immutable(),
 		field.String("original_filename").NotEmpty().Immutable(),
 		field.String("type").NotEmpty().Immutable(),
+		field.String("extra_value").Nillable().Optional().Immutable(),
 	}
 }
 

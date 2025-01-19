@@ -20,6 +20,8 @@ const (
 	FieldOriginalFilename = "original_filename"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
+	// FieldExtraValue holds the string denoting the extra_value field in the database.
+	FieldExtraValue = "extra_value"
 	// EdgeImageprocess holds the string denoting the imageprocess edge name in mutations.
 	EdgeImageprocess = "imageprocess"
 	// Table holds the table name of the uploadimage in the database.
@@ -40,6 +42,7 @@ var Columns = []string{
 	FieldDestinationPath,
 	FieldOriginalFilename,
 	FieldType,
+	FieldExtraValue,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -89,6 +92,11 @@ func ByOriginalFilename(opts ...sql.OrderTermOption) OrderOption {
 // ByType orders the results by the type field.
 func ByType(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldType, opts...).ToFunc()
+}
+
+// ByExtraValue orders the results by the extra_value field.
+func ByExtraValue(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldExtraValue, opts...).ToFunc()
 }
 
 // ByImageprocessCount orders the results by imageprocess count.

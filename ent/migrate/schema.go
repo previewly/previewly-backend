@@ -101,6 +101,7 @@ var (
 		{Name: "destination_path", Type: field.TypeString},
 		{Name: "original_filename", Type: field.TypeString},
 		{Name: "type", Type: field.TypeString},
+		{Name: "extra_value", Type: field.TypeString, Nullable: true},
 	}
 	// UploadImagesTable holds the schema information for the "upload_images" table.
 	UploadImagesTable = &schema.Table{

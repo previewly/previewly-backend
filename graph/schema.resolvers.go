@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"errors"
+
 	"wsw/backend/domain/image/process"
 	"wsw/backend/domain/image/upload"
 	"wsw/backend/graph/convertor"
@@ -14,23 +15,14 @@ import (
 	"wsw/backend/lib/utils"
 	tokenModel "wsw/backend/model/token"
 	urlModel "wsw/backend/model/url"
+	"wsw/backend/resolvers/token"
 
 	container "github.com/golobby/container/v3"
 )
 
 // CreateToken is the resolver for the createToken field.
 func (r *mutationResolver) CreateToken(ctx context.Context) (string, error) {
-	var model tokenModel.Token
-	err := container.Resolve(&model)
-	if err != nil {
-		utils.F("Couldnt resolve model Token: %v", err)
-		return "", err
-	}
-	token, err := model.CreateToken()
-	if err != nil {
-		return "", err
-	}
-	return *token, nil
+	return token.ResolveCreateToken(ctx)
 }
 
 // AddURL is the resolver for the addUrl field.
@@ -148,5 +140,7 @@ func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
-type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }
+type (
+	mutationResolver struct{ *Resolver }
+	queryResolver    struct{ *Resolver }
+)

@@ -7,6 +7,7 @@ import (
 	"wsw/backend/graph"
 	"wsw/backend/lib/rest"
 	"wsw/backend/resolvers/token"
+	"wsw/backend/resolvers/url"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/vektah/gqlparser/v2/ast"
@@ -35,6 +36,10 @@ func newRouter(midlewares Middlewares) *chi.Mux {
 
 	router.Post("/json/create-token", rest.RESTHandle(func(w http.ResponseWriter, r *http.Request) (interface{}, error) {
 		return token.ResolveCreateToken(r.Context())
+	}))
+
+	router.Post("/json/add-url/{url}/token/{token}/", rest.RESTHandle(func(w http.ResponseWriter, r *http.Request) (interface{}, error) {
+		return url.ResolveAddURL(chi.URLParam(r, "token"), chi.URLParam(r, "url"))
 	}))
 
 	return router

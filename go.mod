@@ -7,6 +7,7 @@ require (
 	github.com/99designs/gqlgen v0.17.63
 	github.com/getsentry/sentry-go v0.31.1
 	github.com/go-chi/chi/v5 v5.2.0
+	github.com/go-chi/render v1.0.3
 	github.com/golobby/container/v3 v3.3.2
 	github.com/google/uuid v1.6.0
 	github.com/gookit/goutil v0.6.18
@@ -24,6 +25,7 @@ require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/agnivade/levenshtein v1.2.0 // indirect
+	github.com/ajg/form v1.5.1 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/bmatcuk/doublestar v1.3.4 // indirect

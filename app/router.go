@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"wsw/backend/graph"
+	"wsw/backend/lib/rest"
+	"wsw/backend/resolvers/token"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/vektah/gqlparser/v2/ast"
@@ -30,6 +32,10 @@ func newRouter(midlewares Middlewares) *chi.Mux {
 	router.Get("/panic", func(w http.ResponseWriter, r *http.Request) {
 		panic("server panic")
 	})
+
+	router.Post("/json/create-token", rest.RESTHandle(func(w http.ResponseWriter, r *http.Request) (interface{}, error) {
+		return token.ResolveCreateToken(r.Context())
+	}))
 
 	return router
 }

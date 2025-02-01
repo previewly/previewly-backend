@@ -42,6 +42,10 @@ func newRouter(midlewares Middlewares) *chi.Mux {
 		return url.ResolveAddURL(chi.URLParam(r, "token"), chi.URLParam(r, "url"))
 	}))
 
+	router.Get("/json/get-preview/token/{token}/?url={url}", rest.RESTHandle(func(w http.ResponseWriter, r *http.Request) (interface{}, error) {
+		return url.ResolveGetPreview(chi.URLParam(r, "token"), chi.URLParam(r, "url"))
+	}))
+
 	return router
 }
 

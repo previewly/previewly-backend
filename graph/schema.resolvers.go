@@ -7,9 +7,9 @@ package graph
 import (
 	"context"
 	"errors"
+
 	"wsw/backend/domain/image/process"
 	"wsw/backend/domain/image/upload"
-	"wsw/backend/graph/convertor"
 	"wsw/backend/graph/model"
 	"wsw/backend/lib/utils"
 	tokenModel "wsw/backend/model/token"
@@ -80,28 +80,7 @@ func (r *mutationResolver) ProcessImage(ctx context.Context, token string, image
 
 // GetPreviewData is the resolver for the getPreviewData field.
 func (r *queryResolver) GetPreviewData(ctx context.Context, token string, url string) (*model.PreviewData, error) {
-	var tokenModelImpl tokenModel.Token
-	var urlModelImpl urlModel.Url
-
-	errTokenModel := container.Resolve(&tokenModelImpl)
-	errURLModel := container.Resolve(&urlModelImpl)
-
-	if errURLModel != nil {
-		return nil, errTokenModel
-	}
-	if errTokenModel != nil {
-		return nil, errTokenModel
-	}
-
-	if !tokenModelImpl.IsTokenExist(token) {
-		return nil, errors.New("invalid token")
-	}
-
-	previewData, err := urlModelImpl.GetPreviewData(url)
-	if err != nil {
-		return nil, err
-	}
-	return convertor.ConvertPreviewData(previewData), nil
+	return urlResolver.ResolveGetPreview(token, url)
 }
 
 // VerifyToken is the resolver for the verifyToken field.
@@ -121,5 +100,7 @@ func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
-type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }
+type (
+	mutationResolver struct{ *Resolver }
+	queryResolver    struct{ *Resolver }
+)

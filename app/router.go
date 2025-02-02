@@ -7,6 +7,7 @@ import (
 
 	"wsw/backend/graph"
 	"wsw/backend/lib/rest"
+	"wsw/backend/lib/utils"
 	"wsw/backend/resolvers/token"
 	"wsw/backend/resolvers/url"
 
@@ -47,8 +48,13 @@ func newRouter(midlewares Middlewares) *chi.Mux {
 		return url.ResolveAddURL(chi.URLParam(r, "token"), urlValue)
 	}))
 
-	router.Get("/json/get-preview/token/{token}/?url={url}", rest.RESTHandle(func(w http.ResponseWriter, r *http.Request) (interface{}, error) {
-		return url.ResolveGetPreview(chi.URLParam(r, "token"), chi.URLParam(r, "url"))
+	router.Get("/json/get-preview/token/{token}/", rest.RESTHandle(func(w http.ResponseWriter, r *http.Request) (interface{}, error) {
+		urlValue, err := netUrl.QueryUnescape(r.URL.Query().Get("url"))
+		if err != nil {
+			return nil, err
+		}
+		utils.D(urlValue)
+		return url.ResolveGetPreview(chi.URLParam(r, "token"), urlValue)
 	}))
 
 	return router

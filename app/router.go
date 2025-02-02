@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"net/http"
+	netUrl "net/url"
 
 	"wsw/backend/graph"
 	"wsw/backend/lib/rest"
@@ -39,7 +40,11 @@ func newRouter(midlewares Middlewares) *chi.Mux {
 	}))
 
 	router.Post("/json/add-url/{url}/token/{token}/", rest.RESTHandle(func(w http.ResponseWriter, r *http.Request) (interface{}, error) {
-		return url.ResolveAddURL(chi.URLParam(r, "token"), chi.URLParam(r, "url"))
+		urlValue, err := netUrl.QueryUnescape(chi.URLParam(r, "url"))
+		if err != nil {
+			return nil, err
+		}
+		return url.ResolveAddURL(chi.URLParam(r, "token"), urlValue)
 	}))
 
 	router.Get("/json/get-preview/token/{token}/?url={url}", rest.RESTHandle(func(w http.ResponseWriter, r *http.Request) (interface{}, error) {

@@ -13,7 +13,8 @@ func RESTHandle(resolveFunc ResolveHandlerFunc) http.HandlerFunc {
 		result, err := resolveFunc(w, r)
 		if err != nil {
 			render.Render(w, r, ErrRender(err))
+		} else {
+			render.JSON(w, r, result)
 		}
-		render.JSON(w, r, result)
 	}
 }

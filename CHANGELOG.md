@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.14.0](https://github.com/previewly/previewly-backend/compare/v1.13.0...v1.14.0) (2025-02-03)
+
+
+### Features
+
+* add getting preview data by REST ([f9eb332](https://github.com/previewly/previewly-backend/commit/f9eb33235e49879a2b8e47f00a385059ca7bc1cf))
+* add simple json responce ([fdc4415](https://github.com/previewly/previewly-backend/commit/fdc44150af90e0e318138c0d5a86b44d09e896f7))
+* add url operation to rest ([94fb59c](https://github.com/previewly/previewly-backend/commit/94fb59cfe5d55173b4d580df36dbeb5f0588ac7d))
+
+
+### Bug Fixes
+
+* fix errors on rest api ([afbe712](https://github.com/previewly/previewly-backend/commit/afbe712edcd798b948a677957371c4dff84db6d2))
+* fix getting preview data ([ddd28ab](https://github.com/previewly/previewly-backend/commit/ddd28ab5a6ed67319bb841e369efcb321f596dce))
+* fix gql server ([29f81fb](https://github.com/previewly/previewly-backend/commit/29f81fb9efa2e0a2787747054349fa6f8f7f38de))
+* fix parsing url on rest api ([4413e0b](https://github.com/previewly/previewly-backend/commit/4413e0b25a0efb4c96ff47fff6b92802352c0889))
+* fix static test ([d10fc1f](https://github.com/previewly/previewly-backend/commit/d10fc1faf8ec908587547bdd2faf8310d9d567cc))
+* fix static test ([d0a3eb3](https://github.com/previewly/previewly-backend/commit/d0a3eb34592d253189c602f8de95161ab14b7d28))
+
 ## [1.13.0](https://github.com/previewly/previewly-backend/compare/v1.12.6...v1.13.0) (2025-01-19)
 
 

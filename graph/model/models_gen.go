@@ -66,7 +66,6 @@ type UploadImageStatus struct {
 }
 
 type UploadInput struct {
-	Name  *string        `json:"name,omitempty"`
 	Extra *string        `json:"extra,omitempty"`
 	Image graphql.Upload `json:"image"`
 }

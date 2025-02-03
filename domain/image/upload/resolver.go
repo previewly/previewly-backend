@@ -4,10 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"wsw/backend/domain/image/upload/storage"
+	"wsw/backend/domain/image"
 	"wsw/backend/ent"
 	"wsw/backend/graph/model"
-	"wsw/backend/model/image"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/xorcare/pointer"
@@ -20,13 +19,12 @@ type (
 		Resolve(context.Context, []*model.UploadInput) ([]*model.UploadImageStatus, error)
 	}
 	resolverImpl struct {
-		model   image.UploadedImage
-		storage storage.Storage
+		saver image.Saver
 	}
 )
 
-func NewUploadResolver(model image.UploadedImage, storage storage.Storage) Resolver {
-	return resolverImpl{model: model, storage: storage}
+func NewUploadResolver(saver image.Saver) Resolver {
+	return resolverImpl{saver: saver}
 }
 
 // Resolve implements Resolver.
@@ -38,27 +36,19 @@ func (r resolverImpl) Resolve(cxt context.Context, images []*model.UploadInput) 
 		}
 
 		imageError := r.validateImage(&image.Image)
-		storageFile, imageError := r.saveToStorage(&image.Image, imageError)
-		imageEntity, imageError := r.saveToDatabase(&image.Image, storageFile.NewFilePlace, storageFile.NewFilename, imageError, image.Extra)
+		if imageError != nil {
+			fileResults[i] = r.createErrorStatus(image.Image.Filename, imageError, image.Extra)
+		} else {
+			imageEntity, err := r.saver.SaveImage(image.Image.Filename, image.Image.File, image.Image.ContentType, image.Extra)
 
-		fileResults[i] = r.createImageStatus(image.Image.Filename, imageError, imageEntity)
+			if err != nil {
+				fileResults[i] = r.createErrorStatus(image.Image.Filename, imageError, image.Extra)
+			} else {
+				fileResults[i] = r.createImageStatus(image.Image.Filename, *imageEntity)
+			}
+		}
 	}
 	return fileResults, nil
-}
-
-func (r resolverImpl) saveToStorage(image *graphql.Upload, imageError error) (*storage.StorageFile, error) {
-	if imageError != nil {
-		return nil, imageError
-	}
-	return r.storage.Save(image.Filename, pointer.String("o/"), image.File)
-}
-
-func (r resolverImpl) saveToDatabase(image *graphql.Upload, destinationPath string, newFilename string, imageError error, extraValue *string) (*ent.UploadImage, error) {
-	if imageError != nil {
-		return nil, imageError
-	}
-
-	return r.model.Insert(newFilename, destinationPath, image.Filename, image.ContentType, extraValue)
 }
 
 func (r resolverImpl) validateImage(image *graphql.Upload) error {
@@ -74,21 +64,21 @@ func (r resolverImpl) validateImage(image *graphql.Upload) error {
 	return nil
 }
 
-func (r resolverImpl) createImageStatus(name string, imageError error, imageEntity *ent.UploadImage) *model.UploadImageStatus {
-	if imageError != nil {
-		return &model.UploadImageStatus{
-			Name:   name,
-			Error:  pointer.String(imageError.Error()),
-			Status: model.StatusError,
-			Extra:  imageEntity.ExtraValue,
-		}
-	} else {
-		return &model.UploadImageStatus{
-			ID:     imageEntity.ID,
-			Name:   name,
-			Error:  nil,
-			Status: model.StatusSuccess,
-			Extra:  imageEntity.ExtraValue,
-		}
+func (r resolverImpl) createErrorStatus(name string, imageError error, extra *string) *model.UploadImageStatus {
+	return &model.UploadImageStatus{
+		Name:   name,
+		Error:  pointer.String(imageError.Error()),
+		Status: model.StatusError,
+		Extra:  extra,
+	}
+}
+
+func (r resolverImpl) createImageStatus(name string, imageEntity ent.UploadImage) *model.UploadImageStatus {
+	return &model.UploadImageStatus{
+		ID:     imageEntity.ID,
+		Name:   name,
+		Error:  nil,
+		Status: model.StatusSuccess,
+		Extra:  imageEntity.ExtraValue,
 	}
 }

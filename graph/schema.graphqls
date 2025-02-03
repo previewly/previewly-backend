@@ -64,7 +64,6 @@ type ImageProcess {
 }
 
 input UploadInput {
-  name: String
   extra: String
   image: Upload!
 }

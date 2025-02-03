@@ -4072,20 +4072,13 @@ func (ec *executionContext) unmarshalInputUploadInput(ctx context.Context, obj a
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "extra", "image"}
+	fieldsInOrder := [...]string{"extra", "image"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "name":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Name = data
 		case "extra":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("extra"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)

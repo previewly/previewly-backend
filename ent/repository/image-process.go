@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"wsw/backend/ent"
+	entImage "wsw/backend/ent/image"
 	entImageProcess "wsw/backend/ent/imageprocess"
 	"wsw/backend/ent/types"
-	entImage "wsw/backend/ent/uploadimage"
 	"wsw/backend/lib/utils"
 )
 

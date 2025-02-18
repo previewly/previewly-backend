@@ -10,7 +10,7 @@ import (
 
 type (
 	ImageProcesses interface {
-		Create(entity *ent.UploadImage, processes []types.ImageProcess, hash string) (*ent.ImageProcess, error)
+		Create(entity *ent.Image, processes []types.ImageProcess, hash string) (*ent.ImageProcess, error)
 		Update(*ent.ImageProcess, string, types.StatusEnum, string) (*ent.ImageProcess, error)
 		TryGetByHash(imageID int, processesHash string) (*ent.ImageProcess, error)
 	}
@@ -36,6 +36,6 @@ func NewImageProcesses(processRepository repository.ImageProcessRepository, imag
 	return imageProcessesImpl{processRepository: processRepository, imageRepository: imageRepository}
 }
 
-func (i imageProcessesImpl) Create(entity *ent.UploadImage, processes []types.ImageProcess, hash string) (*ent.ImageProcess, error) {
+func (i imageProcessesImpl) Create(entity *ent.Image, processes []types.ImageProcess, hash string) (*ent.ImageProcess, error) {
 	return i.imageRepository.CreateProcess(entity, processes, hash)
 }

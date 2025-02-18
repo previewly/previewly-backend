@@ -4,15 +4,15 @@ import (
 	"context"
 
 	"wsw/backend/ent"
+	entImage "wsw/backend/ent/image"
 	"wsw/backend/ent/types"
-	entImage "wsw/backend/ent/uploadimage"
 )
 
 type (
 	UploadImageRepository interface {
-		Insert(filename string, destinationPath string, originalFilename string, filetype string, extraValue *string) (*ent.UploadImage, error)
-		CreateProcess(entity *ent.UploadImage, processes []types.ImageProcess, hash string) (*ent.ImageProcess, error)
-		GetByID(int) (*ent.UploadImage, error)
+		Insert(filename string, destinationPath string, originalFilename string, filetype string, extraValue *string) (*ent.Image, error)
+		CreateProcess(entity *ent.Image, processes []types.ImageProcess, hash string) (*ent.ImageProcess, error)
+		GetByID(int) (*ent.Image, error)
 	}
 	uploadrepositoryImpl struct {
 		client *ent.Client
@@ -20,7 +20,7 @@ type (
 	}
 )
 
-func (u uploadrepositoryImpl) CreateProcess(imageEntity *ent.UploadImage, imageProcesses []types.ImageProcess, hash string) (*ent.ImageProcess, error) {
+func (u uploadrepositoryImpl) CreateProcess(imageEntity *ent.Image, imageProcesses []types.ImageProcess, hash string) (*ent.ImageProcess, error) {
 	process, err := u.client.ImageProcess.Create().
 		SetStatus(types.Pending).
 		SetProcessHash(hash).
@@ -30,7 +30,7 @@ func (u uploadrepositoryImpl) CreateProcess(imageEntity *ent.UploadImage, imageP
 		return nil, err
 	}
 
-	_, errUpdated := u.client.UploadImage.
+	_, errUpdated := u.client.Image.
 		UpdateOne(imageEntity).
 		AddImageprocess(process).
 		Save(u.ctx)
@@ -41,13 +41,13 @@ func (u uploadrepositoryImpl) CreateProcess(imageEntity *ent.UploadImage, imageP
 }
 
 // GetByID implements UploadImageRepository.
-func (u uploadrepositoryImpl) GetByID(imageID int) (*ent.UploadImage, error) {
-	return u.client.UploadImage.Query().Where(entImage.ID(imageID)).Only(u.ctx)
+func (u uploadrepositoryImpl) GetByID(imageID int) (*ent.Image, error) {
+	return u.client.Image.Query().Where(entImage.ID(imageID)).Only(u.ctx)
 }
 
 // Inser implements UploadImageRepository.
-func (u uploadrepositoryImpl) Insert(filename string, destinationPath string, originalFilename string, filetype string, extraValue *string) (*ent.UploadImage, error) {
-	entity := u.client.UploadImage.Create().
+func (u uploadrepositoryImpl) Insert(filename string, destinationPath string, originalFilename string, filetype string, extraValue *string) (*ent.Image, error) {
+	entity := u.client.Image.Create().
 		SetFilename(filename).
 		SetOriginalFilename(originalFilename).
 		SetDestinationPath(destinationPath).

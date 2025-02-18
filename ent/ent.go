@@ -9,10 +9,10 @@ import (
 	"reflect"
 	"sync"
 	"wsw/backend/ent/errorresult"
+	"wsw/backend/ent/image"
 	"wsw/backend/ent/imageprocess"
 	"wsw/backend/ent/stat"
 	"wsw/backend/ent/token"
-	"wsw/backend/ent/uploadimage"
 	"wsw/backend/ent/url"
 
 	"entgo.io/ent"
@@ -79,10 +79,10 @@ func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			errorresult.Table:  errorresult.ValidColumn,
+			image.Table:        image.ValidColumn,
 			imageprocess.Table: imageprocess.ValidColumn,
 			stat.Table:         stat.ValidColumn,
 			token.Table:        token.ValidColumn,
-			uploadimage.Table:  uploadimage.ValidColumn,
 			url.Table:          url.ValidColumn,
 		})
 	})

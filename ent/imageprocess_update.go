@@ -7,10 +7,10 @@ import (
 	"errors"
 	"fmt"
 	"time"
+	"wsw/backend/ent/image"
 	"wsw/backend/ent/imageprocess"
 	"wsw/backend/ent/predicate"
 	"wsw/backend/ent/types"
-	"wsw/backend/ent/uploadimage"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -131,13 +131,13 @@ func (ipu *ImageProcessUpdate) ClearError() *ImageProcessUpdate {
 	return ipu
 }
 
-// SetUploadimageID sets the "uploadimage" edge to the UploadImage entity by ID.
+// SetUploadimageID sets the "uploadimage" edge to the Image entity by ID.
 func (ipu *ImageProcessUpdate) SetUploadimageID(id int) *ImageProcessUpdate {
 	ipu.mutation.SetUploadimageID(id)
 	return ipu
 }
 
-// SetNillableUploadimageID sets the "uploadimage" edge to the UploadImage entity by ID if the given value is not nil.
+// SetNillableUploadimageID sets the "uploadimage" edge to the Image entity by ID if the given value is not nil.
 func (ipu *ImageProcessUpdate) SetNillableUploadimageID(id *int) *ImageProcessUpdate {
 	if id != nil {
 		ipu = ipu.SetUploadimageID(*id)
@@ -145,9 +145,9 @@ func (ipu *ImageProcessUpdate) SetNillableUploadimageID(id *int) *ImageProcessUp
 	return ipu
 }
 
-// SetUploadimage sets the "uploadimage" edge to the UploadImage entity.
-func (ipu *ImageProcessUpdate) SetUploadimage(u *UploadImage) *ImageProcessUpdate {
-	return ipu.SetUploadimageID(u.ID)
+// SetUploadimage sets the "uploadimage" edge to the Image entity.
+func (ipu *ImageProcessUpdate) SetUploadimage(i *Image) *ImageProcessUpdate {
+	return ipu.SetUploadimageID(i.ID)
 }
 
 // Mutation returns the ImageProcessMutation object of the builder.
@@ -155,7 +155,7 @@ func (ipu *ImageProcessUpdate) Mutation() *ImageProcessMutation {
 	return ipu.mutation
 }
 
-// ClearUploadimage clears the "uploadimage" edge to the UploadImage entity.
+// ClearUploadimage clears the "uploadimage" edge to the Image entity.
 func (ipu *ImageProcessUpdate) ClearUploadimage() *ImageProcessUpdate {
 	ipu.mutation.ClearUploadimage()
 	return ipu
@@ -259,7 +259,7 @@ func (ipu *ImageProcessUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{imageprocess.UploadimageColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(uploadimage.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -272,7 +272,7 @@ func (ipu *ImageProcessUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{imageprocess.UploadimageColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(uploadimage.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -400,13 +400,13 @@ func (ipuo *ImageProcessUpdateOne) ClearError() *ImageProcessUpdateOne {
 	return ipuo
 }
 
-// SetUploadimageID sets the "uploadimage" edge to the UploadImage entity by ID.
+// SetUploadimageID sets the "uploadimage" edge to the Image entity by ID.
 func (ipuo *ImageProcessUpdateOne) SetUploadimageID(id int) *ImageProcessUpdateOne {
 	ipuo.mutation.SetUploadimageID(id)
 	return ipuo
 }
 
-// SetNillableUploadimageID sets the "uploadimage" edge to the UploadImage entity by ID if the given value is not nil.
+// SetNillableUploadimageID sets the "uploadimage" edge to the Image entity by ID if the given value is not nil.
 func (ipuo *ImageProcessUpdateOne) SetNillableUploadimageID(id *int) *ImageProcessUpdateOne {
 	if id != nil {
 		ipuo = ipuo.SetUploadimageID(*id)
@@ -414,9 +414,9 @@ func (ipuo *ImageProcessUpdateOne) SetNillableUploadimageID(id *int) *ImageProce
 	return ipuo
 }
 
-// SetUploadimage sets the "uploadimage" edge to the UploadImage entity.
-func (ipuo *ImageProcessUpdateOne) SetUploadimage(u *UploadImage) *ImageProcessUpdateOne {
-	return ipuo.SetUploadimageID(u.ID)
+// SetUploadimage sets the "uploadimage" edge to the Image entity.
+func (ipuo *ImageProcessUpdateOne) SetUploadimage(i *Image) *ImageProcessUpdateOne {
+	return ipuo.SetUploadimageID(i.ID)
 }
 
 // Mutation returns the ImageProcessMutation object of the builder.
@@ -424,7 +424,7 @@ func (ipuo *ImageProcessUpdateOne) Mutation() *ImageProcessMutation {
 	return ipuo.mutation
 }
 
-// ClearUploadimage clears the "uploadimage" edge to the UploadImage entity.
+// ClearUploadimage clears the "uploadimage" edge to the Image entity.
 func (ipuo *ImageProcessUpdateOne) ClearUploadimage() *ImageProcessUpdateOne {
 	ipuo.mutation.ClearUploadimage()
 	return ipuo
@@ -558,7 +558,7 @@ func (ipuo *ImageProcessUpdateOne) sqlSave(ctx context.Context) (_node *ImagePro
 			Columns: []string{imageprocess.UploadimageColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(uploadimage.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -571,7 +571,7 @@ func (ipuo *ImageProcessUpdateOne) sqlSave(ctx context.Context) (_node *ImagePro
 			Columns: []string{imageprocess.UploadimageColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(uploadimage.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

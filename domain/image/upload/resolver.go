@@ -73,7 +73,7 @@ func (r resolverImpl) createErrorStatus(name string, imageError error, extra *st
 	}
 }
 
-func (r resolverImpl) createImageStatus(name string, imageEntity ent.UploadImage) *model.UploadImageStatus {
+func (r resolverImpl) createImageStatus(name string, imageEntity ent.Image) *model.UploadImageStatus {
 	return &model.UploadImageStatus{
 		ID:     imageEntity.ID,
 		Name:   name,

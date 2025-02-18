@@ -6,9 +6,9 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"wsw/backend/ent/image"
 	"wsw/backend/ent/imageprocess"
 	"wsw/backend/ent/predicate"
-	"wsw/backend/ent/uploadimage"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -23,7 +23,7 @@ type ImageProcessQuery struct {
 	order           []imageprocess.OrderOption
 	inters          []Interceptor
 	predicates      []predicate.ImageProcess
-	withUploadimage *UploadImageQuery
+	withUploadimage *ImageQuery
 	withFKs         bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -62,8 +62,8 @@ func (ipq *ImageProcessQuery) Order(o ...imageprocess.OrderOption) *ImageProcess
 }
 
 // QueryUploadimage chains the current query on the "uploadimage" edge.
-func (ipq *ImageProcessQuery) QueryUploadimage() *UploadImageQuery {
-	query := (&UploadImageClient{config: ipq.config}).Query()
+func (ipq *ImageProcessQuery) QueryUploadimage() *ImageQuery {
+	query := (&ImageClient{config: ipq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := ipq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -74,7 +74,7 @@ func (ipq *ImageProcessQuery) QueryUploadimage() *UploadImageQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(imageprocess.Table, imageprocess.FieldID, selector),
-			sqlgraph.To(uploadimage.Table, uploadimage.FieldID),
+			sqlgraph.To(image.Table, image.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, imageprocess.UploadimageTable, imageprocess.UploadimageColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ipq.driver.Dialect(), step)
@@ -284,8 +284,8 @@ func (ipq *ImageProcessQuery) Clone() *ImageProcessQuery {
 
 // WithUploadimage tells the query-builder to eager-load the nodes that are connected to
 // the "uploadimage" edge. The optional arguments are used to configure the query builder of the edge.
-func (ipq *ImageProcessQuery) WithUploadimage(opts ...func(*UploadImageQuery)) *ImageProcessQuery {
-	query := (&UploadImageClient{config: ipq.config}).Query()
+func (ipq *ImageProcessQuery) WithUploadimage(opts ...func(*ImageQuery)) *ImageProcessQuery {
+	query := (&ImageClient{config: ipq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -402,21 +402,21 @@ func (ipq *ImageProcessQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 	}
 	if query := ipq.withUploadimage; query != nil {
 		if err := ipq.loadUploadimage(ctx, query, nodes, nil,
-			func(n *ImageProcess, e *UploadImage) { n.Edges.Uploadimage = e }); err != nil {
+			func(n *ImageProcess, e *Image) { n.Edges.Uploadimage = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (ipq *ImageProcessQuery) loadUploadimage(ctx context.Context, query *UploadImageQuery, nodes []*ImageProcess, init func(*ImageProcess), assign func(*ImageProcess, *UploadImage)) error {
+func (ipq *ImageProcessQuery) loadUploadimage(ctx context.Context, query *ImageQuery, nodes []*ImageProcess, init func(*ImageProcess), assign func(*ImageProcess, *Image)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*ImageProcess)
 	for i := range nodes {
-		if nodes[i].upload_image_imageprocess == nil {
+		if nodes[i].image_imageprocess == nil {
 			continue
 		}
-		fk := *nodes[i].upload_image_imageprocess
+		fk := *nodes[i].image_imageprocess
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -425,7 +425,7 @@ func (ipq *ImageProcessQuery) loadUploadimage(ctx context.Context, query *Upload
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(uploadimage.IDIn(ids...))
+	query.Where(image.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -433,7 +433,7 @@ func (ipq *ImageProcessQuery) loadUploadimage(ctx context.Context, query *Upload
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "upload_image_imageprocess" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "image_imageprocess" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

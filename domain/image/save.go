@@ -3,7 +3,7 @@ package image
 import (
 	"io"
 
-	"wsw/backend/domain/image/upload/storage"
+	"wsw/backend/domain/image/storage"
 	"wsw/backend/ent"
 	"wsw/backend/model/image"
 

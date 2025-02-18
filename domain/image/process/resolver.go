@@ -16,13 +16,13 @@ type (
 	}
 
 	resolverImpl struct {
-		imagesModel  image.UploadedImage
+		imagesModel  image.Model
 		gqlConvertor Convertor
 		runner       ProcessRunner
 	}
 )
 
-func NewProcessResolver(imagesModel image.UploadedImage, gqlConvertor Convertor, runner ProcessRunner) Resolver {
+func NewProcessResolver(imagesModel image.Model, gqlConvertor Convertor, runner ProcessRunner) Resolver {
 	return resolverImpl{imagesModel: imagesModel, gqlConvertor: gqlConvertor, runner: runner}
 }
 

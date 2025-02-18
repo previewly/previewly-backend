@@ -132,14 +132,14 @@ func initDomains(config config.Config) {
 		) domainImageProcess.ProcessRunner {
 			return domainImageProcess.NewProcessRunner(pathProvider, pathGenerator, urlProvider, processesModel)
 		})
-	initService(func(model imageModel.UploadedImage, storage domainStorage.Storage) domainImageSaver.Saver {
+	initService(func(model imageModel.Model, storage domainStorage.Storage) domainImageSaver.Saver {
 		return domainImageSaver.NewSaver(model, storage)
 	})
 }
 
 func initResolvers() {
 	initService(func(saver domainImageSaver.Saver) upload.Resolver { return upload.NewUploadResolver(saver) })
-	initService(func(model imageModel.UploadedImage, gqlConvertor domainImageProcess.Convertor, runner domainImageProcess.ProcessRunner) domainImageProcess.Resolver {
+	initService(func(model imageModel.Model, gqlConvertor domainImageProcess.Convertor, runner domainImageProcess.ProcessRunner) domainImageProcess.Resolver {
 		return domainImageProcess.NewProcessResolver(model, gqlConvertor, runner)
 	})
 }
@@ -152,7 +152,7 @@ func initModels() {
 		return url.NewUrl(urlRepository, client, provider)
 	})
 
-	initService(func(uploadRepository repository.ImageRepository) imageModel.UploadedImage {
+	initService(func(uploadRepository repository.ImageRepository) imageModel.Model {
 		return imageModel.NewModel(uploadRepository)
 	})
 	initService(func(processRepository repository.ImageProcessRepository, imageRepository repository.ImageRepository) imageModel.ImageProcesses {

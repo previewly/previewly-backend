@@ -21,7 +21,7 @@ import (
 	domainImageSaver "wsw/backend/domain/image"
 	domainImagePath "wsw/backend/domain/image/path"
 	domainImageProcess "wsw/backend/domain/image/process"
-	domainStorage "wsw/backend/domain/image/upload/storage"
+	domainStorage "wsw/backend/domain/image/storage"
 	domainImageUrl "wsw/backend/domain/image/url"
 
 	imageModel "wsw/backend/model/image"

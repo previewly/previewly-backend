@@ -15,7 +15,7 @@ type (
 		FullPath     string
 	}
 	Storage interface {
-		Save(string, *string, io.ReadSeeker) (*StorageFile, error)
+		Save(filename string, prefix *string, file io.ReadSeeker) (*StorageFile, error)
 	}
 	storageImpl struct {
 		nameGenerator path.FilenameGenerator

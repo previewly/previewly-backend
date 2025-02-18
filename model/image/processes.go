@@ -16,7 +16,7 @@ type (
 	}
 	imageProcessesImpl struct {
 		processRepository repository.ImageProcessRepository
-		imageRepository   repository.UploadImageRepository
+		imageRepository   repository.ImageRepository
 	}
 )
 
@@ -32,7 +32,7 @@ func (i imageProcessesImpl) Update(processEntity *ent.ImageProcess, prefix strin
 	return i.processRepository.Update(processEntity, prefix, status, pointer.String(err))
 }
 
-func NewImageProcesses(processRepository repository.ImageProcessRepository, imageRepository repository.UploadImageRepository) ImageProcesses {
+func NewImageProcesses(processRepository repository.ImageProcessRepository, imageRepository repository.ImageRepository) ImageProcesses {
 	return imageProcessesImpl{processRepository: processRepository, imageRepository: imageRepository}
 }
 

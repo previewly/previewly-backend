@@ -152,10 +152,10 @@ func initModels() {
 		return url.NewUrl(urlRepository, client, provider)
 	})
 
-	initService(func(uploadRepository repository.UploadImageRepository) imageModel.UploadedImage {
+	initService(func(uploadRepository repository.ImageRepository) imageModel.UploadedImage {
 		return imageModel.NewModel(uploadRepository)
 	})
-	initService(func(processRepository repository.ImageProcessRepository, imageRepository repository.UploadImageRepository) imageModel.ImageProcesses {
+	initService(func(processRepository repository.ImageProcessRepository, imageRepository repository.ImageRepository) imageModel.ImageProcesses {
 		return imageModel.NewImageProcesses(processRepository, imageRepository)
 	})
 }
@@ -170,7 +170,7 @@ func initRepositories() {
 	initService(func(client *ent.Client, ctx context.Context) repository.Stat {
 		return repository.NewStat(client, ctx)
 	})
-	initService(func(client *ent.Client, ctx context.Context) repository.UploadImageRepository {
+	initService(func(client *ent.Client, ctx context.Context) repository.ImageRepository {
 		return repository.NewUploadImageRepository(client, ctx)
 	})
 	initService(func(client *ent.Client, ctx context.Context) repository.ImageProcessRepository {

@@ -46,6 +46,7 @@ func initDi(config config.Config, appContext context.Context) {
 	initVoidServices(config)
 
 	initService(func() context.Context { return appContext })
+
 	initService(func() (*ent.Client, error) { return newDBClient(config.Postgres, appContext) })
 
 	initService(func() Middlewares {
@@ -82,15 +83,19 @@ func initDi(config config.Config, appContext context.Context) {
 		}
 	})
 
+	initRepositories()
+	initGoWitness(config)
+	initModels()
+	initDomains(config)
+	initResolvers()
+}
+
+func initGoWitness(config config.Config) {
 	initService(func() generator.TokenGenerator { return generator.NewTokenGenerator() })
 	initService(func() domainImageUrl.Provider {
 		return domainImageUrl.NewProvider(config.Gowitness.ScreenshotBaseUrl, config.App.AssetsBaseURL)
 	})
 	initService(func() relative.Provider { return relative.NewProvider() })
-
-	initRepositories()
-
-	initService(func() *slog.Logger { return slog.Default() })
 
 	initService(func(urlRepository repository.Url, statRepository repository.Stat, relativePathProvider relative.Provider) gowitness.CreateWriter {
 		return func(url *ent.Url) gowitness.Writer {
@@ -109,10 +114,6 @@ func initDi(config config.Config, appContext context.Context) {
 		}
 		return gowitness.NewClient(logger, createWriter, driver, *options)
 	})
-
-	initModels()
-	initDomains(config)
-	initResolvers()
 }
 
 func initDomains(config config.Config) {
@@ -198,6 +199,8 @@ func initSentry(options sentry.ClientOptions) {
 func initLogger() {
 	logger := slog.New(log.NewHandler(nil))
 	slog.SetDefault(logger)
+
+	initService(func() *slog.Logger { return slog.Default() })
 }
 
 func initService(resolver interface{}) {

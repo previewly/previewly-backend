@@ -1,5 +1,7 @@
 package preview
 
+import "wsw/backend/ent"
+
 type Status string
 
 const (
@@ -15,4 +17,6 @@ type PreviewData struct {
 	Status Status
 	Error  *string
 	Title  *string
+	IsNew  bool
+	Entity *ent.Url
 }

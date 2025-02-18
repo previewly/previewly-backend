@@ -4,7 +4,6 @@ import (
 	netUrl "net/url"
 	"strings"
 
-	"wsw/backend/domain/gowitness"
 	"wsw/backend/domain/image/url"
 	"wsw/backend/domain/preview"
 	"wsw/backend/ent"
@@ -18,7 +17,6 @@ type (
 		GetPreviewData(string) (*preview.PreviewData, error)
 	}
 	urlImpl struct {
-		client                gowitness.Client
 		urlRepository         repository.Url
 		screenshotURLProvider url.Provider
 	}
@@ -31,7 +29,7 @@ func (u urlImpl) GetPreviewData(url string) (*preview.PreviewData, error) {
 		return nil, err
 	}
 
-	return u.createPreviewData(entity)
+	return u.createPreviewData(entity, false)
 }
 
 // AddURL implements Url.
@@ -45,29 +43,14 @@ func (u urlImpl) AddURL(url string) (*preview.PreviewData, error) {
 		return nil, err
 	}
 
-	updatedEntity, err := u.updateURLData(urlEntity, isNew)
-	if err != nil {
-		return nil, err
-	}
-
-	return u.createPreviewData(updatedEntity)
+	return u.createPreviewData(urlEntity, isNew)
 }
 
-func NewUrl(urlRepository repository.Url, client gowitness.Client, provider url.Provider) Url {
+func NewUrl(urlRepository repository.Url, provider url.Provider) Url {
 	return urlImpl{
 		urlRepository:         urlRepository,
-		client:                client,
 		screenshotURLProvider: provider,
 	}
-}
-
-func (u urlImpl) updateURLData(urlEntity *ent.Url, isNew bool) (*ent.Url, error) {
-	if isNew {
-		go func(url *ent.Url) {
-			u.client.UpdateUrl(url)
-		}(urlEntity)
-	}
-	return urlEntity, nil
 }
 
 func (u urlImpl) getOrCreateURLEntity(url string) (*ent.Url, error, bool) {
@@ -79,7 +62,7 @@ func (u urlImpl) getOrCreateURLEntity(url string) (*ent.Url, error, bool) {
 	return entity, nil, false
 }
 
-func (u urlImpl) createPreviewData(url *ent.Url) (*preview.PreviewData, error) {
+func (u urlImpl) createPreviewData(url *ent.Url, isNew bool) (*preview.PreviewData, error) {
 	lastError, err := u.getLastError(url)
 	if err != nil {
 		return nil, err
@@ -107,6 +90,8 @@ func (u urlImpl) createPreviewData(url *ent.Url) (*preview.PreviewData, error) {
 		Status: u.getPreviewDataStatus(url.Status),
 		Error:  errorMessage,
 		Title:  title,
+		IsNew:  isNew,
+		Entity: url,
 	}, nil
 }
 

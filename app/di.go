@@ -149,8 +149,8 @@ func initModels() {
 	initService(func(generator generator.TokenGenerator, tokenRepository repository.Token) token.Token {
 		return token.NewModel(generator, tokenRepository)
 	})
-	initService(func(urlRepository repository.Url, client gowitness.Client, provider domainImageUrl.Provider) url.Url {
-		return url.NewUrl(urlRepository, client, provider)
+	initService(func(urlRepository repository.Url, provider domainImageUrl.Provider) url.Url {
+		return url.NewUrl(urlRepository, provider)
 	})
 
 	initService(func(uploadRepository repository.ImageRepository) imageModel.Model {

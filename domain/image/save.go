@@ -16,11 +16,11 @@ type (
 	}
 	saverImpl struct {
 		storage storage.Storage
-		model   image.UploadedImage
+		model   image.Model
 	}
 )
 
-func NewSaver(model image.UploadedImage, storage storage.Storage) Saver {
+func NewSaver(model image.Model, storage storage.Storage) Saver {
 	return saverImpl{storage: storage, model: model}
 }
 

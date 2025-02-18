@@ -34,7 +34,7 @@ func (ImageProcess) Fields() []ent.Field {
 // Edges of the ImageProcess.
 func (ImageProcess) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("uploadimage", UploadImage.Type).Ref("imageprocess").Unique(),
+		edge.From("uploadimage", Image.Type).Ref("imageprocess").Unique(),
 	}
 }
 

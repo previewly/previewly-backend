@@ -7,9 +7,9 @@ import (
 	"errors"
 	"fmt"
 	"time"
+	"wsw/backend/ent/image"
 	"wsw/backend/ent/imageprocess"
 	"wsw/backend/ent/types"
-	"wsw/backend/ent/uploadimage"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -96,13 +96,13 @@ func (ipc *ImageProcessCreate) SetNillableError(s *string) *ImageProcessCreate {
 	return ipc
 }
 
-// SetUploadimageID sets the "uploadimage" edge to the UploadImage entity by ID.
+// SetUploadimageID sets the "uploadimage" edge to the Image entity by ID.
 func (ipc *ImageProcessCreate) SetUploadimageID(id int) *ImageProcessCreate {
 	ipc.mutation.SetUploadimageID(id)
 	return ipc
 }
 
-// SetNillableUploadimageID sets the "uploadimage" edge to the UploadImage entity by ID if the given value is not nil.
+// SetNillableUploadimageID sets the "uploadimage" edge to the Image entity by ID if the given value is not nil.
 func (ipc *ImageProcessCreate) SetNillableUploadimageID(id *int) *ImageProcessCreate {
 	if id != nil {
 		ipc = ipc.SetUploadimageID(*id)
@@ -110,9 +110,9 @@ func (ipc *ImageProcessCreate) SetNillableUploadimageID(id *int) *ImageProcessCr
 	return ipc
 }
 
-// SetUploadimage sets the "uploadimage" edge to the UploadImage entity.
-func (ipc *ImageProcessCreate) SetUploadimage(u *UploadImage) *ImageProcessCreate {
-	return ipc.SetUploadimageID(u.ID)
+// SetUploadimage sets the "uploadimage" edge to the Image entity.
+func (ipc *ImageProcessCreate) SetUploadimage(i *Image) *ImageProcessCreate {
+	return ipc.SetUploadimageID(i.ID)
 }
 
 // Mutation returns the ImageProcessMutation object of the builder.
@@ -244,13 +244,13 @@ func (ipc *ImageProcessCreate) createSpec() (*ImageProcess, *sqlgraph.CreateSpec
 			Columns: []string{imageprocess.UploadimageColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(uploadimage.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.upload_image_imageprocess = &nodes[0]
+		_node.image_imageprocess = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

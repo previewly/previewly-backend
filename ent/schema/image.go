@@ -6,13 +6,13 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// UploadImage holds the schema definition for the UploadImage entity.
-type UploadImage struct {
+// Image holds the schema definition for the Image entity.
+type Image struct {
 	ent.Schema
 }
 
 // Fields of the UploadImage.
-func (UploadImage) Fields() []ent.Field {
+func (Image) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("filename").NotEmpty().Immutable(),
 		field.String("destination_path").NotEmpty().Immutable(),
@@ -23,7 +23,7 @@ func (UploadImage) Fields() []ent.Field {
 }
 
 // Edges of the UploadImage.
-func (UploadImage) Edges() []ent.Edge {
+func (Image) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("imageprocess", ImageProcess.Type),
 	}

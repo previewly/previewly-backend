@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"wsw/backend/ent/image"
 	"wsw/backend/ent/imageprocess"
 	"wsw/backend/ent/types"
-	"wsw/backend/ent/uploadimage"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -36,15 +36,15 @@ type ImageProcess struct {
 	Error string `json:"error,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ImageProcessQuery when eager-loading is set.
-	Edges                     ImageProcessEdges `json:"edges"`
-	upload_image_imageprocess *int
-	selectValues              sql.SelectValues
+	Edges              ImageProcessEdges `json:"edges"`
+	image_imageprocess *int
+	selectValues       sql.SelectValues
 }
 
 // ImageProcessEdges holds the relations/edges for other nodes in the graph.
 type ImageProcessEdges struct {
 	// Uploadimage holds the value of the uploadimage edge.
-	Uploadimage *UploadImage `json:"uploadimage,omitempty"`
+	Uploadimage *Image `json:"uploadimage,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
@@ -52,11 +52,11 @@ type ImageProcessEdges struct {
 
 // UploadimageOrErr returns the Uploadimage value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ImageProcessEdges) UploadimageOrErr() (*UploadImage, error) {
+func (e ImageProcessEdges) UploadimageOrErr() (*Image, error) {
 	if e.Uploadimage != nil {
 		return e.Uploadimage, nil
 	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: uploadimage.Label}
+		return nil, &NotFoundError{label: image.Label}
 	}
 	return nil, &NotLoadedError{edge: "uploadimage"}
 }
@@ -74,7 +74,7 @@ func (*ImageProcess) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case imageprocess.FieldCreatedAt, imageprocess.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case imageprocess.ForeignKeys[0]: // upload_image_imageprocess
+		case imageprocess.ForeignKeys[0]: // image_imageprocess
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -143,10 +143,10 @@ func (ip *ImageProcess) assignValues(columns []string, values []any) error {
 			}
 		case imageprocess.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field upload_image_imageprocess", value)
+				return fmt.Errorf("unexpected type %T for edge-field image_imageprocess", value)
 			} else if value.Valid {
-				ip.upload_image_imageprocess = new(int)
-				*ip.upload_image_imageprocess = int(value.Int64)
+				ip.image_imageprocess = new(int)
+				*ip.image_imageprocess = int(value.Int64)
 			}
 		default:
 			ip.selectValues.Set(columns[i], values[i])
@@ -162,7 +162,7 @@ func (ip *ImageProcess) Value(name string) (ent.Value, error) {
 }
 
 // QueryUploadimage queries the "uploadimage" edge of the ImageProcess entity.
-func (ip *ImageProcess) QueryUploadimage() *UploadImageQuery {
+func (ip *ImageProcess) QueryUploadimage() *ImageQuery {
 	return NewImageProcessClient(ip.config).QueryUploadimage(ip)
 }
 

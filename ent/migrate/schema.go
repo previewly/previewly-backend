@@ -29,6 +29,21 @@ var (
 			},
 		},
 	}
+	// ImagesColumns holds the columns for the "images" table.
+	ImagesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "filename", Type: field.TypeString},
+		{Name: "destination_path", Type: field.TypeString},
+		{Name: "original_filename", Type: field.TypeString},
+		{Name: "type", Type: field.TypeString},
+		{Name: "extra_value", Type: field.TypeString, Nullable: true},
+	}
+	// ImagesTable holds the schema information for the "images" table.
+	ImagesTable = &schema.Table{
+		Name:       "images",
+		Columns:    ImagesColumns,
+		PrimaryKey: []*schema.Column{ImagesColumns[0]},
+	}
 	// ImageProcessesColumns holds the columns for the "image_processes" table.
 	ImageProcessesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -39,7 +54,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "path_prefix", Type: field.TypeString, Nullable: true},
 		{Name: "error", Type: field.TypeString, Nullable: true},
-		{Name: "upload_image_imageprocess", Type: field.TypeInt, Nullable: true},
+		{Name: "image_imageprocess", Type: field.TypeInt, Nullable: true},
 	}
 	// ImageProcessesTable holds the schema information for the "image_processes" table.
 	ImageProcessesTable = &schema.Table{
@@ -48,15 +63,15 @@ var (
 		PrimaryKey: []*schema.Column{ImageProcessesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "image_processes_upload_images_imageprocess",
+				Symbol:     "image_processes_images_imageprocess",
 				Columns:    []*schema.Column{ImageProcessesColumns[8]},
-				RefColumns: []*schema.Column{UploadImagesColumns[0]},
+				RefColumns: []*schema.Column{ImagesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
 		Indexes: []*schema.Index{
 			{
-				Name:    "imageprocess_process_hash_upload_image_imageprocess",
+				Name:    "imageprocess_process_hash_image_imageprocess",
 				Unique:  true,
 				Columns: []*schema.Column{ImageProcessesColumns[2], ImageProcessesColumns[8]},
 			},
@@ -94,21 +109,6 @@ var (
 		Columns:    TokensColumns,
 		PrimaryKey: []*schema.Column{TokensColumns[0]},
 	}
-	// UploadImagesColumns holds the columns for the "upload_images" table.
-	UploadImagesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "filename", Type: field.TypeString},
-		{Name: "destination_path", Type: field.TypeString},
-		{Name: "original_filename", Type: field.TypeString},
-		{Name: "type", Type: field.TypeString},
-		{Name: "extra_value", Type: field.TypeString, Nullable: true},
-	}
-	// UploadImagesTable holds the schema information for the "upload_images" table.
-	UploadImagesTable = &schema.Table{
-		Name:       "upload_images",
-		Columns:    UploadImagesColumns,
-		PrimaryKey: []*schema.Column{UploadImagesColumns[0]},
-	}
 	// UrlsColumns holds the columns for the "urls" table.
 	UrlsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -125,16 +125,16 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		ErrorResultsTable,
+		ImagesTable,
 		ImageProcessesTable,
 		StatsTable,
 		TokensTable,
-		UploadImagesTable,
 		UrlsTable,
 	}
 )
 
 func init() {
 	ErrorResultsTable.ForeignKeys[0].RefTable = UrlsTable
-	ImageProcessesTable.ForeignKeys[0].RefTable = UploadImagesTable
+	ImageProcessesTable.ForeignKeys[0].RefTable = ImagesTable
 	StatsTable.ForeignKeys[0].RefTable = UrlsTable
 }

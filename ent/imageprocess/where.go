@@ -418,7 +418,7 @@ func HasUploadimage() predicate.ImageProcess {
 }
 
 // HasUploadimageWith applies the HasEdge predicate on the "uploadimage" edge with a given conditions (other predicates).
-func HasUploadimageWith(preds ...predicate.UploadImage) predicate.ImageProcess {
+func HasUploadimageWith(preds ...predicate.Image) predicate.ImageProcess {
 	return predicate.ImageProcess(func(s *sql.Selector) {
 		step := newUploadimageStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

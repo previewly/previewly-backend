@@ -27,7 +27,7 @@ type (
 		Error      error
 	}
 	ProcessRunner interface {
-		Start(*ent.UploadImage, []types.ImageProcess) (*RunnerResult, error)
+		Start(*ent.Image, []types.ImageProcess) (*RunnerResult, error)
 	}
 	processRunnerimpl struct {
 		pathProvider   path.PathProvider
@@ -36,7 +36,7 @@ type (
 		processesModel image.ImageProcesses
 	}
 	inputArg struct {
-		Image     *ent.UploadImage
+		Image     *ent.Image
 		Processes []types.ImageProcess
 	}
 )
@@ -46,7 +46,7 @@ func NewProcessRunner(pathProvider path.PathProvider, pathGenerator path.Filenam
 }
 
 // Start implements ProcessRunner.
-func (p processRunnerimpl) Start(image *ent.UploadImage, processes []types.ImageProcess) (*RunnerResult, error) {
+func (p processRunnerimpl) Start(image *ent.Image, processes []types.ImageProcess) (*RunnerResult, error) {
 	inputArgs := inputArg{Image: image, Processes: processes}
 
 	processList, err := p.createProcessList(processes)
@@ -72,7 +72,7 @@ func (p processRunnerimpl) Start(image *ent.UploadImage, processes []types.Image
 	}
 }
 
-func (p processRunnerimpl) doProcess(image *ent.UploadImage, processes []types.ImageProcess, processList []Process) (*ent.ImageProcess, error) {
+func (p processRunnerimpl) doProcess(image *ent.Image, processes []types.ImageProcess, processList []Process) (*ent.ImageProcess, error) {
 	hash := p.getProcessesHash(processList)
 	processEntity, err := p.createProcessEntity(image, processes, hash)
 	if err != nil {
@@ -90,11 +90,11 @@ func (p processRunnerimpl) doProcess(image *ent.UploadImage, processes []types.I
 	return processEntity, nil
 }
 
-func (p processRunnerimpl) createProcessEntity(image *ent.UploadImage, processes []types.ImageProcess, hash string) (*ent.ImageProcess, error) {
+func (p processRunnerimpl) createProcessEntity(image *ent.Image, processes []types.ImageProcess, hash string) (*ent.ImageProcess, error) {
 	return p.processesModel.Create(image, processes, hash)
 }
 
-func (p processRunnerimpl) runProcesses(image *ent.UploadImage, processList []Process) (*path.PathData, error) {
+func (p processRunnerimpl) runProcesses(image *ent.Image, processList []Process) (*path.PathData, error) {
 	var imagePath *path.PathData
 	imagePath = p.pathProvider.Provide(image.DestinationPath, image.Filename)
 	for _, process := range processList {

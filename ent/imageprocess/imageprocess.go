@@ -36,11 +36,11 @@ const (
 	Table = "image_processes"
 	// UploadimageTable is the table that holds the uploadimage relation/edge.
 	UploadimageTable = "image_processes"
-	// UploadimageInverseTable is the table name for the UploadImage entity.
-	// It exists in this package in order to avoid circular dependency with the "uploadimage" package.
-	UploadimageInverseTable = "upload_images"
+	// UploadimageInverseTable is the table name for the Image entity.
+	// It exists in this package in order to avoid circular dependency with the "image" package.
+	UploadimageInverseTable = "images"
 	// UploadimageColumn is the table column denoting the uploadimage relation/edge.
-	UploadimageColumn = "upload_image_imageprocess"
+	UploadimageColumn = "image_imageprocess"
 )
 
 // Columns holds all SQL columns for imageprocess fields.
@@ -58,7 +58,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "image_processes"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"upload_image_imageprocess",
+	"image_imageprocess",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

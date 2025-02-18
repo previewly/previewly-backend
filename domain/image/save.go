@@ -12,7 +12,7 @@ import (
 
 type (
 	Saver interface {
-		SaveImage(imageName string, image io.ReadSeeker, contentType string, extraValue *string) (*ent.UploadImage, error)
+		SaveImage(imageName string, image io.ReadSeeker, contentType string, extraValue *string) (*ent.Image, error)
 	}
 	saverImpl struct {
 		storage storage.Storage
@@ -24,7 +24,7 @@ func NewSaver(model image.UploadedImage, storage storage.Storage) Saver {
 	return saverImpl{storage: storage, model: model}
 }
 
-func (s saverImpl) SaveImage(imageName string, image io.ReadSeeker, contentType string, extraValue *string) (*ent.UploadImage, error) {
+func (s saverImpl) SaveImage(imageName string, image io.ReadSeeker, contentType string, extraValue *string) (*ent.Image, error) {
 	storageFile, err := s.storage.Save(imageName, pointer.String("o/"), image)
 	if err != nil {
 		return nil, err

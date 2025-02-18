@@ -37,7 +37,7 @@ func (r resolverImpl) Resolve(ctx context.Context, imageID int, processes []*mod
 	return r.createImageProcess(imageEntity, imageProcesses)
 }
 
-func (r resolverImpl) createImageProcess(imageEntity *ent.UploadImage, imageProcesses []types.ImageProcess) (*model.ImageProcess, error) {
+func (r resolverImpl) createImageProcess(imageEntity *ent.Image, imageProcesses []types.ImageProcess) (*model.ImageProcess, error) {
 	runnerResult, err := r.runner.Start(imageEntity, imageProcesses)
 	if err != nil {
 		return nil, err

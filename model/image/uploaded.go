@@ -11,7 +11,7 @@ type (
 		GetByID(int) (*ent.Image, error)
 	}
 	uploadImpl struct {
-		repository repository.UploadImageRepository
+		repository repository.ImageRepository
 	}
 )
 
@@ -25,6 +25,6 @@ func (u uploadImpl) Insert(filename string, desctinationPath string, originalFil
 	return u.repository.Insert(filename, desctinationPath, originalFilename, filetype, extraValue)
 }
 
-func NewModel(repository repository.UploadImageRepository) UploadedImage {
+func NewModel(repository repository.ImageRepository) UploadedImage {
 	return uploadImpl{repository: repository}
 }

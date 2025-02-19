@@ -66,7 +66,6 @@ func (w writerImpl) safeFileName(s string) string {
 // Write implements writers.Writer.
 func (w writerImpl) Write(result *models.Result) error {
 	filename := w.newFilename(result.URL)
-
 	imageEntity, err := w.addScreenshotToImages(result.Screenshot, filename)
 	if err != nil {
 		return err

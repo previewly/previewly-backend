@@ -77,12 +77,13 @@ type ComplexityRoot struct {
 	}
 
 	PreviewData struct {
-		Error  func(childComplexity int) int
-		ID     func(childComplexity int) int
-		Image  func(childComplexity int) int
-		Status func(childComplexity int) int
-		Title  func(childComplexity int) int
-		URL    func(childComplexity int) int
+		Error   func(childComplexity int) int
+		ID      func(childComplexity int) int
+		Image   func(childComplexity int) int
+		ImageID func(childComplexity int) int
+		Status  func(childComplexity int) int
+		Title   func(childComplexity int) int
+		URL     func(childComplexity int) int
 	}
 
 	Query struct {
@@ -262,6 +263,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PreviewData.Image(childComplexity), true
+
+	case "PreviewData.imageId":
+		if e.complexity.PreviewData.ImageID == nil {
+			break
+		}
+
+		return e.complexity.PreviewData.ImageID(childComplexity), true
 
 	case "PreviewData.status":
 		if e.complexity.PreviewData.Status == nil {
@@ -1316,6 +1324,8 @@ func (ec *executionContext) fieldContext_Mutation_addUrl(ctx context.Context, fi
 				return ec.fieldContext_PreviewData_status(ctx, field)
 			case "image":
 				return ec.fieldContext_PreviewData_image(ctx, field)
+			case "imageId":
+				return ec.fieldContext_PreviewData_imageId(ctx, field)
 			case "error":
 				return ec.fieldContext_PreviewData_error(ctx, field)
 			case "title":
@@ -1737,6 +1747,47 @@ func (ec *executionContext) fieldContext_PreviewData_image(_ context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _PreviewData_imageId(ctx context.Context, field graphql.CollectedField, obj *model.PreviewData) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PreviewData_imageId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ImageID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PreviewData_imageId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PreviewData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _PreviewData_error(ctx context.Context, field graphql.CollectedField, obj *model.PreviewData) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_PreviewData_error(ctx, field)
 	if err != nil {
@@ -1863,6 +1914,8 @@ func (ec *executionContext) fieldContext_Query_getPreviewData(ctx context.Contex
 				return ec.fieldContext_PreviewData_status(ctx, field)
 			case "image":
 				return ec.fieldContext_PreviewData_image(ctx, field)
+			case "imageId":
+				return ec.fieldContext_PreviewData_imageId(ctx, field)
 			case "error":
 				return ec.fieldContext_PreviewData_error(ctx, field)
 			case "title":
@@ -4615,6 +4668,8 @@ func (ec *executionContext) _PreviewData(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "imageId":
+			out.Values[i] = ec._PreviewData_imageId(ctx, field, obj)
 		case "error":
 			out.Values[i] = ec._PreviewData_error(ctx, field, obj)
 		case "title":
@@ -5717,6 +5772,22 @@ func (ec *executionContext) marshalOImageProcess2ᚖwswᚋbackendᚋgraphᚋmode
 		return graphql.Null
 	}
 	return ec._ImageProcess(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v any) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalInt(*v)
+	return res
 }
 
 func (ec *executionContext) marshalOPreviewData2ᚖwswᚋbackendᚋgraphᚋmodelᚐPreviewData(ctx context.Context, sel ast.SelectionSet, v *model.PreviewData) graphql.Marshaler {

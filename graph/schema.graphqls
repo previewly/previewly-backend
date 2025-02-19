@@ -33,6 +33,7 @@ type PreviewData {
   url: String!
   status: Status!
   image: String!
+  imageId: Int
   error: String
   title: String
 }

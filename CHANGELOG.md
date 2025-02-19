@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.2](https://github.com/previewly/previewly-backend/compare/v1.15.1...v1.15.2) (2025-02-19)
+
+
+### Bug Fixes
+
+* fix image url ([98810e3](https://github.com/previewly/previewly-backend/commit/98810e34ed9b4c0a5c36f2a0849b5444d358ea14))
+
 ## [1.15.1](https://github.com/previewly/previewly-backend/compare/v1.15.0...v1.15.1) (2025-02-19)
 
 

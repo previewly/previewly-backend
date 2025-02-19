@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.1](https://github.com/previewly/previewly-backend/compare/v1.15.0...v1.15.1) (2025-02-19)
+
+
+### Bug Fixes
+
+* fix error on first screenshot request ([ee77257](https://github.com/previewly/previewly-backend/commit/ee77257a97eae1b95fe174b83d441af7d849d95a))
+
 ## [1.15.0](https://github.com/previewly/previewly-backend/compare/v1.14.0...v1.15.0) (2025-02-19)
 
 

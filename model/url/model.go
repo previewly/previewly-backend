@@ -9,8 +9,6 @@ import (
 	"wsw/backend/ent"
 	"wsw/backend/ent/repository"
 	"wsw/backend/ent/types"
-
-	"github.com/go-errors/errors"
 )
 
 type (
@@ -19,6 +17,7 @@ type (
 		GetPreviewData(string) (*preview.PreviewData, error)
 	}
 	urlImpl struct {
+		assetsURL             string
 		urlRepository         repository.Url
 		statRepository        repository.Stat
 		screenshotURLProvider url.Provider
@@ -49,8 +48,9 @@ func (u urlImpl) AddURL(url string) (*preview.PreviewData, error) {
 	return u.createPreviewData(urlEntity, isNew)
 }
 
-func NewUrl(urlRepository repository.Url, statRepository repository.Stat, provider url.Provider) Url {
+func NewURLModel(assetsURL string, urlRepository repository.Url, statRepository repository.Stat, provider url.Provider) Url {
 	return urlImpl{
+		assetsURL:             assetsURL,
 		urlRepository:         urlRepository,
 		statRepository:        statRepository,
 		screenshotURLProvider: provider,
@@ -87,18 +87,30 @@ func (u urlImpl) createPreviewData(url *ent.Url, isNew bool) (*preview.PreviewDa
 		return nil, errImage
 	}
 
-	imageDto := dto.NewImage(image.OriginalFilename, image.DestinationPath)
+	var title *string = nil
+	var imageId *int = nil
+	imageURL := u.assetsURL + "loader-200px-200px.gif"
+
+	if lastStat != nil {
+		title = lastStat.Title
+	}
+
+	if image != nil {
+		imageDto := dto.NewImage(image.OriginalFilename, image.DestinationPath)
+		imageURL = u.screenshotURLProvider.Provide(imageDto)
+		imageId = &image.ID
+	}
 
 	return &preview.PreviewData{
 		ID:  url.ID,
 		URL: url.URL,
 		Image: preview.Image{
-			ID:  image.ID,
-			URL: u.screenshotURLProvider.ProvideNew(imageDto),
+			ID:  imageId,
+			URL: imageURL,
 		},
 		Status: u.getPreviewDataStatus(url.Status),
 		Error:  errorMessage,
-		Title:  lastStat.Title,
+		Title:  title,
 		IsNew:  isNew,
 		Entity: url,
 	}, nil
@@ -123,12 +135,15 @@ func (u urlImpl) getLastStat(entity *ent.Url) (*ent.Stat, error) {
 	}
 	count := len(stats)
 	if count == 0 {
-		return nil, errors.New("no stats found")
+		return nil, nil
 	}
 	return stats[count-1], nil
 }
 
 func (u urlImpl) getLastImage(lastStat *ent.Stat) (*ent.Image, error) {
+	if lastStat == nil {
+		return nil, nil
+	}
 	return u.statRepository.GetImage(lastStat)
 }
 

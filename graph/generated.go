@@ -1768,14 +1768,11 @@ func (ec *executionContext) _PreviewData_imageId(ctx context.Context, field grap
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(*int)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_PreviewData_imageId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4673,9 +4670,6 @@ func (ec *executionContext) _PreviewData(ctx context.Context, sel ast.SelectionS
 			}
 		case "imageId":
 			out.Values[i] = ec._PreviewData_imageId(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "error":
 			out.Values[i] = ec._PreviewData_error(ctx, field, obj)
 		case "title":
@@ -5778,6 +5772,22 @@ func (ec *executionContext) marshalOImageProcess2ᚖwswᚋbackendᚋgraphᚋmode
 		return graphql.Null
 	}
 	return ec._ImageProcess(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v any) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalInt(*v)
+	return res
 }
 
 func (ec *executionContext) marshalOPreviewData2ᚖwswᚋbackendᚋgraphᚋmodelᚐPreviewData(ctx context.Context, sel ast.SelectionSet, v *model.PreviewData) graphql.Marshaler {

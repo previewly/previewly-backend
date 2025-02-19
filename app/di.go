@@ -84,12 +84,10 @@ func initDi(config config.Config, appContext context.Context) {
 	})
 
 	initService(func() generator.TokenGenerator { return generator.NewTokenGenerator() })
-	initService(func() domainImageUrl.Provider {
-		return domainImageUrl.NewProvider(config.App.ImagesBaseURL, config.App.AssetsBaseURL)
-	})
+	initService(func() domainImageUrl.Provider { return domainImageUrl.NewProvider(config.App.ImagesBaseURL) })
 
 	initRepositories()
-	initModels()
+	initModels(config)
 	initDomains(config)
 	initGoWitness(config)
 	initResolvers()
@@ -153,12 +151,12 @@ func initResolvers() {
 	})
 }
 
-func initModels() {
+func initModels(config config.Config) {
 	initService(func(generator generator.TokenGenerator, tokenRepository repository.Token) token.Token {
 		return token.NewModel(generator, tokenRepository)
 	})
 	initService(func(urlRepository repository.Url, statRepository repository.Stat, provider domainImageUrl.Provider) url.Url {
-		return url.NewUrl(urlRepository, statRepository, provider)
+		return url.NewURLModel(config.App.AssetsBaseURL, urlRepository, statRepository, provider)
 	})
 
 	initService(func(uploadRepository repository.ImageRepository) imageModel.Model {

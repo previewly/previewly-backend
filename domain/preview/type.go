@@ -12,7 +12,7 @@ type (
 	Status string
 
 	Image struct {
-		ID  int
+		ID  *int
 		URL string
 	}
 

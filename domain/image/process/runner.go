@@ -6,6 +6,7 @@ import (
 	"errors"
 	"strings"
 
+	"wsw/backend/domain/dto"
 	"wsw/backend/domain/image/path"
 	"wsw/backend/domain/image/url"
 	"wsw/backend/ent"
@@ -114,8 +115,7 @@ func (p processRunnerimpl) runProcesses(image *ent.Image, processList []Process)
 }
 
 func (p processRunnerimpl) createExistResult(processEntity *ent.ImageProcess, inputArgs inputArg) (*RunnerResult, error) {
-	path := p.getImagePathForURL(processEntity.PathPrefix, inputArgs.Image.Filename)
-	url := p.urlProvider.Provide(path)
+	url := p.urlProvider.Provide(dto.NewImage(processEntity.PathPrefix, inputArgs.Image.Filename))
 
 	var errorResult error
 	if processEntity.Error != "" {
@@ -165,13 +165,4 @@ func (p processRunnerimpl) createProcessList(processes []types.ImageProcess) ([]
 func (p processRunnerimpl) getMd5Hash(text string) string {
 	hash := md5.Sum([]byte(text))
 	return hex.EncodeToString(hash[:])
-}
-
-func (p processRunnerimpl) getImagePathForURL(path string, name string) *string {
-	var sb strings.Builder
-	sb.WriteString("uploads/")
-	sb.WriteString(path)
-	sb.WriteString(name)
-	result := sb.String()
-	return &result
 }

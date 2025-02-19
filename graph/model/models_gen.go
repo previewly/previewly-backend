@@ -50,7 +50,7 @@ type PreviewData struct {
 	URL     string  `json:"url"`
 	Status  Status  `json:"status"`
 	Image   string  `json:"image"`
-	ImageID int     `json:"imageId"`
+	ImageID *int    `json:"imageId,omitempty"`
 	Error   *string `json:"error,omitempty"`
 	Title   *string `json:"title,omitempty"`
 }

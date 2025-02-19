@@ -46,12 +46,13 @@ type OneImageProcess struct {
 }
 
 type PreviewData struct {
-	ID     int     `json:"id"`
-	URL    string  `json:"url"`
-	Status Status  `json:"status"`
-	Image  string  `json:"image"`
-	Error  *string `json:"error,omitempty"`
-	Title  *string `json:"title,omitempty"`
+	ID      int     `json:"id"`
+	URL     string  `json:"url"`
+	Status  Status  `json:"status"`
+	Image   string  `json:"image"`
+	ImageID *int    `json:"imageId,omitempty"`
+	Error   *string `json:"error,omitempty"`
+	Title   *string `json:"title,omitempty"`
 }
 
 type Query struct {

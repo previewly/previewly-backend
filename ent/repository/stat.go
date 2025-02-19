@@ -10,6 +10,7 @@ import (
 type (
 	Stat interface {
 		Insert(title *string, image *ent.Image) (*ent.Stat, error)
+		GetImage(statEntity *ent.Stat) (*ent.Image, error)
 	}
 
 	statImp struct {
@@ -17,6 +18,10 @@ type (
 		ctx    context.Context
 	}
 )
+
+func (s *statImp) GetImage(statEntity *ent.Stat) (*ent.Image, error) {
+	return statEntity.QueryImage().Only(s.ctx)
+}
 
 // Insert implements Stat.
 func (s *statImp) Insert(title *string, image *ent.Image) (*ent.Stat, error) {

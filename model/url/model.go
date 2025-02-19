@@ -18,6 +18,7 @@ type (
 	}
 	urlImpl struct {
 		urlRepository         repository.Url
+		statRepository        repository.Stat
 		screenshotURLProvider url.Provider
 	}
 )
@@ -46,9 +47,10 @@ func (u urlImpl) AddURL(url string) (*preview.PreviewData, error) {
 	return u.createPreviewData(urlEntity, isNew)
 }
 
-func NewUrl(urlRepository repository.Url, provider url.Provider) Url {
+func NewUrl(urlRepository repository.Url, statRepository repository.Stat, provider url.Provider) Url {
 	return urlImpl{
 		urlRepository:         urlRepository,
+		statRepository:        statRepository,
 		screenshotURLProvider: provider,
 	}
 }
@@ -79,19 +81,31 @@ func (u urlImpl) createPreviewData(url *ent.Url, isNew bool) (*preview.PreviewDa
 	}
 
 	var title *string = nil
+	var imageID *int = nil
+
+	image, errImage := u.getLastImage(lastStat)
+	if errImage != nil {
+		return nil, errImage
+	}
+
 	if lastStat != nil {
 		title = lastStat.Title
 	}
+	if image != nil {
+		imageID = &image.ID
+	}
+
 	imagePath := u.getImagePath(url.RelativePath)
 	return &preview.PreviewData{
-		ID:     url.ID,
-		URL:    url.URL,
-		Image:  u.screenshotURLProvider.Provide(imagePath),
-		Status: u.getPreviewDataStatus(url.Status),
-		Error:  errorMessage,
-		Title:  title,
-		IsNew:  isNew,
-		Entity: url,
+		ID:      url.ID,
+		URL:     url.URL,
+		Image:   u.screenshotURLProvider.Provide(imagePath),
+		Status:  u.getPreviewDataStatus(url.Status),
+		Error:   errorMessage,
+		Title:   title,
+		ImageID: imageID,
+		IsNew:   isNew,
+		Entity:  url,
 	}, nil
 }
 
@@ -129,6 +143,13 @@ func (u urlImpl) getLastStat(entity *ent.Url) (*ent.Stat, error) {
 		return nil, nil
 	}
 	return stats[count-1], nil
+}
+
+func (u urlImpl) getLastImage(lastStat *ent.Stat) (*ent.Image, error) {
+	if lastStat != nil {
+		return u.statRepository.GetImage(lastStat)
+	}
+	return nil, nil
 }
 
 func (u urlImpl) getPreviewDataStatus(status types.StatusEnum) preview.Status {

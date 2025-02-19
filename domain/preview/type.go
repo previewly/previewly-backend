@@ -11,12 +11,13 @@ const (
 )
 
 type PreviewData struct {
-	ID     int
-	URL    string
-	Image  string
-	Status Status
-	Error  *string
-	Title  *string
-	IsNew  bool
-	Entity *ent.Url
+	ID      int
+	URL     string
+	Image   string
+	Status  Status
+	Error   *string
+	Title   *string
+	ImageID *int
+	IsNew   bool
+	Entity  *ent.Url
 }

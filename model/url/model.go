@@ -88,7 +88,7 @@ func (u urlImpl) createPreviewData(url *ent.Url, isNew bool) (*preview.PreviewDa
 	}
 
 	var title *string = nil
-	var imageId *int = nil
+	var imageID *int = nil
 	imageURL := u.assetsURL + "loader-200px-200px.gif"
 
 	if lastStat != nil {
@@ -96,16 +96,16 @@ func (u urlImpl) createPreviewData(url *ent.Url, isNew bool) (*preview.PreviewDa
 	}
 
 	if image != nil {
-		imageDto := dto.NewImage(image.OriginalFilename, image.DestinationPath)
+		imageDto := dto.NewImage(image.Filename, image.DestinationPath)
 		imageURL = u.screenshotURLProvider.Provide(imageDto)
-		imageId = &image.ID
+		imageID = &image.ID
 	}
 
 	return &preview.PreviewData{
 		ID:  url.ID,
 		URL: url.URL,
 		Image: preview.Image{
-			ID:  imageId,
+			ID:  imageID,
 			URL: imageURL,
 		},
 		Status: u.getPreviewDataStatus(url.Status),

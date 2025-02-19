@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.3](https://github.com/previewly/previewly-backend/compare/v1.15.2...v1.15.3) (2025-02-19)
+
+
+### Bug Fixes
+
+* fix empty screenshot ([155aa6a](https://github.com/previewly/previewly-backend/commit/155aa6aca7ce46c8eff43110c2ca1325ef3c2387))
+
 ## [1.15.2](https://github.com/previewly/previewly-backend/compare/v1.15.1...v1.15.2) (2025-02-19)
 
 

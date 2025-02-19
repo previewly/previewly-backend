@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"wsw/backend/ent/image"
 	"wsw/backend/ent/stat"
 
 	"entgo.io/ent"
@@ -20,9 +21,33 @@ type Stat struct {
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Title holds the value of the "title" field.
-	Title        *string `json:"title,omitempty"`
+	Title *string `json:"title,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the StatQuery when eager-loading is set.
+	Edges        StatEdges `json:"edges"`
+	stat_image   *int
 	url_stat     *int
 	selectValues sql.SelectValues
+}
+
+// StatEdges holds the relations/edges for other nodes in the graph.
+type StatEdges struct {
+	// Image holds the value of the image edge.
+	Image *Image `json:"image,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// ImageOrErr returns the Image value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e StatEdges) ImageOrErr() (*Image, error) {
+	if e.Image != nil {
+		return e.Image, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: image.Label}
+	}
+	return nil, &NotLoadedError{edge: "image"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -36,7 +61,9 @@ func (*Stat) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case stat.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
-		case stat.ForeignKeys[0]: // url_stat
+		case stat.ForeignKeys[0]: // stat_image
+			values[i] = new(sql.NullInt64)
+		case stat.ForeignKeys[1]: // url_stat
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -74,6 +101,13 @@ func (s *Stat) assignValues(columns []string, values []any) error {
 			}
 		case stat.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field stat_image", value)
+			} else if value.Valid {
+				s.stat_image = new(int)
+				*s.stat_image = int(value.Int64)
+			}
+		case stat.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field url_stat", value)
 			} else if value.Valid {
 				s.url_stat = new(int)
@@ -90,6 +124,11 @@ func (s *Stat) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (s *Stat) Value(name string) (ent.Value, error) {
 	return s.selectValues.Get(name)
+}
+
+// QueryImage queries the "image" edge of the Stat entity.
+func (s *Stat) QueryImage() *ImageQuery {
+	return NewStatClient(s.config).QueryImage(s)
 }
 
 // Update returns a builder for updating this Stat.

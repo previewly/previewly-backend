@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
+	"strconv"
 	"strings"
 	"unicode"
 
@@ -14,6 +15,7 @@ import (
 
 	"github.com/sensepost/gowitness/pkg/models"
 	"github.com/sensepost/gowitness/pkg/writers"
+	"github.com/xorcare/pointer"
 )
 
 type (
@@ -65,12 +67,12 @@ func (w writerImpl) safeFileName(s string) string {
 func (w writerImpl) Write(result *models.Result) error {
 	filename := w.newFilename(result.URL)
 
-	_, err := w.addScreenshotToImages(result.Screenshot, filename)
+	imageEntity, err := w.addScreenshotToImages(result.Screenshot, filename)
 	if err != nil {
 		return err
 	}
 
-	statEntity, errStat := w.statRepository.Insert(&result.Title)
+	statEntity, errStat := w.statRepository.Insert(&result.Title, imageEntity)
 	if errStat != nil {
 		return errStat
 	}
@@ -93,11 +95,19 @@ func (w writerImpl) addScreenshotToImages(screenshotContent string, filename str
 		return nil, err
 	}
 
-	imageEntity, errImage := w.saver.SaveImage(filename, reader, "image/jpeg", nil)
+	imageEntity, errImage := w.saver.SaveImage(filename, reader, "image/jpeg", w.newExtra(w.url.ID))
 	if errImage != nil {
 		return nil, errImage
 	}
 	return imageEntity, nil
+}
+
+func (w writerImpl) newExtra(id int) *string {
+	var builder strings.Builder
+
+	builder.WriteString("url: ")
+	builder.WriteString(strconv.Itoa(id))
+	return pointer.String(builder.String())
 }
 
 func (w writerImpl) decodeScreenReader(screenshot string) (io.ReadSeeker, error) {

@@ -82,6 +82,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "title", Type: field.TypeString, Nullable: true},
+		{Name: "stat_image", Type: field.TypeInt},
 		{Name: "url_stat", Type: field.TypeInt, Nullable: true},
 	}
 	// StatsTable holds the schema information for the "stats" table.
@@ -91,8 +92,14 @@ var (
 		PrimaryKey: []*schema.Column{StatsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "stats_urls_stat",
+				Symbol:     "stats_images_image",
 				Columns:    []*schema.Column{StatsColumns[3]},
+				RefColumns: []*schema.Column{ImagesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "stats_urls_stat",
+				Columns:    []*schema.Column{StatsColumns[4]},
 				RefColumns: []*schema.Column{UrlsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -136,5 +143,6 @@ var (
 func init() {
 	ErrorResultsTable.ForeignKeys[0].RefTable = UrlsTable
 	ImageProcessesTable.ForeignKeys[0].RefTable = ImagesTable
-	StatsTable.ForeignKeys[0].RefTable = UrlsTable
+	StatsTable.ForeignKeys[0].RefTable = ImagesTable
+	StatsTable.ForeignKeys[1].RefTable = UrlsTable
 }

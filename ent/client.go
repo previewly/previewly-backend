@@ -785,6 +785,22 @@ func (c *StatClient) GetX(ctx context.Context, id int) *Stat {
 	return obj
 }
 
+// QueryImage queries the image edge of a Stat.
+func (c *StatClient) QueryImage(s *Stat) *ImageQuery {
+	query := (&ImageClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(stat.Table, stat.FieldID, id),
+			sqlgraph.To(image.Table, image.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, stat.ImageTable, stat.ImageColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *StatClient) Hooks() []Hook {
 	return c.hooks.Stat

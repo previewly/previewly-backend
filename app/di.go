@@ -83,30 +83,38 @@ func initDi(config config.Config, appContext context.Context) {
 		}
 	})
 
-	initRepositories()
-	initGoWitness(config)
-	initModels()
-	initDomains(config)
-	initResolvers()
-}
-
-func initGoWitness(config config.Config) {
 	initService(func() generator.TokenGenerator { return generator.NewTokenGenerator() })
 	initService(func() domainImageUrl.Provider {
 		return domainImageUrl.NewProvider(config.Gowitness.ScreenshotBaseUrl, config.App.AssetsBaseURL)
 	})
+
+	initRepositories()
+	initModels()
+	initDomains(config)
+	initGoWitness(config)
+	initResolvers()
+}
+
+func initGoWitness(config config.Config) {
 	initService(func() relative.Provider { return relative.NewProvider() })
 
-	initService(func(urlRepository repository.Url, statRepository repository.Stat, relativePathProvider relative.Provider) gowitness.CreateWriter {
-		return func(url *ent.Url) gowitness.Writer {
-			return gowitness.NewRunnerWriter(url, urlRepository, statRepository, relativePathProvider)
-		}
-	})
+	initService(
+		func(
+			urlRepository repository.Url,
+			statRepository repository.Stat,
+			relativePathProvider relative.Provider,
+			saver domainImageSaver.Saver,
+		) gowitness.CreateWriter {
+			return func(url *ent.Url) gowitness.Writer {
+				return gowitness.NewRunnerWriter(url, urlRepository, statRepository, relativePathProvider, saver)
+			}
+		})
 	initService(func(logger *slog.Logger, createWriter gowitness.CreateWriter) gowitness.Client {
 		logger.Info("Starting gowitness")
 
 		options := runner.NewDefaultOptions()
 		options.Scan.ScreenshotPath = config.Gowitness.ScreenshotPath
+		// options.Scan.ScreenshotSkipSave = true
 
 		driver, err := driver.NewChromedp(logger, *options)
 		if err != nil {

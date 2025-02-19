@@ -85,7 +85,7 @@ func initDi(config config.Config, appContext context.Context) {
 
 	initService(func() generator.TokenGenerator { return generator.NewTokenGenerator() })
 	initService(func() domainImageUrl.Provider {
-		return domainImageUrl.NewProvider(config.Gowitness.ScreenshotBaseUrl, config.App.AssetsBaseURL)
+		return domainImageUrl.NewProvider(config.App.ImagesBaseURL, config.App.AssetsBaseURL)
 	})
 
 	initRepositories()
@@ -114,7 +114,7 @@ func initGoWitness(config config.Config) {
 
 		options := runner.NewDefaultOptions()
 		options.Scan.ScreenshotPath = config.Gowitness.ScreenshotPath
-		// options.Scan.ScreenshotSkipSave = true
+		options.Scan.ScreenshotSkipSave = true
 
 		driver, err := driver.NewChromedp(logger, *options)
 		if err != nil {

@@ -2,13 +2,15 @@ package url
 
 import (
 	netUrl "net/url"
-	"strings"
 
+	"wsw/backend/domain/dto"
 	"wsw/backend/domain/image/url"
 	"wsw/backend/domain/preview"
 	"wsw/backend/ent"
 	"wsw/backend/ent/repository"
 	"wsw/backend/ent/types"
+
+	"github.com/go-errors/errors"
 )
 
 type (
@@ -80,45 +82,26 @@ func (u urlImpl) createPreviewData(url *ent.Url, isNew bool) (*preview.PreviewDa
 		errorMessage = lastError.Message
 	}
 
-	var title *string = nil
-	var imageID *int = nil
-
 	image, errImage := u.getLastImage(lastStat)
 	if errImage != nil {
 		return nil, errImage
 	}
 
-	if lastStat != nil {
-		title = lastStat.Title
-	}
-	if image != nil {
-		imageID = &image.ID
-	}
+	imageDto := dto.NewImage(image.OriginalFilename, image.DestinationPath)
 
-	imagePath := u.getImagePath(url.RelativePath)
 	return &preview.PreviewData{
-		ID:      url.ID,
-		URL:     url.URL,
-		Image:   u.screenshotURLProvider.Provide(imagePath),
-		Status:  u.getPreviewDataStatus(url.Status),
-		Error:   errorMessage,
-		Title:   title,
-		ImageID: imageID,
-		IsNew:   isNew,
-		Entity:  url,
+		ID:  url.ID,
+		URL: url.URL,
+		Image: preview.Image{
+			ID:  image.ID,
+			URL: u.screenshotURLProvider.ProvideNew(imageDto),
+		},
+		Status: u.getPreviewDataStatus(url.Status),
+		Error:  errorMessage,
+		Title:  lastStat.Title,
+		IsNew:  isNew,
+		Entity: url,
 	}, nil
-}
-
-func (u urlImpl) getImagePath(path *string) *string {
-	if path != nil {
-		var sb strings.Builder
-		sb.WriteString("screenshots/")
-		sb.WriteString(*path)
-		result := sb.String()
-		return &result
-	} else {
-		return nil
-	}
 }
 
 func (u urlImpl) getLastError(entity *ent.Url) (*ent.ErrorResult, error) {
@@ -140,16 +123,13 @@ func (u urlImpl) getLastStat(entity *ent.Url) (*ent.Stat, error) {
 	}
 	count := len(stats)
 	if count == 0 {
-		return nil, nil
+		return nil, errors.New("no stats found")
 	}
 	return stats[count-1], nil
 }
 
 func (u urlImpl) getLastImage(lastStat *ent.Stat) (*ent.Image, error) {
-	if lastStat != nil {
-		return u.statRepository.GetImage(lastStat)
-	}
-	return nil, nil
+	return u.statRepository.GetImage(lastStat)
 }
 
 func (u urlImpl) getPreviewDataStatus(status types.StatusEnum) preview.Status {

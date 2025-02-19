@@ -21,8 +21,7 @@ type Postgres struct {
 }
 
 type Gowitness struct {
-	ScreenshotPath    string
-	ScreenshotBaseUrl string
+	ScreenshotPath string
 }
 
 type (
@@ -46,6 +45,7 @@ type ListenHost struct {
 type AppConfig struct {
 	Listen        ListenHost
 	AssetsBaseURL string
+	ImagesBaseURL string
 	BaseDataPath  string
 	UploadPath    string
 }
@@ -65,8 +65,8 @@ func NewConfig() Config {
 		postgresUser     string
 		postgresPassword string
 
-		screenShotPath    string
-		screenshotBaseURL string
+		screenShotPath string
+		imagesBaseURL  string
 	)
 
 	flag.StringVar(&listenHostFlag, "listen-host", "", "Listen host")
@@ -83,7 +83,7 @@ func NewConfig() Config {
 	flag.StringVar(&postgresPassword, "postgres-password", "wsw", "Database user password")
 
 	flag.StringVar(&screenShotPath, "screenshot-path", baseDataPath+"screenshots", "Screenshot path")
-	flag.StringVar(&screenshotBaseURL, "screenshot-base-url", "http://localhost:8000/", "Base url for screenshot")
+	flag.StringVar(&imagesBaseURL, "images-base-url", "http://localhost:8000/uploads/", "Base URL for images")
 
 	flag.Parse()
 
@@ -94,6 +94,7 @@ func NewConfig() Config {
 				Port: listenPortFlag,
 			},
 			AssetsBaseURL: assetsBaseURL,
+			ImagesBaseURL: imagesBaseURL,
 			BaseDataPath:  baseDataPath,
 			UploadPath:    uploadPath,
 		},
@@ -105,8 +106,7 @@ func NewConfig() Config {
 			Password: postgresPassword,
 		},
 		Gowitness: Gowitness{
-			ScreenshotPath:    screenShotPath,
-			ScreenshotBaseUrl: screenshotBaseURL,
+			ScreenshotPath: screenShotPath,
 		},
 		Sentry: sentry.ClientOptions{
 			Dsn:           "https://563bfbafd64427d650b376395d83765c@o390093.ingest.us.sentry.io/4508046587002880",

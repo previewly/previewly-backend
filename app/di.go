@@ -113,6 +113,7 @@ func initGoWitness(config config.Config) {
 		options := runner.NewDefaultOptions()
 		options.Scan.ScreenshotPath = config.Gowitness.ScreenshotPath
 		options.Scan.ScreenshotSkipSave = true
+		options.Scan.ScreenshotToWriter = true
 
 		driver, err := driver.NewChromedp(logger, *options)
 		if err != nil {

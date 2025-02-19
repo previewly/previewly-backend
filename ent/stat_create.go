@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"time"
+	"wsw/backend/ent/image"
 	"wsw/backend/ent/stat"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -46,6 +47,17 @@ func (sc *StatCreate) SetNillableTitle(s *string) *StatCreate {
 		sc.SetTitle(*s)
 	}
 	return sc
+}
+
+// SetImageID sets the "image" edge to the Image entity by ID.
+func (sc *StatCreate) SetImageID(id int) *StatCreate {
+	sc.mutation.SetImageID(id)
+	return sc
+}
+
+// SetImage sets the "image" edge to the Image entity.
+func (sc *StatCreate) SetImage(i *Image) *StatCreate {
+	return sc.SetImageID(i.ID)
 }
 
 // Mutation returns the StatMutation object of the builder.
@@ -94,6 +106,9 @@ func (sc *StatCreate) check() error {
 	if _, ok := sc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Stat.created_at"`)}
 	}
+	if len(sc.mutation.ImageIDs()) == 0 {
+		return &ValidationError{Name: "image", err: errors.New(`ent: missing required edge "Stat.image"`)}
+	}
 	return nil
 }
 
@@ -127,6 +142,23 @@ func (sc *StatCreate) createSpec() (*Stat, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.Title(); ok {
 		_spec.SetField(stat.FieldTitle, field.TypeString, value)
 		_node.Title = &value
+	}
+	if nodes := sc.mutation.ImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   stat.ImageTable,
+			Columns: []string{stat.ImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.stat_image = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

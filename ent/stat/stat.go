@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -17,8 +18,17 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldTitle holds the string denoting the title field in the database.
 	FieldTitle = "title"
+	// EdgeImage holds the string denoting the image edge name in mutations.
+	EdgeImage = "image"
 	// Table holds the table name of the stat in the database.
 	Table = "stats"
+	// ImageTable is the table that holds the image relation/edge.
+	ImageTable = "stats"
+	// ImageInverseTable is the table name for the Image entity.
+	// It exists in this package in order to avoid circular dependency with the "image" package.
+	ImageInverseTable = "images"
+	// ImageColumn is the table column denoting the image relation/edge.
+	ImageColumn = "stat_image"
 )
 
 // Columns holds all SQL columns for stat fields.
@@ -31,6 +41,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "stats"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
+	"stat_image",
 	"url_stat",
 }
 
@@ -70,4 +81,18 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByTitle orders the results by the title field.
 func ByTitle(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTitle, opts...).ToFunc()
+}
+
+// ByImageField orders the results by image field.
+func ByImageField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newImageStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newImageStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ImageInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, ImageTable, ImageColumn),
+	)
 }

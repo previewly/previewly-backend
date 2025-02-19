@@ -9,7 +9,7 @@ import (
 
 type (
 	Stat interface {
-		Insert(*string) (*ent.Stat, error)
+		Insert(title *string, image *ent.Image) (*ent.Stat, error)
 	}
 
 	statImp struct {
@@ -19,8 +19,12 @@ type (
 )
 
 // Insert implements Stat.
-func (s *statImp) Insert(title *string) (*ent.Stat, error) {
-	statEntity, err := s.client.Stat.Create().SetTitle(*title).SetCreatedAt(time.Now()).Save(s.ctx)
+func (s *statImp) Insert(title *string, image *ent.Image) (*ent.Stat, error) {
+	statEntity, err := s.client.Stat.Create().
+		SetTitle(*title).
+		SetImage(image).
+		SetCreatedAt(time.Now()).
+		Save(s.ctx)
 	if err != nil {
 		return nil, err
 	}

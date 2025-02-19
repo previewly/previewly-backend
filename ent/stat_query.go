@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"wsw/backend/ent/image"
 	"wsw/backend/ent/predicate"
 	"wsw/backend/ent/stat"
 
@@ -22,6 +23,7 @@ type StatQuery struct {
 	order      []stat.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Stat
+	withImage  *ImageQuery
 	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -57,6 +59,28 @@ func (sq *StatQuery) Unique(unique bool) *StatQuery {
 func (sq *StatQuery) Order(o ...stat.OrderOption) *StatQuery {
 	sq.order = append(sq.order, o...)
 	return sq
+}
+
+// QueryImage chains the current query on the "image" edge.
+func (sq *StatQuery) QueryImage() *ImageQuery {
+	query := (&ImageClient{config: sq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := sq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := sq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(stat.Table, stat.FieldID, selector),
+			sqlgraph.To(image.Table, image.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, stat.ImageTable, stat.ImageColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Stat entity from the query.
@@ -251,10 +275,22 @@ func (sq *StatQuery) Clone() *StatQuery {
 		order:      append([]stat.OrderOption{}, sq.order...),
 		inters:     append([]Interceptor{}, sq.inters...),
 		predicates: append([]predicate.Stat{}, sq.predicates...),
+		withImage:  sq.withImage.Clone(),
 		// clone intermediate query.
 		sql:  sq.sql.Clone(),
 		path: sq.path,
 	}
+}
+
+// WithImage tells the query-builder to eager-load the nodes that are connected to
+// the "image" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *StatQuery) WithImage(opts ...func(*ImageQuery)) *StatQuery {
+	query := (&ImageClient{config: sq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	sq.withImage = query
+	return sq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -333,10 +369,16 @@ func (sq *StatQuery) prepareQuery(ctx context.Context) error {
 
 func (sq *StatQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Stat, error) {
 	var (
-		nodes   = []*Stat{}
-		withFKs = sq.withFKs
-		_spec   = sq.querySpec()
+		nodes       = []*Stat{}
+		withFKs     = sq.withFKs
+		_spec       = sq.querySpec()
+		loadedTypes = [1]bool{
+			sq.withImage != nil,
+		}
 	)
+	if sq.withImage != nil {
+		withFKs = true
+	}
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, stat.ForeignKeys...)
 	}
@@ -346,6 +388,7 @@ func (sq *StatQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Stat, e
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Stat{config: sq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -357,7 +400,46 @@ func (sq *StatQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Stat, e
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := sq.withImage; query != nil {
+		if err := sq.loadImage(ctx, query, nodes, nil,
+			func(n *Stat, e *Image) { n.Edges.Image = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (sq *StatQuery) loadImage(ctx context.Context, query *ImageQuery, nodes []*Stat, init func(*Stat), assign func(*Stat, *Image)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Stat)
+	for i := range nodes {
+		if nodes[i].stat_image == nil {
+			continue
+		}
+		fk := *nodes[i].stat_image
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(image.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "stat_image" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
 }
 
 func (sq *StatQuery) sqlCount(ctx context.Context) (int, error) {

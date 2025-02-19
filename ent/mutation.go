@@ -1880,6 +1880,8 @@ type StatMutation struct {
 	created_at    *time.Time
 	title         *string
 	clearedFields map[string]struct{}
+	image         *int
+	clearedimage  bool
 	done          bool
 	oldValue      func(context.Context) (*Stat, error)
 	predicates    []predicate.Stat
@@ -2068,6 +2070,45 @@ func (m *StatMutation) ResetTitle() {
 	delete(m.clearedFields, stat.FieldTitle)
 }
 
+// SetImageID sets the "image" edge to the Image entity by id.
+func (m *StatMutation) SetImageID(id int) {
+	m.image = &id
+}
+
+// ClearImage clears the "image" edge to the Image entity.
+func (m *StatMutation) ClearImage() {
+	m.clearedimage = true
+}
+
+// ImageCleared reports if the "image" edge to the Image entity was cleared.
+func (m *StatMutation) ImageCleared() bool {
+	return m.clearedimage
+}
+
+// ImageID returns the "image" edge ID in the mutation.
+func (m *StatMutation) ImageID() (id int, exists bool) {
+	if m.image != nil {
+		return *m.image, true
+	}
+	return
+}
+
+// ImageIDs returns the "image" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ImageID instead. It exists only for internal usage by the builders.
+func (m *StatMutation) ImageIDs() (ids []int) {
+	if id := m.image; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetImage resets all changes to the "image" edge.
+func (m *StatMutation) ResetImage() {
+	m.image = nil
+	m.clearedimage = false
+}
+
 // Where appends a list predicates to the StatMutation builder.
 func (m *StatMutation) Where(ps ...predicate.Stat) {
 	m.predicates = append(m.predicates, ps...)
@@ -2227,19 +2268,28 @@ func (m *StatMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *StatMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.image != nil {
+		edges = append(edges, stat.EdgeImage)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *StatMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case stat.EdgeImage:
+		if id := m.image; id != nil {
+			return []ent.Value{*id}
+		}
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *StatMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
 	return edges
 }
 
@@ -2251,25 +2301,42 @@ func (m *StatMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *StatMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedimage {
+		edges = append(edges, stat.EdgeImage)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *StatMutation) EdgeCleared(name string) bool {
+	switch name {
+	case stat.EdgeImage:
+		return m.clearedimage
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *StatMutation) ClearEdge(name string) error {
+	switch name {
+	case stat.EdgeImage:
+		m.ClearImage()
+		return nil
+	}
 	return fmt.Errorf("unknown Stat unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *StatMutation) ResetEdge(name string) error {
+	switch name {
+	case stat.EdgeImage:
+		m.ResetImage()
+		return nil
+	}
 	return fmt.Errorf("unknown Stat edge %s", name)
 }
 

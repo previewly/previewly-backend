@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"time"
+	"wsw/backend/ent/image"
 	"wsw/backend/ent/predicate"
 	"wsw/backend/ent/stat"
 
@@ -62,9 +63,26 @@ func (su *StatUpdate) ClearTitle() *StatUpdate {
 	return su
 }
 
+// SetImageID sets the "image" edge to the Image entity by ID.
+func (su *StatUpdate) SetImageID(id int) *StatUpdate {
+	su.mutation.SetImageID(id)
+	return su
+}
+
+// SetImage sets the "image" edge to the Image entity.
+func (su *StatUpdate) SetImage(i *Image) *StatUpdate {
+	return su.SetImageID(i.ID)
+}
+
 // Mutation returns the StatMutation object of the builder.
 func (su *StatUpdate) Mutation() *StatMutation {
 	return su.mutation
+}
+
+// ClearImage clears the "image" edge to the Image entity.
+func (su *StatUpdate) ClearImage() *StatUpdate {
+	su.mutation.ClearImage()
+	return su
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -94,7 +112,18 @@ func (su *StatUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (su *StatUpdate) check() error {
+	if su.mutation.ImageCleared() && len(su.mutation.ImageIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "Stat.image"`)
+	}
+	return nil
+}
+
 func (su *StatUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := su.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(stat.Table, stat.Columns, sqlgraph.NewFieldSpec(stat.FieldID, field.TypeInt))
 	if ps := su.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -111,6 +140,35 @@ func (su *StatUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if su.mutation.TitleCleared() {
 		_spec.ClearField(stat.FieldTitle, field.TypeString)
+	}
+	if su.mutation.ImageCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   stat.ImageTable,
+			Columns: []string{stat.ImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.ImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   stat.ImageTable,
+			Columns: []string{stat.ImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -166,9 +224,26 @@ func (suo *StatUpdateOne) ClearTitle() *StatUpdateOne {
 	return suo
 }
 
+// SetImageID sets the "image" edge to the Image entity by ID.
+func (suo *StatUpdateOne) SetImageID(id int) *StatUpdateOne {
+	suo.mutation.SetImageID(id)
+	return suo
+}
+
+// SetImage sets the "image" edge to the Image entity.
+func (suo *StatUpdateOne) SetImage(i *Image) *StatUpdateOne {
+	return suo.SetImageID(i.ID)
+}
+
 // Mutation returns the StatMutation object of the builder.
 func (suo *StatUpdateOne) Mutation() *StatMutation {
 	return suo.mutation
+}
+
+// ClearImage clears the "image" edge to the Image entity.
+func (suo *StatUpdateOne) ClearImage() *StatUpdateOne {
+	suo.mutation.ClearImage()
+	return suo
 }
 
 // Where appends a list predicates to the StatUpdate builder.
@@ -211,7 +286,18 @@ func (suo *StatUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (suo *StatUpdateOne) check() error {
+	if suo.mutation.ImageCleared() && len(suo.mutation.ImageIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "Stat.image"`)
+	}
+	return nil
+}
+
 func (suo *StatUpdateOne) sqlSave(ctx context.Context) (_node *Stat, err error) {
+	if err := suo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(stat.Table, stat.Columns, sqlgraph.NewFieldSpec(stat.FieldID, field.TypeInt))
 	id, ok := suo.mutation.ID()
 	if !ok {
@@ -245,6 +331,35 @@ func (suo *StatUpdateOne) sqlSave(ctx context.Context) (_node *Stat, err error) 
 	}
 	if suo.mutation.TitleCleared() {
 		_spec.ClearField(stat.FieldTitle, field.TypeString)
+	}
+	if suo.mutation.ImageCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   stat.ImageTable,
+			Columns: []string{stat.ImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.ImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   stat.ImageTable,
+			Columns: []string{stat.ImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Stat{config: suo.config}
 	_spec.Assign = _node.assignValues

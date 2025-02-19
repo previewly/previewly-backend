@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.15.0](https://github.com/previewly/previewly-backend/compare/v1.14.0...v1.15.0) (2025-02-19)
+
+
+### Features
+
+* expose image ID on preview ([6c2a315](https://github.com/previewly/previewly-backend/commit/6c2a31574df6a40a3cf1ddeab81c4d7a197c0461))
+* previews use images entities for generating screenshots ([d77aa43](https://github.com/previewly/previewly-backend/commit/d77aa43241d3599ffb871e10d6f2f4f1188e9eaf))
+* save image to stat entity ([b74e437](https://github.com/previewly/previewly-backend/commit/b74e4370d3140d80fcc8068183979c8f72117c7f))
+* saving screenshot to images table ([252a3bb](https://github.com/previewly/previewly-backend/commit/252a3bb858cc84d12f6717b09376191d40762bec))
+
+
+### Bug Fixes
+
+* fix static test ([b0ed4a3](https://github.com/previewly/previewly-backend/commit/b0ed4a388f2d7708b3e55e8c07d8d12104aa7a08))
+
 ## [1.14.0](https://github.com/previewly/previewly-backend/compare/v1.13.0...v1.14.0) (2025-02-03)
 
 

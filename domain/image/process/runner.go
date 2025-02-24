@@ -115,7 +115,7 @@ func (p processRunnerimpl) runProcesses(image *ent.Image, processList []Process)
 }
 
 func (p processRunnerimpl) createExistResult(processEntity *ent.ImageProcess, inputArgs inputArg) (*RunnerResult, error) {
-	url := p.urlProvider.Provide(dto.NewImage(processEntity.PathPrefix, inputArgs.Image.Filename))
+	url := p.urlProvider.Provide(dto.NewImage(inputArgs.Image.Filename, processEntity.PathPrefix))
 
 	var errorResult error
 	if processEntity.Error != "" {

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.4](https://github.com/previewly/previewly-backend/compare/v1.15.3...v1.15.4) (2025-02-24)
+
+
+### Bug Fixes
+
+* fix image process path ([f0b4503](https://github.com/previewly/previewly-backend/commit/f0b4503058b613192c151e9e2e5fe6e8b31cfe8f))
+
 ## [1.15.3](https://github.com/previewly/previewly-backend/compare/v1.15.2...v1.15.3) (2025-02-19)
 
 

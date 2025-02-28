@@ -1,6 +1,7 @@
 package process
 
 import (
+	"wsw/backend/domain/image/process/runner/result"
 	"wsw/backend/ent/types"
 	"wsw/backend/graph/model"
 
@@ -9,7 +10,7 @@ import (
 
 type (
 	Convertor interface {
-		Convert(RunnerResult) *model.ImageProcess
+		Convert(result.Result) *model.ImageProcess
 	}
 	convertorImpl struct{}
 )
@@ -18,14 +19,14 @@ func NewConvertor() Convertor {
 	return convertorImpl{}
 }
 
-func (c convertorImpl) Convert(result RunnerResult) *model.ImageProcess {
+func (c convertorImpl) Convert(result result.Result) *model.ImageProcess {
 	var errorMessage *string
 	if result.Error != nil {
 		errorMessage = pointer.String(result.Error.Error())
 	}
 
 	return &model.ImageProcess{
-		Image:     c.convertImageData(result.Input.ImageName, result.ImageURL),
+		Image:     c.convertImageData(result.Input.Image.Filename, result.ImageURL),
 		Processes: c.convertToGQLProcesses(result.Input.Processes),
 		Error:     errorMessage,
 		Status:    model.Status(result.Status),

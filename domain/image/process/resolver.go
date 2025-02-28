@@ -3,6 +3,9 @@ package process
 import (
 	"context"
 
+	"wsw/backend/domain/image/process/input"
+	"wsw/backend/domain/image/process/processor"
+	"wsw/backend/domain/image/process/runner"
 	"wsw/backend/ent"
 	"wsw/backend/ent/types"
 	"wsw/backend/graph/model"
@@ -16,14 +19,25 @@ type (
 	}
 
 	resolverImpl struct {
-		imagesModel  image.Model
-		gqlConvertor Convertor
-		runner       ProcessRunner
+		imagesModel      image.Model
+		gqlConvertor     Convertor
+		runner           runner.ProcessRunner
+		processorFactory processor.Factory
 	}
 )
 
-func NewProcessResolver(imagesModel image.Model, gqlConvertor Convertor, runner ProcessRunner) Resolver {
-	return resolverImpl{imagesModel: imagesModel, gqlConvertor: gqlConvertor, runner: runner}
+func NewProcessResolver(
+	imagesModel image.Model,
+	gqlConvertor Convertor,
+	runner runner.ProcessRunner,
+	processorFactory processor.Factory,
+) Resolver {
+	return resolverImpl{
+		imagesModel:      imagesModel,
+		gqlConvertor:     gqlConvertor,
+		runner:           runner,
+		processorFactory: processorFactory,
+	}
 }
 
 // Resolve implements Resolver.
@@ -38,7 +52,14 @@ func (r resolverImpl) Resolve(ctx context.Context, imageID int, processes []*mod
 }
 
 func (r resolverImpl) createImageProcess(imageEntity *ent.Image, imageProcesses []types.ImageProcess) (*model.ImageProcess, error) {
-	runnerResult, err := r.runner.Start(imageEntity, imageProcesses)
+	inputArg := input.Input{Image: imageEntity, Processes: imageProcesses}
+
+	processor, err := r.processorFactory.NewProcessor(imageProcesses)
+	if err != nil {
+		return nil, err
+	}
+
+	runnerResult, err := r.runner.Start(inputArg, processor)
 	if err != nil {
 		return nil, err
 	}

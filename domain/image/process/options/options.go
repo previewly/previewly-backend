@@ -1,4 +1,4 @@
-package process
+package options
 
 import (
 	"strconv"
@@ -6,8 +6,8 @@ import (
 	"wsw/backend/ent/types"
 )
 
-func GetIntOption(options []types.ImageProcessOption, key string) *int {
-	value := GetStringOption(options, key)
+func ExtractIntOption(options []types.ImageProcessOption, key string) *int {
+	value := ExtractStringOption(options, key)
 	if value != nil {
 		intValue, err := strconv.Atoi(*value)
 		if err != nil {
@@ -18,7 +18,7 @@ func GetIntOption(options []types.ImageProcessOption, key string) *int {
 	return nil
 }
 
-func GetStringOption(options []types.ImageProcessOption, key string) *string {
+func ExtractStringOption(options []types.ImageProcessOption, key string) *string {
 	for _, option := range options {
 		if option.Key == key {
 			return option.Value

@@ -21,6 +21,9 @@ import (
 	domainImageSaver "wsw/backend/domain/image"
 	domainImagePath "wsw/backend/domain/image/path"
 	domainImageProcess "wsw/backend/domain/image/process"
+	domainImageProcessorFactory "wsw/backend/domain/image/process/processor"
+	domainImageProcessRunner "wsw/backend/domain/image/process/runner"
+	domainImageProcessRunnerResult "wsw/backend/domain/image/process/runner/result"
 	domainStorage "wsw/backend/domain/image/storage"
 	domainImageUrl "wsw/backend/domain/image/url"
 
@@ -132,13 +135,28 @@ func initDomains(config config.Config) {
 		return domainStorage.NewUploadStorage(filenameGenerator, pathProvider)
 	})
 	initService(func() domainImageProcess.Convertor { return domainImageProcess.NewConvertor() })
+	initService(func(urlProvider domainImageUrl.Provider) domainImageProcessRunnerResult.Factory {
+		return domainImageProcessRunnerResult.NewFactory(urlProvider)
+	})
+	initService(func(
+		pathProvider domainImagePath.PathProvider,
+		pathGenerator domainImagePath.FilenameGenerator,
+	) domainImageProcessorFactory.Factory {
+		return domainImageProcessorFactory.NewProcessorFactory(pathProvider, pathGenerator)
+	})
 	initService(
 		func(pathProvider domainImagePath.PathProvider,
 			pathGenerator domainImagePath.FilenameGenerator,
 			urlProvider domainImageUrl.Provider,
 			processesModel imageModel.ImageProcesses,
-		) domainImageProcess.ProcessRunner {
-			return domainImageProcess.NewProcessRunner(pathProvider, pathGenerator, urlProvider, processesModel)
+			resultFactory domainImageProcessRunnerResult.Factory,
+		) domainImageProcessRunner.ProcessRunner {
+			return domainImageProcessRunner.NewCachedRunner(
+				domainImageProcessRunner.NewProcessRunner(pathProvider, pathGenerator, urlProvider, processesModel, resultFactory),
+				urlProvider,
+				processesModel,
+				resultFactory,
+			)
 		})
 	initService(func(model imageModel.Model, storage domainStorage.Storage) domainImageSaver.Saver {
 		return domainImageSaver.NewSaver(model, storage)
@@ -147,8 +165,8 @@ func initDomains(config config.Config) {
 
 func initResolvers() {
 	initService(func(saver domainImageSaver.Saver) upload.Resolver { return upload.NewUploadResolver(saver) })
-	initService(func(model imageModel.Model, gqlConvertor domainImageProcess.Convertor, runner domainImageProcess.ProcessRunner) domainImageProcess.Resolver {
-		return domainImageProcess.NewProcessResolver(model, gqlConvertor, runner)
+	initService(func(model imageModel.Model, gqlConvertor domainImageProcess.Convertor, runner domainImageProcessRunner.ProcessRunner, processorFactory domainImageProcessorFactory.Factory) domainImageProcess.Resolver {
+		return domainImageProcess.NewProcessResolver(model, gqlConvertor, runner, processorFactory)
 	})
 }
 

@@ -36,3 +36,8 @@ func (c compositeProcessor) GetHash() string {
 	}
 	return utils.GetMD5Hash(sb.String())
 }
+
+// GetPathPrefix implements Processor.
+func (c compositeProcessor) GetPathPrefix() string {
+	panic("Count not get path prefix for composite processor")
+}

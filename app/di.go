@@ -234,3 +234,12 @@ func initService(resolver interface{}) {
 		utils.F("Couldnt inititalize service: %v", err)
 	}
 }
+
+func InitModule(name string, resolvers ...interface{}) {
+	for _, resolver := range resolvers {
+		err := container.Singleton(resolver)
+		if err != nil {
+			utils.F("Couldnt inititalize service: %v of module %s", err, name)
+		}
+	}
+}

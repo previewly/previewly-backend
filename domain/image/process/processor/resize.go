@@ -8,27 +8,27 @@ import (
 
 	"wsw/backend/domain/image/path"
 	"wsw/backend/domain/image/process/options"
+
+	processPathProvider "wsw/backend/domain/image/process/path"
 	"wsw/backend/ent/types"
 
 	"github.com/h2non/bimg"
-	"github.com/xorcare/pointer"
 )
 
 type (
 	resizeProcessor struct {
-		pathProvider  path.PathProvider
-		pathGenerator path.FilenameGenerator
-		width         *int
-		height        *int
+		pathProvider processPathProvider.Provider
+		width        *int
+		height       *int
 	}
 )
 
 // GetHash implements Processor.
-func (r resizeProcessor) GetHash() string { return r.GetPathPrefix() }
+func (r resizeProcessor) GetHash() string { return r.getPathPrefix() }
 
 // Run implements Process.
 func (r resizeProcessor) Run(from path.PathData, filename string) (*path.PathData, error) {
-	to := r.generatePath(filename)
+	to := r.pathProvider.Get(r.getPathPrefix(), filename)
 	buffer, err := bimg.Read(from.FullPath)
 	if err != nil {
 		return nil, err
@@ -61,11 +61,6 @@ func (r resizeProcessor) Run(from path.PathData, filename string) (*path.PathDat
 	return to, nil
 }
 
-func (r resizeProcessor) generatePath(filename string) *path.PathData {
-	newPath := r.pathGenerator.GenerateFilepath(pointer.String(r.GetPathPrefix()))
-	return r.pathProvider.Provide(newPath, filename)
-}
-
 func (r resizeProcessor) getResizeHeight(ratio float64) int {
 	if r.height != nil {
 		return *r.height
@@ -80,7 +75,7 @@ func (r resizeProcessor) getResizeWidth(ratio float64) int {
 	return int(ratio * float64(*r.height))
 }
 
-func (r resizeProcessor) GetPathPrefix() string {
+func (r resizeProcessor) getPathPrefix() string {
 	var sb strings.Builder
 	sb.WriteString("resize/")
 	if r.width != nil {
@@ -95,12 +90,12 @@ func (r resizeProcessor) GetPathPrefix() string {
 }
 
 // NewResizeProcessor implements ProcessFactory.
-func NewResizeProcessor(pathProvider path.PathProvider, pathGenerator path.FilenameGenerator, opts []types.ImageProcessOption) (Processor, error) {
+func NewResizeProcessor(pathProvider processPathProvider.Provider, opts []types.ImageProcessOption) (Processor, error) {
 	width := options.ExtractIntOption(opts, "width")
 	height := options.ExtractIntOption(opts, "height")
 
 	if width != nil || height != nil {
-		return resizeProcessor{width: width, height: height, pathProvider: pathProvider, pathGenerator: pathGenerator}, nil
+		return resizeProcessor{width: width, height: height, pathProvider: pathProvider}, nil
 	}
 	return nil, errors.New("width or height should be provided")
 }

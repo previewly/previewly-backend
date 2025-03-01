@@ -14,19 +14,17 @@ import (
 type (
 	processRunnerImpl struct {
 		pathProvider   path.PathProvider
-		pathGenerator  path.FilenameGenerator
 		urlProvider    url.Provider
 		processesModel image.ImageProcesses
 		resultFactory  result.Factory
 	}
 )
 
-func NewProcessRunner(pathProvider path.PathProvider, pathGenerator path.FilenameGenerator, urlProvider url.Provider, processesModel image.ImageProcesses,
+func NewProcessRunner(pathProvider path.PathProvider, urlProvider url.Provider, processesModel image.ImageProcesses,
 	resultFactory result.Factory,
 ) ProcessRunner {
 	return processRunnerImpl{
 		pathProvider:   pathProvider,
-		pathGenerator:  pathGenerator,
 		urlProvider:    urlProvider,
 		processesModel: processesModel,
 		resultFactory:  resultFactory,

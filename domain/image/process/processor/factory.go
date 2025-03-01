@@ -3,7 +3,7 @@ package processor
 import (
 	"errors"
 
-	"wsw/backend/domain/image/path"
+	processPathProvider "wsw/backend/domain/image/process/path"
 	"wsw/backend/ent/types"
 )
 
@@ -13,8 +13,7 @@ type (
 	}
 
 	processorFactoryImpl struct {
-		pathProvider  path.PathProvider
-		pathGenerator path.FilenameGenerator
+		pathProvider processPathProvider.Provider
 	}
 )
 
@@ -33,11 +32,11 @@ func (p processorFactoryImpl) NewProcessor(processes []types.ImageProcess) (Proc
 
 func (p processorFactoryImpl) createProcessor(processType types.ImageProcessType, options []types.ImageProcessOption) (Processor, error) {
 	if processType == types.Resize {
-		return NewResizeProcessor(p.pathProvider, p.pathGenerator, options)
+		return NewResizeProcessor(p.pathProvider, options)
 	}
 	return nil, errors.New("process type not found")
 }
 
-func NewProcessorFactory(pathProvider path.PathProvider, pathGenerator path.FilenameGenerator) Factory {
-	return processorFactoryImpl{pathProvider: pathProvider, pathGenerator: pathGenerator}
+func NewProcessorFactory(pathProvider processPathProvider.Provider) Factory {
+	return processorFactoryImpl{pathProvider: pathProvider}
 }

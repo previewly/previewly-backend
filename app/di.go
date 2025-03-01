@@ -8,6 +8,7 @@ import (
 
 	"wsw/backend/app/config"
 	"wsw/backend/domain/gowitness"
+	"wsw/backend/domain/image"
 	"wsw/backend/domain/image/upload"
 	"wsw/backend/domain/path/screenshot/relative"
 	"wsw/backend/domain/token/generator"
@@ -19,12 +20,9 @@ import (
 	"wsw/backend/model/url"
 
 	domainImageSaver "wsw/backend/domain/image"
-	domainImagePath "wsw/backend/domain/image/path"
 	domainImageProcess "wsw/backend/domain/image/process"
 	domainImageProcessorFactory "wsw/backend/domain/image/process/processor"
 	domainImageProcessRunner "wsw/backend/domain/image/process/runner"
-	domainImageProcessRunnerResult "wsw/backend/domain/image/process/runner/result"
-	domainStorage "wsw/backend/domain/image/storage"
 	domainImageUrl "wsw/backend/domain/image/url"
 
 	imageModel "wsw/backend/model/image"
@@ -127,40 +125,7 @@ func initGoWitness(config config.Config) {
 }
 
 func initDomains(config config.Config) {
-	initService(func() domainImagePath.FilenameGenerator { return domainImagePath.NewFilenameProvider() })
-	initService(func() domainImagePath.PathProvider {
-		return domainImagePath.NewPathProvider(config.App.UploadPath)
-	})
-	initService(func(filenameGenerator domainImagePath.FilenameGenerator, pathProvider domainImagePath.PathProvider) domainStorage.Storage {
-		return domainStorage.NewUploadStorage(filenameGenerator, pathProvider)
-	})
-	initService(func() domainImageProcess.Convertor { return domainImageProcess.NewConvertor() })
-	initService(func(urlProvider domainImageUrl.Provider) domainImageProcessRunnerResult.Factory {
-		return domainImageProcessRunnerResult.NewFactory(urlProvider)
-	})
-	initService(func(
-		pathProvider domainImagePath.PathProvider,
-		pathGenerator domainImagePath.FilenameGenerator,
-	) domainImageProcessorFactory.Factory {
-		return domainImageProcessorFactory.NewProcessorFactory(pathProvider, pathGenerator)
-	})
-	initService(
-		func(pathProvider domainImagePath.PathProvider,
-			pathGenerator domainImagePath.FilenameGenerator,
-			urlProvider domainImageUrl.Provider,
-			processesModel imageModel.ImageProcesses,
-			resultFactory domainImageProcessRunnerResult.Factory,
-		) domainImageProcessRunner.ProcessRunner {
-			return domainImageProcessRunner.NewCachedRunner(
-				domainImageProcessRunner.NewProcessRunner(pathProvider, pathGenerator, urlProvider, processesModel, resultFactory),
-				urlProvider,
-				processesModel,
-				resultFactory,
-			)
-		})
-	initService(func(model imageModel.Model, storage domainStorage.Storage) domainImageSaver.Saver {
-		return domainImageSaver.NewSaver(model, storage)
-	})
+	image.InitImageModuleDI(config)
 }
 
 func initResolvers() {
@@ -232,14 +197,5 @@ func initService(resolver interface{}) {
 	err := container.Singleton(resolver)
 	if err != nil {
 		utils.F("Couldnt inititalize service: %v", err)
-	}
-}
-
-func InitModule(name string, resolvers ...interface{}) {
-	for _, resolver := range resolvers {
-		err := container.Singleton(resolver)
-		if err != nil {
-			utils.F("Couldnt inititalize service: %v of module %s", err, name)
-		}
 	}
 }

@@ -24,7 +24,7 @@ type (
 )
 
 // GetHash implements Processor.
-func (r resizeProcessor) GetHash() string { return r.generatePathPrefix() }
+func (r resizeProcessor) GetHash() string { return r.GetPathPrefix() }
 
 // Run implements Process.
 func (r resizeProcessor) Run(from path.PathData, filename string) (*path.PathData, error) {
@@ -62,7 +62,7 @@ func (r resizeProcessor) Run(from path.PathData, filename string) (*path.PathDat
 }
 
 func (r resizeProcessor) generatePath(filename string) *path.PathData {
-	newPath := r.pathGenerator.GenerateFilepath(pointer.String(r.generatePathPrefix()))
+	newPath := r.pathGenerator.GenerateFilepath(pointer.String(r.GetPathPrefix()))
 	return r.pathProvider.Provide(newPath, filename)
 }
 
@@ -80,7 +80,7 @@ func (r resizeProcessor) getResizeWidth(ratio float64) int {
 	return int(ratio * float64(*r.height))
 }
 
-func (r resizeProcessor) generatePathPrefix() string {
+func (r resizeProcessor) GetPathPrefix() string {
 	var sb strings.Builder
 	sb.WriteString("resize/")
 	if r.width != nil {

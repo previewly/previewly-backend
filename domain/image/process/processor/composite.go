@@ -8,15 +8,14 @@ import (
 )
 
 type (
-	Processor interface {
-		Run(from path.PathData, filename string) (*path.PathData, error)
-		GetHash() string
-	}
-
 	compositeProcessor struct {
 		processors []Processor
 	}
 )
+
+func NewCompositeProcessor(processors []Processor) Processor {
+	return compositeProcessor{processors: processors}
+}
 
 // Run implements Processor.
 func (c compositeProcessor) Run(from path.PathData, filename string) (*path.PathData, error) {

@@ -11,6 +11,7 @@ import (
 	"wsw/backend/ent/types"
 
 	"github.com/h2non/bimg"
+	"github.com/xorcare/pointer"
 )
 
 type (
@@ -23,11 +24,11 @@ type (
 )
 
 // GetHash implements Processor.
-func (r resizeProcessor) GetHash() string { return r.GeneratePathPrefix() }
+func (r resizeProcessor) GetHash() string { return r.generatePathPrefix() }
 
 // Run implements Process.
 func (r resizeProcessor) Run(from path.PathData, filename string) (*path.PathData, error) {
-	to := r.generatePath(from, filename)
+	to := r.generatePath(filename)
 	buffer, err := bimg.Read(from.FullPath)
 	if err != nil {
 		return nil, err
@@ -60,9 +61,8 @@ func (r resizeProcessor) Run(from path.PathData, filename string) (*path.PathDat
 	return to, nil
 }
 
-func (r resizeProcessor) generatePath(from path.PathData, filename string) *path.PathData {
-	prefix := r.GeneratePathPrefix()
-	newPath := r.pathGenerator.GenerateFilepath(&prefix)
+func (r resizeProcessor) generatePath(filename string) *path.PathData {
+	newPath := r.pathGenerator.GenerateFilepath(pointer.String(r.generatePathPrefix()))
 	return r.pathProvider.Provide(newPath, filename)
 }
 
@@ -80,7 +80,7 @@ func (r resizeProcessor) getResizeWidth(ratio float64) int {
 	return int(ratio * float64(*r.height))
 }
 
-func (r resizeProcessor) GeneratePathPrefix() string {
+func (r resizeProcessor) generatePathPrefix() string {
 	var sb strings.Builder
 	sb.WriteString("resize/")
 	if r.width != nil {
@@ -94,8 +94,8 @@ func (r resizeProcessor) GeneratePathPrefix() string {
 	return sb.String()
 }
 
-// newResizeProcessor implements ProcessFactory.
-func newResizeProcessor(pathProvider path.PathProvider, pathGenerator path.FilenameGenerator, opts []types.ImageProcessOption) (Processor, error) {
+// NewResizeProcessor implements ProcessFactory.
+func NewResizeProcessor(pathProvider path.PathProvider, pathGenerator path.FilenameGenerator, opts []types.ImageProcessOption) (Processor, error) {
 	width := options.ExtractIntOption(opts, "width")
 	height := options.ExtractIntOption(opts, "height")
 

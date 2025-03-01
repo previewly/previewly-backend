@@ -20,20 +20,20 @@ type (
 
 // NewProcessor implements ProcessorFactory.
 func (p processorFactoryImpl) NewProcessor(processes []types.ImageProcess) (Processor, error) {
-	processList := make([]Processor, 0, len(processes))
+	processors := make([]Processor, 0, len(processes))
 	for _, processInput := range processes {
 		process, err := p.createProcessor(processInput.Type, processInput.Options)
 		if err != nil {
 			return nil, err
 		}
-		processList = append(processList, process)
+		processors = append(processors, process)
 	}
-	return compositeProcessor{processors: processList}, nil
+	return NewCompositeProcessor(processors), nil
 }
 
 func (p processorFactoryImpl) createProcessor(processType types.ImageProcessType, options []types.ImageProcessOption) (Processor, error) {
 	if processType == types.Resize {
-		return newResizeProcessor(p.pathProvider, p.pathGenerator, options)
+		return NewResizeProcessor(p.pathProvider, p.pathGenerator, options)
 	}
 	return nil, errors.New("process type not found")
 }

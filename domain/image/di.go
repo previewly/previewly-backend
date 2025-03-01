@@ -15,24 +15,16 @@ import (
 )
 
 func InitImageModuleDI(config config.Config) {
+	filenameGenerator := path.NewFilenameProvider()
+	pathProvider := path.NewPathProvider(config.App.UploadPath)
+	storage := storage.NewUploadStorage(filenameGenerator, pathProvider)
+	processPathProvider := processPathProvider.NewProvider(pathProvider, filenameGenerator)
+
 	di.InitModule("image",
-
-		func() path.FilenameGenerator { return path.NewFilenameProvider() },
-		func() path.PathProvider { return path.NewPathProvider(config.App.UploadPath) },
-
-		func(filenameGenerator path.FilenameGenerator, pathProvider path.PathProvider) storage.Storage {
-			return storage.NewUploadStorage(filenameGenerator, pathProvider)
-		},
-		func(pathProvider path.PathProvider, pathGenerator path.FilenameGenerator) processPathProvider.Provider {
-			return processPathProvider.NewProvider(pathProvider, pathGenerator)
-		},
-		func(pathProvider processPathProvider.Provider) processor.Factory {
-			return processor.NewProcessorFactory(pathProvider)
-		},
 		func() process.Convertor { return process.NewConvertor() },
+		func() processor.Factory { return processor.NewProcessorFactory(processPathProvider) },
 		func(urlProvider url.Provider) result.Factory { return result.NewFactory(urlProvider) },
-		func(pathProvider path.PathProvider,
-			urlProvider url.Provider,
+		func(urlProvider url.Provider,
 			processesModel imageModel.ImageProcesses,
 			resultFactory result.Factory,
 		) runner.ProcessRunner {
@@ -43,8 +35,6 @@ func InitImageModuleDI(config config.Config) {
 				resultFactory,
 			)
 		},
-		func(model imageModel.Model, storage storage.Storage) Saver {
-			return NewSaver(model, storage)
-		},
+		func(model imageModel.Model) Saver { return NewSaver(model, storage) },
 	)
 }

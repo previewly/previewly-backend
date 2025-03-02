@@ -21,7 +21,6 @@ func NewCompositeProcessor(processors []Processor) Processor {
 func (c compositeProcessor) Run(from path.PathData, filename string) (*path.PathData, error) {
 	for _, process := range c.processors {
 		to, err := process.Run(from, filename)
-		utils.D(err)
 		if err != nil {
 			return nil, err
 		}

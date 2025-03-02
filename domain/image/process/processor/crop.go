@@ -11,7 +11,6 @@ import (
 	processPathProvider "wsw/backend/domain/image/process/path"
 	"wsw/backend/domain/image/process/processor/sizes"
 	"wsw/backend/ent/types"
-	"wsw/backend/lib/utils"
 
 	"github.com/h2non/bimg"
 )
@@ -47,8 +46,6 @@ func (c cropProcessor) Run(from path.PathData, filename string) (*path.PathData,
 	cropHeight := newSizes.Height
 	x := (size.Width - cropWidth) / 2
 	y := (size.Height - cropHeight) / 2
-
-	utils.D(x, y, cropWidth, cropHeight, size)
 
 	newImage, err := bimgNewImage.Extract(y, x, cropWidth, cropHeight)
 	if err != nil {

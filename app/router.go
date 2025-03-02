@@ -7,7 +7,6 @@ import (
 
 	"wsw/backend/graph"
 	"wsw/backend/lib/rest"
-	"wsw/backend/lib/utils"
 	"wsw/backend/resolvers/token"
 	"wsw/backend/resolvers/url"
 
@@ -53,7 +52,6 @@ func newRouter(midlewares Middlewares) *chi.Mux {
 		if err != nil {
 			return nil, err
 		}
-		utils.D(urlValue)
 		return url.ResolveGetPreview(chi.URLParam(r, "token"), urlValue)
 	}))
 

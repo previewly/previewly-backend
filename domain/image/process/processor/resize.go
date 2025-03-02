@@ -8,6 +8,7 @@ import (
 
 	"wsw/backend/domain/image/path"
 	"wsw/backend/domain/image/process/options"
+	"wsw/backend/domain/image/process/processor/sizes"
 
 	processPathProvider "wsw/backend/domain/image/process/path"
 	"wsw/backend/ent/types"
@@ -30,20 +31,21 @@ func (r resizeProcessor) GetHash() string { return r.getPathPrefix() }
 // Run implements Process.
 func (r resizeProcessor) Run(from path.PathData, filename string) (*path.PathData, error) {
 	to := r.pathProvider.Get(r.getPathPrefix(), filename)
+
 	buffer, err := bimg.Read(from.FullPath)
 	if err != nil {
 		return nil, err
 	}
+	bimgNewImage := bimg.NewImage(buffer)
 
-	ratio, err := r.getRatio(buffer)
+	size, err := bimgNewImage.Size()
 	if err != nil {
 		return nil, err
 	}
 
-	resizeWidth := r.getResizeWidth(*ratio)
-	resizeHeight := r.getResizeHeight(*ratio)
+	newSizes := sizes.GetNewSizesByRatio(size, r.width, r.height)
 
-	newImage, err := bimg.NewImage(buffer).Resize(resizeWidth, resizeHeight)
+	newImage, err := bimgNewImage.Resize(newSizes.Width, newSizes.Height)
 	if err != nil {
 		return nil, err
 	}

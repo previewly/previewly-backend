@@ -35,6 +35,7 @@ func (u imageRepositoryImpl) CreateProcess(imageEntity *ent.Image, imageProcesse
 		AddImageprocess(process).
 		Save(u.ctx)
 	if errUpdated != nil {
+		process.Update().SetError(errUpdated.Error()).Save(u.ctx)
 		return nil, errUpdated
 	}
 	return process, nil

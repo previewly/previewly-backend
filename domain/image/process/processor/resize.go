@@ -13,6 +13,7 @@ import (
 	"wsw/backend/ent/types"
 
 	"github.com/h2non/bimg"
+	"github.com/xorcare/pointer"
 )
 
 type (
@@ -34,14 +35,13 @@ func (r resizeProcessor) Run(from path.PathData, filename string) (*path.PathDat
 		return nil, err
 	}
 
-	size, err := bimg.NewImage(buffer).Size()
+	ratio, err := r.getRatio(buffer)
 	if err != nil {
 		return nil, err
 	}
-	ratio := float64(size.Width) / float64(size.Height)
 
-	resizeWidth := r.getResizeWidth(ratio)
-	resizeHeight := r.getResizeHeight(ratio)
+	resizeWidth := r.getResizeWidth(*ratio)
+	resizeHeight := r.getResizeHeight(*ratio)
 
 	newImage, err := bimg.NewImage(buffer).Resize(resizeWidth, resizeHeight)
 	if err != nil {
@@ -61,18 +61,26 @@ func (r resizeProcessor) Run(from path.PathData, filename string) (*path.PathDat
 	return to, nil
 }
 
-func (r resizeProcessor) getResizeHeight(ratio float64) int {
+func (r resizeProcessor) getRatio(buffer []byte) (*float32, error) {
+	size, err := bimg.NewImage(buffer).Size()
+	if err != nil {
+		return nil, err
+	}
+	return pointer.Float32(float32(size.Width) / float32(size.Height)), nil
+}
+
+func (r resizeProcessor) getResizeHeight(ratio float32) int {
 	if r.height != nil {
 		return *r.height
 	}
-	return int(ratio * float64(*r.width))
+	return int(ratio * float32(*r.width))
 }
 
-func (r resizeProcessor) getResizeWidth(ratio float64) int {
+func (r resizeProcessor) getResizeWidth(ratio float32) int {
 	if r.width != nil {
 		return *r.width
 	}
-	return int(ratio * float64(*r.height))
+	return int(ratio * float32(*r.height))
 }
 
 func (r resizeProcessor) getPathPrefix() string {

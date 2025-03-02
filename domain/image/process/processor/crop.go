@@ -9,10 +9,11 @@ import (
 	"wsw/backend/domain/image/path"
 	"wsw/backend/domain/image/process/options"
 	processPathProvider "wsw/backend/domain/image/process/path"
+	"wsw/backend/domain/image/process/processor/sizes"
 	"wsw/backend/ent/types"
+	"wsw/backend/lib/utils"
 
 	"github.com/h2non/bimg"
-	"github.com/xorcare/pointer"
 )
 
 type (
@@ -34,21 +35,22 @@ func (c cropProcessor) Run(from path.PathData, filename string) (*path.PathData,
 	if err != nil {
 		return nil, err
 	}
+	bimgNewImage := bimg.NewImage(buffer)
 
-	size, err := bimg.NewImage(buffer).Size()
+	size, err := bimgNewImage.Size()
 	if err != nil {
 		return nil, err
 	}
 
-	ratio := pointer.Float32(float32(size.Width) / float32(size.Height))
-
-	cropWidth := c.getResizeWidth(*ratio)
-	cropHeight := c.getResizeHeight(*ratio)
-
+	newSizes := sizes.GetNewSizesByRatio(size, c.width, c.height)
+	cropWidth := newSizes.Width
+	cropHeight := newSizes.Height
 	x := (size.Width - cropWidth) / 2
 	y := (size.Height - cropHeight) / 2
 
-	newImage, err := bimg.NewImage(buffer).Extract(y, x, cropWidth, cropHeight)
+	utils.D(x, y, cropWidth, cropHeight, size)
+
+	newImage, err := bimgNewImage.Extract(y, x, cropWidth, cropHeight)
 	if err != nil {
 		return nil, err
 	}

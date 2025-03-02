@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.16.0](https://github.com/previewly/previewly-backend/compare/v1.15.4...v1.16.0) (2025-03-02)
+
+
+### Features
+
+* add image crop centered ([d865024](https://github.com/previewly/previewly-backend/commit/d8650248f929379d720bc96180e18ba308ae0ba7))
+* add InitModule function to DI ([a7f5dba](https://github.com/previewly/previewly-backend/commit/a7f5dbae0ba3fed1efc94a7e7cac3a319f7f9ede))
+
+
+### Bug Fixes
+
+* fix calculation of image sizes ([f1f5652](https://github.com/previewly/previewly-backend/commit/f1f5652f6073acbf28da59f98a0ca41394ccd964))
+* saving error message to image process ([5d92836](https://github.com/previewly/previewly-backend/commit/5d92836ce1e732739e47629ce3deb8da22738e37))
+
 ## [1.15.4](https://github.com/previewly/previewly-backend/compare/v1.15.3...v1.15.4) (2025-02-24)
 
 

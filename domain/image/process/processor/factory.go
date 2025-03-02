@@ -34,6 +34,9 @@ func (p processorFactoryImpl) createProcessor(processType types.ImageProcessType
 	if processType == types.Resize {
 		return NewResizeProcessor(p.pathProvider, options)
 	}
+	if processType == types.Crop {
+		return NewCropProcessor(p.pathProvider, options)
+	}
 	return nil, errors.New("process type not found")
 }
 

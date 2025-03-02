@@ -75,15 +75,17 @@ type ImageProcessType string
 
 const (
 	ImageProcessTypeResize ImageProcessType = "resize"
+	ImageProcessTypeCrop   ImageProcessType = "crop"
 )
 
 var AllImageProcessType = []ImageProcessType{
 	ImageProcessTypeResize,
+	ImageProcessTypeCrop,
 }
 
 func (e ImageProcessType) IsValid() bool {
 	switch e {
-	case ImageProcessTypeResize:
+	case ImageProcessTypeResize, ImageProcessTypeCrop:
 		return true
 	}
 	return false

@@ -14,6 +14,7 @@ type (
 
 const (
 	Resize ImageProcessType = "resize"
+	Crop   ImageProcessType = "crop"
 )
 
 // Values provides list valid values for Enum.

@@ -26,6 +26,7 @@ enum Status {
 }
 enum ImageProcessType {
   resize
+  crop
 }
 
 type PreviewData {

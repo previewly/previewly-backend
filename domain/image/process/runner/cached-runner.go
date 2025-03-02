@@ -32,7 +32,6 @@ func (c cachedRunnerImpl) Start(input input.Input, processor processor.Processor
 	if err != nil {
 		return nil, err
 	}
-
 	if processEntity != nil {
 		return c.resultFactory.New(input, processEntity)
 	} else {

@@ -42,12 +42,7 @@ func (c cropProcessor) Run(from path.PathData, filename string) (*path.PathData,
 	}
 
 	newSizes := sizes.GetNewSizesByRatio(size, c.width, c.height)
-	cropWidth := newSizes.Width
-	cropHeight := newSizes.Height
-	x := (size.Width - cropWidth) / 2
-	y := (size.Height - cropHeight) / 2
-
-	newImage, err := bimgNewImage.Extract(y, x, cropWidth, cropHeight)
+	newImage, err := bimgNewImage.Crop(newSizes.Width, newSizes.Height, bimg.GravityCentre)
 	if err != nil {
 		return nil, err
 	}

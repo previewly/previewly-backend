@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.2](https://github.com/previewly/previewly-backend/compare/v1.16.1...v1.16.2) (2025-03-03)
+
+
+### Bug Fixes
+
+* fix image crop ([b40b69b](https://github.com/previewly/previewly-backend/commit/b40b69b4fc797c0d4d9102a84849128c5494332b))
+
 ## [1.16.1](https://github.com/previewly/previewly-backend/compare/v1.16.0...v1.16.1) (2025-03-02)
 
 

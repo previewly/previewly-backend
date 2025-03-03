@@ -5,18 +5,18 @@ services:
       POSTGRES_USER: wsw
       POSTGRES_PASSWORD: wsw
       POSTGRES_DB: wsw
-    ports:
-      - 5434:5432
-  # app:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   container_name: previewly-backend
-  #   user: "1001:101"
-  #   command: /app/previewly-backend -db-host wswdb
-  #   ports:
-  #     - 8000:8000
-  #   volumes:
-  #     - "./data/screenshots/:/app/data/screenshots/"
-  #   depends_on:
-  #     - wswdb
+    # ports:
+    #   - 5434:5432
+    # app:
+    #   build:
+    #     context: .
+    #     dockerfile: Dockerfile
+    #   container_name: previewly-backend
+    #   user: "1001:101"
+    #   command: /app/previewly-backend -db-host wswdb
+    #   ports:
+    #     - 8000:8000
+    #   volumes:
+    #     - "./data/screenshots/:/app/data/screenshots/"
+    #   depends_on:
+    #     - wswdb

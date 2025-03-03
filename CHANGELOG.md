@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.3](https://github.com/previewly/previewly-backend/compare/v1.16.2...v1.16.3) (2025-03-03)
+
+
+### Bug Fixes
+
+* update port for docker db container ([278830e](https://github.com/previewly/previewly-backend/commit/278830e6a66cd322ee48d8adfb4f1bf141233cd0))
+
 ## [1.16.2](https://github.com/previewly/previewly-backend/compare/v1.16.1...v1.16.2) (2025-03-03)
 
 

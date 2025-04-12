@@ -193,7 +193,7 @@ func initLogger() {
 	initService(func() *slog.Logger { return slog.Default() })
 }
 
-func initService(resolver interface{}) {
+func initService(resolver any) {
 	err := container.Singleton(resolver)
 	if err != nil {
 		utils.F("Couldnt inititalize service: %v", err)

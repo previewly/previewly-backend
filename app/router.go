@@ -35,11 +35,11 @@ func newRouter(midlewares Middlewares) *chi.Mux {
 		panic("server panic")
 	})
 
-	router.Post("/json/create-token", rest.RESTHandle(func(w http.ResponseWriter, r *http.Request) (interface{}, error) {
+	router.Post("/json/create-token", rest.RESTHandle(func(w http.ResponseWriter, r *http.Request) (any, error) {
 		return token.ResolveCreateToken(r.Context())
 	}))
 
-	router.Post("/json/add-url/{url}/token/{token}/", rest.RESTHandle(func(w http.ResponseWriter, r *http.Request) (interface{}, error) {
+	router.Post("/json/add-url/{url}/token/{token}/", rest.RESTHandle(func(w http.ResponseWriter, r *http.Request) (any, error) {
 		urlValue, err := netUrl.QueryUnescape(chi.URLParam(r, "url"))
 		if err != nil {
 			return nil, err
@@ -47,7 +47,7 @@ func newRouter(midlewares Middlewares) *chi.Mux {
 		return url.ResolveAddURL(chi.URLParam(r, "token"), urlValue)
 	}))
 
-	router.Get("/json/get-preview/token/{token}/", rest.RESTHandle(func(w http.ResponseWriter, r *http.Request) (interface{}, error) {
+	router.Get("/json/get-preview/token/{token}/", rest.RESTHandle(func(w http.ResponseWriter, r *http.Request) (any, error) {
 		urlValue, err := netUrl.QueryUnescape(r.URL.Query().Get("url"))
 		if err != nil {
 			return nil, err
@@ -72,7 +72,7 @@ func createGQLServer(schema graphql.ExecutableSchema) *handler.Server {
 	srv.AddTransport(transport.MultipartForm{})
 	srv.SetQueryCache(lru.New[*ast.QueryDocument](1000))
 
-	srv.SetRecoverFunc(func(ctx context.Context, err interface{}) error {
+	srv.SetRecoverFunc(func(ctx context.Context, err any) error {
 		return gqlerror.Errorf("Internal server error!")
 	})
 

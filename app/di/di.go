@@ -6,7 +6,7 @@ import (
 	"github.com/golobby/container/v3"
 )
 
-func InitModule(name string, resolvers ...interface{}) {
+func InitModule(name string, resolvers ...any) {
 	for _, resolver := range resolvers {
 		err := container.Singleton(resolver)
 		if err != nil {

@@ -6,7 +6,7 @@ import (
 	"github.com/go-chi/render"
 )
 
-type ResolveHandlerFunc func(http.ResponseWriter, *http.Request) (interface{}, error)
+type ResolveHandlerFunc func(http.ResponseWriter, *http.Request) (any, error)
 
 func RESTHandle(resolveFunc ResolveHandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

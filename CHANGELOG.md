@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.4](https://github.com/previewly/previewly-backend/compare/v1.16.3...v1.16.4) (2025-04-12)
+
+
+### Bug Fixes
+
+* small fixes ([ddc8817](https://github.com/previewly/previewly-backend/commit/ddc881739619ab840f74cf06d23f0a395c296c8b))
+
 ## [1.16.3](https://github.com/previewly/previewly-backend/compare/v1.16.2...v1.16.3) (2025-03-03)
 
 
